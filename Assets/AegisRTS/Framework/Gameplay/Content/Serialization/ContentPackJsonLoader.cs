@@ -97,7 +97,8 @@ namespace AegisRTS.Gameplay.Content.Serialization
             {
                 settlements.Add(new SettlementDefinition(
                     Id(item.Id), item.DisplayName, item.MaxHealth, item.PrefabId,
-                    Ids(item.StartingResourceIds), Tags(item.Tags)));
+                    Ids(item.StartingResourceIds), Tags(item.Tags), item.InitialPopulation,
+                    item.MaxDefense, item.CaptureRule, item.CaptureConditions));
             }
 
             GameRuleSet rules = document.Rules == null
@@ -212,6 +213,10 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public double MaxHealth { get; set; }
         public string PrefabId { get; set; }
         public string[] StartingResourceIds { get; set; }
+        public double InitialPopulation { get; set; }
+        public double MaxDefense { get; set; }
+        public string CaptureRule { get; set; }
+        public string[] CaptureConditions { get; set; }
     }
 
     internal sealed class ResourceCostDocument

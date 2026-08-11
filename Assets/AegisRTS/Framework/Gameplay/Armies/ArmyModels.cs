@@ -101,6 +101,11 @@ namespace AegisRTS.Gameplay.Armies
         void SetArmy(EntityId unitId, EntityId armyId);
     }
 
+    public interface IArmySettlementTargetValidator
+    {
+        bool Validate(EntityId settlementId, EntityId attackerFactionId, out string error);
+    }
+
     public sealed class ArmyCreatedEvent : IEvent
     {
         public ArmyCreatedEvent(EntityId armyId, EntityId factionId, int unitCount)

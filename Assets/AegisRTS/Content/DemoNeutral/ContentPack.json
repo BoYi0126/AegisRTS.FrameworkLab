@@ -57,6 +57,10 @@
       "id": "neutral.keep",
       "displayName": "Debug Keep",
       "maxHealth": 2000,
+      "initialPopulation": 1000,
+      "maxDefense": 100,
+      "captureRule": "clear-defenders",
+      "captureConditions": [],
       "prefabId": "PF_Settlement_Placeholder",
       "startingResourceIds": ["neutral.supplies"],
       "tags": ["settlement"]

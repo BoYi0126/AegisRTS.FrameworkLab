@@ -4,10 +4,40 @@
 
 ## Current Status
 
-- Current Phase：Phase 06 Hero / Army / Command 完成；Unity EditMode 60/60、PlayMode 6/6 通過。
+- Current Phase：Phase 07 Faction / Settlement / Territory 完成；Unity EditMode 72/72、PlayMode 8/8 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 07 Faction / Settlement / Territory
+
+- Status：Completed
+- Goal：完成 Faction runtime state、Settlement ownership／capture、Territory graph／visibility／value，並驗收三座 settlement 變更 owner 後 Faction territory 自動更新。
+- Changed：
+  - 新增 `FactionSystem`、Faction profiles／snapshots、resources、technology、diplomacy、AI profile 與 ownership indices。
+  - 新增 `FactionArmyEventBridge`，從 Army create／split／merge events 維護 Faction army index。
+  - 新增 `TerritorySystem`、territory node／connection、owner、visibility、value 與 settlement mapping。
+  - 新增 `SettlementSystem`、settlement runtime state、五種 capture rules、`CaptureSettlementCommand` 與 router。
+  - 新增 `SettlementArmyTargetValidator`，補強 AttackSettlement 的 existence／ownership／diplomacy validation。
+  - `SettlementDefinition`、JSON loader／validator 與三個 Content Packs 新增 population、defense、capture rule／conditions。
+  - `Sandbox_Siege` 新增三座 settlement、三個 connected territory nodes、自動 capture acceptance 與 debug HUD。
+  - 新增 12 個 Phase 07 EditMode cases、2 個 PlayMode cases，更新 07、16、26 與本進度文件。
+- Architecture / API / Data：
+  - Settlement capture 是 ownership transaction entry；Settlement、Faction settlement index、Territory、Faction territory index 依序同步。
+  - Faction／Settlement／Territory 都是 Pure C#，Gameplay 保持 `noEngineReferences=true`；Sandbox 只負責 composition 與 visual。
+  - Capture conditions 由上游 Combat／Siege 系統提供 flags；capture rule 不依賴世界觀名稱。
+  - Army settlement target validation 經 interface 注入，不讓 ArmySystem 直接依賴 SettlementSystem concrete type。
+- Tests / Validation：
+  - Unity EditMode Test Runner：PASS，72/72 passed、0 failed；Phase 07 新增 12 cases。
+  - Unity PlayMode Test Runner：PASS，8/8 passed、0 failed；Phase 07 新增 2 Sandbox_Siege cases。
+  - 三 settlement ownership acceptance：PASS；Faction A 的 settlement／territory 清空，Faction B 自動取得三座 settlement 與三個 territory nodes。
+  - Capture rules、invalid command、Faction state、territory graph／visibility、settlement state、army bridge、AttackSettlement diplomacy validation：PASS。
+- Known Issues / Risks：
+  - Settlement resources／buildings／recruitment 尚未執行成本、時間或產出規則，待 Phase 08。
+  - Territory visibility 是明確設定的狀態，尚未串 Fog of War 探索／視野傳播。
+  - Capture completed conditions 尚未由實際 Siege objectives 產生，待 Phase 09。
+- Next：
+  - 進入 Phase 08 Economy / Recruit / Build / Tech，使用既有 Faction／Settlement runtime state 實作成本與生產流程。
 
 ## 2026-08-11 — Phase 06 Hero / Army / Command
 

@@ -26,6 +26,9 @@ namespace AegisRTS.Tests.EditMode
             Assert.That(pack.Buildings.Count, Is.EqualTo(1));
             Assert.That(pack.Technologies.Count, Is.EqualTo(1));
             Assert.That(pack.Settlements.Count, Is.EqualTo(1));
+            Assert.That(pack.Settlements[0].InitialPopulation, Is.GreaterThan(0));
+            Assert.That(pack.Settlements[0].MaxDefense, Is.GreaterThan(0));
+            Assert.That(pack.Settlements[0].CaptureRule, Is.Not.Empty);
             Assert.That(validation.IsValid, Is.True,
                 string.Join(System.Environment.NewLine, validation.Issues));
         }

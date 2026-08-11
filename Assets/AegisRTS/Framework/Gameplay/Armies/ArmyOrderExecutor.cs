@@ -82,4 +82,10 @@ namespace AegisRTS.Gameplay.Armies
     {
         public void SetArmy(EntityId unitId, EntityId armyId) { }
     }
+
+    internal sealed class AllowAllSettlementTargets : IArmySettlementTargetValidator
+    {
+        public bool Validate(EntityId settlementId, EntityId attackerFactionId, out string error)
+        { error = string.Empty; return true; }
+    }
 }

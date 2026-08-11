@@ -74,6 +74,22 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void Validate_DetectsInvalidSettlementCaptureConfiguration()
+        {
+            PackParts parts = ContentPackTestFactory.CreateValidParts();
+            parts.Settlements.Clear();
+            parts.Settlements.Add(new SettlementDefinition(
+                new DefinitionId("test.bad-settlement"), "Bad Settlement", 1000d, "PF_Settlement_Placeholder",
+                Array.Empty<DefinitionId>(), ContentPackTestFactory.Tags("settlement"),
+                initialPopulation: 100d, maxDefense: 50d, captureRule: "mixed"));
+
+            ContentValidationResult result = _validator.Validate(parts.Build(), ContentPackTestFactory.Assets);
+
+            Assert.That(result.Issues.Any(issue =>
+                issue.Code == ContentValidationIssueCode.InvalidStat && issue.Message.Contains("Mixed capture")), Is.True);
+        }
+
+        [Test]
         public void Validate_DetectsTechnologyCycle()
         {
             PackParts parts = ContentPackTestFactory.CreateValidParts();

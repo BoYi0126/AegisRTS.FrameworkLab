@@ -17,15 +17,18 @@ namespace AegisRTS.Gameplay.Armies
         private readonly ArmyRuleOptions _rules;
         private readonly IArmyOrderExecutor _orders;
         private readonly IArmyMembershipSink _membershipSink;
+        private readonly IArmySettlementTargetValidator _settlementTargets;
         private readonly EventBus _events;
 
         public ArmySystem(HeroSystem heroes, ArmyRuleOptions rules = null, IArmyOrderExecutor orderExecutor = null,
-            IArmyMembershipSink membershipSink = null, EventBus eventBus = null)
+            IArmyMembershipSink membershipSink = null, EventBus eventBus = null,
+            IArmySettlementTargetValidator settlementTargetValidator = null)
         {
             _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _rules = rules ?? new ArmyRuleOptions(false, false);
             _orders = orderExecutor ?? new StateOnlyArmyOrderExecutor();
             _membershipSink = membershipSink ?? new NullArmyMembershipSink();
+            _settlementTargets = settlementTargetValidator ?? new AllowAllSettlementTargets();
             _events = eventBus;
         }
 
@@ -157,6 +160,16 @@ namespace AegisRTS.Gameplay.Armies
                 : ArmyCommandResult.Failure("Army does not exist or has no units.");
         }
 
+        public ArmyCommandResult Validate(AttackSettlementArmyCommand command)
+        {
+            ArmyCommandResult validation = Validate((ArmyOrderCommand)command);
+            if (!validation.Succeeded) return validation;
+            ArmyRecord army = _armies[command.ArmyId];
+            return _settlementTargets.Validate(command.SettlementId, army.FactionId, out string error)
+                ? validation
+                : ArmyCommandResult.Failure(error);
+        }
+
         public ArmyCommandResult Execute(MoveArmyCommand command) => ExecuteOrder(command,
             army => new ArmyOrder(ArmyOrderType.Move, command.Destination, default, army.Formation),
             army => _orders.Move(army.UnitIds.AsReadOnly(), command.Destination, army.Formation));
@@ -219,7 +232,9 @@ namespace AegisRTS.Gameplay.Armies
         private ArmyCommandResult ExecuteOrder(ArmyOrderCommand command, Func<ArmyRecord, ArmyOrder> createOrder,
             Func<ArmyRecord, ArmyOrderExecutionResult> execute)
         {
-            ArmyCommandResult validation = Validate(command);
+            ArmyCommandResult validation = command is AttackSettlementArmyCommand attackSettlement
+                ? Validate(attackSettlement)
+                : Validate(command);
             if (!validation.Succeeded) return validation;
             ArmyRecord army = _armies[command.ArmyId];
             ArmyOrderExecutionResult execution = execute(army);

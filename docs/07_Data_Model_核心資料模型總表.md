@@ -89,3 +89,27 @@ Army
 - `HeroDefinition.Leadership` 是 world-neutral authoring stat；runtime 使用 `HeroProfile`。
 - `ArmySystem` 是 unit-to-army membership 的 authoritative owner，並透過 `IArmyMembershipSink` 同步需要顯示 ArmyId 的其他 runtime read model。
 - `ArmySnapshot.UnitIds` 為複製後的唯讀排序集合，外部無法修改軍團 composition。
+
+## Phase 07 Faction / Settlement / Territory Runtime Model
+
+```text
+Faction
+├─ Resources / Technologies / Diplomacy / AI Profile
+└─ SettlementIds / TerritoryIds / ArmyIds
+
+Settlement
+├─ Owner / Population / Garrison / Defense
+├─ Resources / Buildings / RecruitmentQueue
+└─ CaptureRule
+   └─ DefendersCleared / ZoneControlled / CoreDestroyed / CommanderKilled
+
+TerritoryNode
+├─ Owner / Value / SettlementId
+├─ Bidirectional Connections
+└─ Visibility by Faction
+```
+
+- Settlement 是 ownership change 的 transaction entry；成功 capture 同步更新 Faction settlement index 與 mapped Territory owner。
+- TerritorySystem 更新 Faction territory index，因此 Faction snapshot 不需要掃描全部 territory 才能顯示領土。
+- `SettlementDefinition` authoring data 包含 `initialPopulation`、`maxDefense`、`captureRule`、`captureConditions`；runtime mutable state 不回寫 definition。
+- Resources、building、technology 與 AI profile 只保存 stable content ID，不依賴 display name 或世界觀類別。

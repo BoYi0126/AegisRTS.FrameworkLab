@@ -57,6 +57,10 @@
       "id": "fantasy.arcane-fortress",
       "displayName": "Arcane Fortress",
       "maxHealth": 2400,
+      "initialPopulation": 1200,
+      "maxDefense": 140,
+      "captureRule": "destroy-core",
+      "captureConditions": [],
       "prefabId": "PF_Settlement_Placeholder",
       "startingResourceIds": ["fantasy.mana"],
       "tags": ["settlement", "magic"]

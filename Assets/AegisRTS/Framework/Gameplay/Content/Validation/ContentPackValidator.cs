@@ -95,6 +95,10 @@ namespace AegisRTS.Gameplay.Content.Validation
             foreach (SettlementDefinition definition in pack.Settlements.Where(item => item != null))
             {
                 ValidatePositiveStat(definition.Id, definition.MaxHealth, "Settlement max health", issues);
+                if (!IsFiniteNonNegative(definition.InitialPopulation))
+                    Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "Settlement population must be finite and non-negative.");
+                ValidatePositiveStat(definition.Id, definition.MaxDefense, "Settlement max defense", issues);
+                ValidateCaptureRule(definition, issues);
                 ValidatePrefab(definition.Id, definition.PrefabId, assets, issues);
                 ValidateReferences(definition.Id, definition.StartingResourceIds, resourceIds, "resource", issues);
             }
@@ -267,6 +271,21 @@ namespace AegisRTS.Gameplay.Content.Validation
 
         private static bool IsFiniteNonNegative(double value) =>
             !double.IsNaN(value) && !double.IsInfinity(value) && value >= 0d;
+
+        private static void ValidateCaptureRule(SettlementDefinition definition, ICollection<ContentValidationIssue> issues)
+        {
+            var knownRules = new HashSet<string>(StringComparer.Ordinal)
+            { "clear-defenders", "capture-zone", "destroy-core", "kill-commander", "mixed" };
+            var knownConditions = new HashSet<string>(StringComparer.Ordinal)
+            { "defenders-cleared", "zone-controlled", "core-destroyed", "commander-killed" };
+            if (!knownRules.Contains(definition.CaptureRule))
+                Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, $"Unknown capture rule '{definition.CaptureRule}'.");
+            foreach (string condition in definition.CaptureConditions)
+                if (!knownConditions.Contains(condition))
+                    Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, $"Unknown capture condition '{condition}'.");
+            if (definition.CaptureRule == "mixed" && definition.CaptureConditions.Count == 0)
+                Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "Mixed capture rule requires capture conditions.");
+        }
 
         private static void ValidateTechnologyCycles(
             IEnumerable<TechnologyDefinition> technologies,

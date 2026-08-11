@@ -281,3 +281,46 @@ commandBus.Dispatch(new AssignArmyCommanderCommand(armyId, replacementHeroId));
 - `ArmyCommandRouter`：為每種 command 同時註冊 validator 與 handler，Player／AI／Scenario／Test 共用相同 flow。
 - `IArmyOrderExecutor`：隔離 Army order state 與執行 backend；`GameplayArmyOrderExecutor` 接到既有 Movement／Combat。
 - Events：`ArmyCreatedEvent`、`ArmiesMergedEvent`、`ArmySplitEvent`、`ArmyCommanderAssignedEvent`、`ArmyOrderIssuedEvent`。
+
+## Phase 07 Faction / Settlement / Territory API
+
+```csharp
+var factions = new FactionSystem(events);
+factions.Register(factionA, new FactionProfile("faction.a", "ai.defend"));
+factions.Register(factionB, new FactionProfile("faction.b", "ai.attack"));
+factions.SetDiplomacy(factionA, factionB, DiplomacyStatus.War);
+
+var territories = new TerritorySystem(factions, events);
+territories.RegisterNode(territoryId,
+    new TerritoryNodeProfile("territory.border", value: 25, settlementId), factionA);
+
+var settlements = new SettlementSystem(factions, territories, events);
+settlements.Register(settlementId, SettlementProfile.FromDefinition(definition), factionA);
+
+using var router = new SettlementCommandRouter(commandBus, settlements);
+commandBus.Dispatch(new CaptureSettlementCommand(
+    settlementId,
+    factionB,
+    CaptureCondition.DefendersCleared,
+    capturingArmyId));
+```
+
+### Faction
+
+- `FactionSystem`／`IFactionQuery`：resources、technology、settlement／territory／army ownership indices、diplomacy 與 AI profile。
+- `SetDiplomacy` 對兩個 factions 對稱更新並發布 `DiplomacyChangedEvent`。
+- `FactionArmyEventBridge`：將 Army lifecycle events 投影到 Faction army index。
+
+### Settlement and capture
+
+- `SettlementSystem`／`ISettlementQuery`：owner、population、garrison、resources、buildings、recruitment、defense 與 capture state。
+- `CaptureRule`：支援 `ClearDefenders`、`CaptureZone`、`DestroyCore`、`KillCommander`、`Mixed`。
+- `CaptureSettlementCommand`：提供 completed condition flags 與 optional capturing army；validator 確認 rule、owner、faction 與 army ownership。
+- `SettlementCommandRouter`：在 mutation 前由 CommandBus validator 拒絕 incomplete capture。
+- Events：`SettlementOwnerChangedEvent`、`TerritoryOwnerChangedEvent`。
+
+### Territory and army validation
+
+- `TerritorySystem`／`ITerritoryQuery`：node／connection graph、owner、settlement mapping、visibility 與 value。
+- `Connect` 建立雙向 connection；snapshot connection IDs 依 EntityId 排序。
+- `SettlementArmyTargetValidator`：注入 `ArmySystem` 後，AttackSettlement 只接受存在、非己方、外交關係為 Hostile／War 的目標。

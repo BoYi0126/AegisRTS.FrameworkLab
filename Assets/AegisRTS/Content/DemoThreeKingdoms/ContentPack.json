@@ -57,6 +57,10 @@
       "id": "three-kingdoms.walled-city",
       "displayName": "Walled City",
       "maxHealth": 2600,
+      "initialPopulation": 1800,
+      "maxDefense": 160,
+      "captureRule": "clear-defenders",
+      "captureConditions": [],
       "prefabId": "PF_Settlement_Placeholder",
       "startingResourceIds": ["three-kingdoms.provisions"],
       "tags": ["settlement"]
