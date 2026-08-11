@@ -1,0 +1,38 @@
+{
+  "id": "scenario.siege.broken-gate",
+  "displayName": "The Broken Gate",
+  "gameMode": {
+    "id": "mode.siege",
+    "displayName": "Siege",
+    "type": "Siege",
+    "allowedSystems": ["army", "combat", "siege", "settlement", "ai"],
+    "rules": { "destructible-walls": true, "population": false }
+  },
+  "objectives": [
+    {
+      "id": "break-gate",
+      "displayName": "Destroy the city gate",
+      "type": "Destroy",
+      "factId": "structures.gates-destroyed",
+      "targetValue": 1
+    },
+    {
+      "id": "capture-core",
+      "displayName": "Capture the inner objective",
+      "type": "Capture",
+      "factId": "settlements.captured",
+      "targetValue": 1,
+      "initiallyActive": false
+    }
+  ],
+  "triggers": [
+    {
+      "id": "gate-opens-capture",
+      "condition": "ObjectiveCompleted",
+      "subjectId": "break-gate",
+      "actions": [
+        { "type": "ActivateObjective", "targetId": "capture-core" }
+      ]
+    }
+  ]
+}

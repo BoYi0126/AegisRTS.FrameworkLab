@@ -169,3 +169,27 @@ AiAgent
 - `AiProfileDefinition` 是 Content Pack authoring data，runtime 轉成驗證後的 `AiProfile`。
 - `AiActionResult.MadeProgress` 驅動 deadlock detection；超過 threshold 後 Recover 取得最高 utility。
 - `AiStrategicMapAnalyzer` 從 Settlement／Territory query 選擇高價值敵方目標並輸出 deterministic route。
+
+## Phase 11 GameMode / Scenario / Objective Runtime Model
+
+```text
+ScenarioDefinition
+├─ GameModeDefinition
+│  └─ Type / Rules / AllowedSystems / VictoryPolicy / DefeatPolicy
+├─ StartSetup Actions
+├─ ObjectiveDefinitions
+│  └─ Type / Fact / Target / HoldDuration / FailureFact / Optional
+└─ TriggerDefinitions
+   └─ Condition → Actions
+
+Scenario Runtime
+├─ Status / ElapsedSeconds / Facts
+├─ Objective Status / Value / HeldSeconds
+└─ Fired Trigger IDs
+```
+
+- Definition 是 immutable JSON authoring data；facts、objective progress、trigger history 與勝敗只存在 runtime。
+- `ScenarioSystem` 不擁有 Combat／Economy／Siege state；composition layer 將既有 events／queries 投影成 stable fact IDs。
+- continuous Hold 在 fact 不再符合 target 時將 `HeldSeconds` 歸零；Protect 等目標可用 failure fact 轉成 Failed／Defeat。
+- `EmitSignal` action 只發布具名 event，讓 composition adapter 執行 start setup 或劇本演出，不讓核心引用 Unity object。
+- Snapshot 複製 objectives 與 facts 為唯讀集合，可供 Phase 12 UI 與 Phase 13 Save／Replay／Debug 使用。

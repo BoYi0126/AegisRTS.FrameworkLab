@@ -4,10 +4,41 @@
 
 ## Current Status
 
-- Current Phase：Phase 10 AI 完成；Unity EditMode 106/106、PlayMode 13/13 通過。
+- Current Phase：Phase 11 GameMode／Scenario／Objective 完成；Unity EditMode 117/117、PlayMode 14/14 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 11 GameMode / Scenario / Objective
+
+- Status：Completed
+- Goal：建立資料驅動 GameMode、Scenario、Objective、Trigger／Action 與勝敗流程，驗收不修改 C# 即可用資料完成至少四種不同關卡。
+- Changed：
+  - 新增 `GameModeDefinition`、`ScenarioDefinition`、`ObjectiveDefinition`、`TriggerDefinition`、`ScenarioActionDefinition` 與 immutable runtime snapshots。
+  - 新增 `ScenarioSystem`，管理 facts、elapsed time、objective lifecycle、continuous hold、failure、trigger/action cascade 與 Victory／Defeat。
+  - 完整宣告八種 default GameMode 與十種 Objective type。
+  - 新增 `ScenarioJsonLoader`，支援 data validation、enum normalization 與 cross-reference validation。
+  - 新增 Start／SetFact／AddFact commands 與 `ScenarioCommandRouter`，Player／AI／Scenario／Test 共用 CommandBus flow。
+  - 新增 scenario lifecycle／objective／action events；`EmitSignal` 提供 start setup、劇情與 Gameplay command composition hook。
+  - 新增 Conquest、Siege、Defense、Survival 四份 JSON 關卡，不含任何關卡專屬 C#。
+  - `Sandbox_AI` 加入 `ScenarioSandboxBootstrap` 與四個 TextAsset references，以 generic driver 完成四種 modes。
+  - 新增 11 個 EditMode cases、1 個 PlayMode case，更新 07、20、26 與本進度文件。
+- Architecture / API / Data：
+  - Scenario core 只擁有流程 facts 與 objective truth；Combat／Economy／Siege／Settlement 等仍是各自 authoritative owner。
+  - Game-specific events 由 composition adapter 轉成 stable fact ID；scenario actions 以 event／CommandBus 邊界驅動外部系統。
+  - GameMode allowed systems 是 composition gate；核心不直接引用或停用具體 gameplay service。
+  - JSON definition 與 runtime state 分離；snapshot 可直接供後續 Objective UI、Save／Replay 與 debug tools。
+- Tests / Validation：
+  - Unity EditMode Test Runner：PASS，117/117 passed、0 failed；Phase 11 新增 11 cases。
+  - Unity PlayMode Test Runner：PASS，14/14 passed、0 failed；Phase 11 新增 1 Sandbox case。
+  - 四 JSON 載入與 generic completion、Siege trigger chain、Defense hold reset／defeat、Survival timer、CommandBus／events：PASS。
+  - JSON syntax、`git diff --check`、Gameplay UnityEngine reference scan：PASS。
+- Known Issues / Risks：
+  - 尚未提供 Scenario custom editor、graph view 或 JSON schema autocomplete；目前由 loader 與 tests 驗證資料。
+  - 核心一次管理一個 active scenario；campaign graph、parallel scenario instances 與 checkpoint 尚未實作。
+  - 外部 Gameplay event 到 fact ID 的 mapping 由 composition layer 定義；正式 vertical slice 仍需建立 production mappings。
+- Next：
+  - 進入 Phase 12 UI／UX，使用 ScenarioSnapshot／events 實作 Objective panel、Victory／Defeat 與 notification presentation。
 
 ## 2026-08-11 — Phase 10 AI
 

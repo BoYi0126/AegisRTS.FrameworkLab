@@ -1,0 +1,24 @@
+{
+  "id": "scenario.conquest.frontier",
+  "displayName": "Frontier Conquest",
+  "gameMode": {
+    "id": "mode.conquest",
+    "displayName": "Conquest",
+    "type": "Conquest",
+    "allowedSystems": ["economy", "recruitment", "army", "combat", "territory", "settlement", "ai"],
+    "rules": { "fog-of-war": true, "population": true, "destructible-walls": false }
+  },
+  "startSetup": [
+    { "type": "SetFact", "targetId": "settlements.captured", "value": 0 },
+    { "type": "EmitSignal", "targetId": "setup.frontier-conquest" }
+  ],
+  "objectives": [
+    {
+      "id": "capture-frontier",
+      "displayName": "Capture the frontier settlement",
+      "type": "Capture",
+      "factId": "settlements.captured",
+      "targetValue": 1
+    }
+  ]
+}

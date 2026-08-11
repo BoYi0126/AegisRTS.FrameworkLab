@@ -433,6 +433,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1700000002}
   - component: {fileID: 1700000003}
+  - component: {fileID: 1700000004}
   m_Layer: 0
   m_Name: AiSandboxBootstrap
   m_TagString: Untagged
@@ -467,6 +468,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e701f640bed34bb4a27280ced36c3651, type: 3}
   m_Name:
   m_EditorClassIdentifier:
+--- !u!114 &1700000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f830c37c108b4e5cae4684b7bcac43f5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  scenarioAssets:
+  - {fileID: 4900000, guid: 189d7d79555742658e53b111f7f7895c, type: 3}
+  - {fileID: 4900000, guid: 1f565aff8997436b9d38b47cd7fc5857, type: 3}
+  - {fileID: 4900000, guid: 9e90114164674a518f8e94ddb6fd99f8, type: 3}
+  - {fileID: 4900000, guid: e4c40893aa00409ba2a4be3d7cdbd9c0, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

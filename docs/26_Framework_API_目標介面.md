@@ -414,3 +414,29 @@ if (ai.TryGetState(factionId, out AiAgentSnapshot state))
 - `AiProfileDefinition`／`AiProfile`：aggression、defense／economy bias、risk、siege preference、decision interval、desired army size。
 - `AiDecisionMadeEvent`：提供 goal、layer、action、score 與 made-progress 給 Debug UI、telemetry 或 replay diagnostics。
 - 連續未進展達 `MaximumStalledDecisions` 時選擇 Recover；Wait 可表達正在等待 recruitment／production，不需 busy loop。
+
+## Phase 11 GameMode / Scenario / Objective API
+
+```csharp
+ScenarioDefinition definition = new ScenarioJsonLoader().Load(jsonText);
+var scenarios = new ScenarioSystem(events);
+using var router = new ScenarioCommandRouter(commandBus, scenarios);
+
+commandBus.Dispatch(new StartScenarioCommand(definition));
+commandBus.Dispatch(new AddScenarioFactCommand("settlements.captured", 1));
+scenarios.Update(deltaSeconds);
+
+if (scenarios.TryGetSnapshot(out ScenarioSnapshot state))
+{
+    // state.Status / ElapsedSeconds / Objectives / Facts
+}
+```
+
+- `GameModeDefinition`：mode、rules、allowed systems、required-objective victory 與 failure defeat policy。
+- `ScenarioDefinition`：start setup、objectives、triggers 與 actions 的 immutable authoring root。
+- `ScenarioJsonLoader.Load`：JSON 轉 definition，拒絕未知 enum、重複 ID、未知 objective reference 與無 target 的 fact／signal action。
+- `ScenarioSystem.Start／Update／SetFact／AddFact`：單一 active scenario runtime；trigger/action cascade 有 deterministic order 與 safety limit。
+- `ScenarioCommandRouter`：StartScenario／SetScenarioFact／AddScenarioFact 共用 CommandBus validation／handler flow。
+- `IsSystemAllowed`：composition root 查詢 GameMode 是否允許指定 system ID。
+- Events：`ScenarioStartedEvent`、`ObjectiveStatusChangedEvent`、`ScenarioActionExecutedEvent`、`ScenarioCompletedEvent`。
+- `ScenarioActionType.EmitSignal`：把 data-authored setup／劇情 hook 交給外部 adapter；adapter 再派送既有 Gameplay commands。

@@ -1,0 +1,32 @@
+{
+  "id": "scenario.survival.ten-seconds",
+  "displayName": "Ten Second Survival",
+  "gameMode": {
+    "id": "mode.survival",
+    "displayName": "Survival",
+    "type": "Survival",
+    "allowedSystems": ["army", "combat", "recruitment", "ai"],
+    "rules": { "population": false, "hero-permanent-death": false }
+  },
+  "objectives": [
+    {
+      "id": "survive-wave",
+      "displayName": "Survive for ten seconds",
+      "type": "Survive",
+      "factId": "scenario.elapsed-seconds",
+      "targetValue": 10,
+      "failureFactId": "heroes.player-defeated",
+      "failureThreshold": 1
+    }
+  ],
+  "triggers": [
+    {
+      "id": "reinforcement-wave",
+      "condition": "ElapsedSecondsAtLeast",
+      "threshold": 5,
+      "actions": [
+        { "type": "AddFact", "targetId": "waves.spawned", "value": 1 }
+      ]
+    }
+  ]
+}

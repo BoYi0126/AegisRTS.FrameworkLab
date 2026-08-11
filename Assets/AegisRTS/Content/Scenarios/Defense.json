@@ -1,0 +1,23 @@
+{
+  "id": "scenario.defense.last-stand",
+  "displayName": "Last Stand",
+  "gameMode": {
+    "id": "mode.defense",
+    "displayName": "Defense",
+    "type": "Defense",
+    "allowedSystems": ["economy", "recruitment", "army", "combat", "siege", "ai"],
+    "rules": { "destructible-walls": true, "hero-permanent-death": false }
+  },
+  "objectives": [
+    {
+      "id": "hold-courtyard",
+      "displayName": "Hold the courtyard for five seconds",
+      "type": "Hold",
+      "factId": "zones.courtyard-controlled",
+      "targetValue": 1,
+      "requiredDurationSeconds": 5,
+      "failureFactId": "structures.command-post-destroyed",
+      "failureThreshold": 1
+    }
+  ]
+}
