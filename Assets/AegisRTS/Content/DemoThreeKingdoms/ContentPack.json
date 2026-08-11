@@ -77,6 +77,18 @@
       "tags": ["settlement"]
     }
   ],
+  "defenseStructures": [
+    {
+      "id": "three-kingdoms.city-gate",
+      "displayName": "Walled City Gate",
+      "structureTypeId": "gate",
+      "siegeAreaId": "gates",
+      "maxHealth": 900,
+      "armor": 18,
+      "prefabId": "PF_Structure_Placeholder",
+      "tags": ["structure"]
+    }
+  ],
   "rules": {
     "moraleEnabled": true,
     "supplyEnabled": true,

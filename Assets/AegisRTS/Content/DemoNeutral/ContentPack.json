@@ -77,6 +77,18 @@
       "tags": ["settlement"]
     }
   ],
+  "defenseStructures": [
+    {
+      "id": "neutral.keep-gate",
+      "displayName": "Debug Keep Gate",
+      "structureTypeId": "gate",
+      "siegeAreaId": "gates",
+      "maxHealth": 600,
+      "armor": 12,
+      "prefabId": "PF_Structure_Placeholder",
+      "tags": ["structure"]
+    }
+  ],
   "rules": {
     "moraleEnabled": false,
     "supplyEnabled": true,

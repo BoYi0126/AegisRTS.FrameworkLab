@@ -353,3 +353,35 @@ recruitment.Tick(deltaSeconds);
 - `BuildingCommandRouter`、`TechnologyCommandRouter`、`RecruitmentCommandRouter`：將上述三種 request 接到共用 CommandBus validation／handler flow。
 - Events：`ResourceProducedEvent`、`BuildingCompletedEvent`、`TechnologyCompletedEvent`、`UnitRecruitedEvent`。
 - `GameplayEconomyStateBridge`：把 resource delta、building completion、technology completion 同步到 Phase 07 read model。
+
+## Phase 09 Siege / 城池攻防 API
+
+```csharp
+var sieges = new SiegeSystem(
+    new CombatSiegeAttackerQuery(combat),
+    navigationSink,
+    new SettlementSiegeCaptureSink(settlements),
+    customSiegeRule,
+    events);
+
+sieges.Register(siegeId, new SiegeProfile(
+    settlementId, attackerFactionId, defenderFactionId, SiegeMode.Assault));
+sieges.RegisterStructure(siegeId, gateId,
+    DefenseStructureProfile.FromDefinition(gateDefinition, defenderFactionId));
+
+using var router = new SiegeCommandRouter(commandBus, sieges);
+commandBus.Dispatch(new StartSiegeCommand(siegeId));
+commandBus.Dispatch(new AttackDefenseStructureCommand(siegeId, attackerUnitId, gateId));
+commandBus.Dispatch(new EnterSiegeAreaCommand(siegeId, SiegeArea.InnerArea));
+commandBus.Dispatch(new EnterSiegeAreaCommand(siegeId, SiegeArea.CaptureObjective));
+commandBus.Dispatch(new CaptureSiegeCommand(siegeId));
+```
+
+- `SiegeSystem`／`ISiegeQuery`：管理 siege lifecycle、areas、structures、capture conditions、waves、timer 與 winner snapshot。
+- `CombatSiegeAttackerQuery`：將一般 Unit 的 immutable `AttackProfile`／tags 接到攻城流程；不存在特殊 SiegeUnit runtime class。
+- `ISiegeNavigationSink`：Gate 開啟或 Wall／Gate 摧毀時通知 navigation backend 刷新通道與新路徑。
+- `ISiegeCaptureSink`／`SettlementSiegeCaptureSink`：將 capture objective 結果送入既有 Settlement owner transaction。
+- `ISiegeRule`：可替換 area entry 與 capture eligibility，不讓世界觀或 scenario 規則硬寫在 system。
+- Commands：Start、AttackDefenseStructure、SetGateState、EnterSiegeArea、ReportSiegeCondition、CompleteSiegeWave、CaptureSiege。
+- Events：SiegeStarted、DefenseStructureDamaged／Destroyed、GateStateChanged、BreachCreated、SiegeAreaEntered、SiegeCompleted。
+- `SiegeCombatEventBridge`：將 `UnitDiedEvent` 投影成 DefendersCleared／CommanderKilled capture conditions。

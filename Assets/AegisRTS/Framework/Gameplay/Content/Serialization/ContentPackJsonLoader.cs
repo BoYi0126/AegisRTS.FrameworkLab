@@ -104,6 +104,14 @@ namespace AegisRTS.Gameplay.Content.Serialization
                     item.MaxDefense, item.CaptureRule, item.CaptureConditions));
             }
 
+            var defenseStructures = new List<DefenseStructureDefinition>();
+            foreach (DefenseStructureDocument item in document.DefenseStructures ?? Array.Empty<DefenseStructureDocument>())
+            {
+                defenseStructures.Add(new DefenseStructureDefinition(
+                    Id(item.Id), item.DisplayName, item.StructureTypeId, item.SiegeAreaId,
+                    item.MaxHealth, item.Armor, item.PrefabId, Tags(item.Tags)));
+            }
+
             GameRuleSet rules = document.Rules == null
                 ? null
                 : new GameRuleSet(
@@ -126,6 +134,7 @@ namespace AegisRTS.Gameplay.Content.Serialization
                 buildings,
                 technologies,
                 settlements,
+                defenseStructures,
                 rules);
         }
 
@@ -180,6 +189,7 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public BuildingDocument[] Buildings { get; set; }
         public TechnologyDocument[] Technologies { get; set; }
         public SettlementDocument[] Settlements { get; set; }
+        public DefenseStructureDocument[] DefenseStructures { get; set; }
         public GameRuleSetDocument Rules { get; set; }
     }
 
@@ -243,6 +253,15 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public double MaxDefense { get; set; }
         public string CaptureRule { get; set; }
         public string[] CaptureConditions { get; set; }
+    }
+
+    internal sealed class DefenseStructureDocument : DefinitionDocument
+    {
+        public string StructureTypeId { get; set; }
+        public string SiegeAreaId { get; set; }
+        public double MaxHealth { get; set; }
+        public double Armor { get; set; }
+        public string PrefabId { get; set; }
     }
 
     internal sealed class ResourceCostDocument

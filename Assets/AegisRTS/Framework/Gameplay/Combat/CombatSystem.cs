@@ -51,6 +51,13 @@ namespace AegisRTS.Gameplay.Combat
             return true;
         }
 
+        /// <summary>Exposes immutable authored combat configuration to cross-system adapters.</summary>
+        public bool TryGetProfile(EntityId entityId, out CombatantProfile profile)
+        {
+            if (_combatants.TryGetValue(entityId, out Combatant combatant)) { profile = combatant.Profile; return true; }
+            profile = null; return false;
+        }
+
         public int IssueAttack(AttackTargetCommand command)
         {
             if (command == null) throw new ArgumentNullException(nameof(command));

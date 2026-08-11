@@ -124,6 +124,17 @@ namespace AegisRTS.Gameplay.Content.Validation
                 ValidateReferences(definition.Id, definition.StartingResourceIds, resourceIds, "resource", issues);
             }
 
+            foreach (DefenseStructureDefinition definition in pack.DefenseStructures.Where(item => item != null))
+            {
+                ValidatePositiveStat(definition.Id, definition.MaxHealth, "Defense structure max health", issues);
+                ValidateNonNegativeStat(definition.Id, definition.Armor, "Defense structure armor", issues);
+                if (string.IsNullOrWhiteSpace(definition.StructureTypeId))
+                    Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "Defense structure type ID is required.");
+                if (!IsKnownSiegeArea(definition.SiegeAreaId))
+                    Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, $"Unknown siege area '{definition.SiegeAreaId}'.");
+                ValidatePrefab(definition.Id, definition.PrefabId, assets, issues);
+            }
+
             ValidateTechnologyCycles(pack.Technologies.Where(item => item != null), technologyIds, issues);
             return new ContentValidationResult(issues);
         }
@@ -314,6 +325,10 @@ namespace AegisRTS.Gameplay.Content.Validation
             if (definition.CaptureRule == "mixed" && definition.CaptureConditions.Count == 0)
                 Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "Mixed capture rule requires capture conditions.");
         }
+
+        private static bool IsKnownSiegeArea(string value) =>
+            value == "outer-area" || value == "walls" || value == "gates" || value == "towers" ||
+            value == "breach" || value == "inner-area" || value == "capture-objective";
 
         private static void ValidateTechnologyCycles(
             IEnumerable<TechnologyDefinition> technologies,

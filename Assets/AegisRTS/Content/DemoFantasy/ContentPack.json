@@ -77,6 +77,18 @@
       "tags": ["settlement", "magic"]
     }
   ],
+  "defenseStructures": [
+    {
+      "id": "fantasy.arcane-gate",
+      "displayName": "Arcane Fortress Gate",
+      "structureTypeId": "gate",
+      "siegeAreaId": "gates",
+      "maxHealth": 1100,
+      "armor": 22,
+      "prefabId": "PF_Structure_Placeholder",
+      "tags": ["structure", "magic"]
+    }
+  ],
   "rules": {
     "moraleEnabled": false,
     "supplyEnabled": false,

@@ -132,3 +132,21 @@ Recruitment Job ── SettlementId / FactionId / Definition / RemainingSeconds
 - `BuildingSystem` 與 `TechnologySystem` 分別提供已完成狀態 query，作為建築、科技與單位的資料驅動 unlock 條件。
 - `TechnologyModifierRegistry` 依 Faction 與 world-neutral stat ID 聚合 additive／multiplicative modifier。
 - `GameplayEconomyStateBridge` 將 authoritative economy 變動投影到既有 Faction／Settlement snapshot；Unity spawn 經 `IUnitSpawnSink` 隔離。
+
+## Phase 09 Siege Runtime Model
+
+```text
+Siege
+├─ SiegeProfile ── Settlement / Attacker / Defender / Mode / TimeLimit
+├─ State / CurrentArea / CompletedCaptureConditions / Winner
+├─ DefenderIds / CommanderId / CompletedWaves
+└─ DefenseStructures
+   └─ Kind / Area / Faction / HP / Armor / GateState / Tags
+```
+
+- Siege areas：OuterArea、Walls、Gates、Towers、Breach、InnerArea、CaptureObjective。
+- Defense structure kind：Wall、Gate、Tower、Barricade、Trap、Core；未內建的 content type 以 Extension＋stable type ID 保存。
+- `DefenseStructureDefinition` 是 immutable authoring data；structure HP、Gate state 與 destroyed state 僅存在 runtime record。
+- Siege unit 不建立額外 entity type；既有 Unit 的 tags、Faction 與 `AttackProfile` 經 query adapter 提供攻城能力。
+- Gate／Wall destruction 產生 breach；Core／defender／commander／objective 狀態轉成共用 `CaptureCondition` flags。
+- Siege capture 不直接寫 owner，而是呼叫 Settlement capture transaction，維持 Faction／Territory indices 一致。

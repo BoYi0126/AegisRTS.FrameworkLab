@@ -20,6 +20,24 @@ namespace AegisRTS.Gameplay.Content
             IEnumerable<TechnologyDefinition> technologies,
             IEnumerable<SettlementDefinition> settlements,
             GameRuleSet rules)
+            : this(id, displayName, declaredTags, resources, units, heroes, abilities, buildings,
+                technologies, settlements, null, rules)
+        {
+        }
+
+        public ContentPack(
+            DefinitionId id,
+            string displayName,
+            IEnumerable<ContentTag> declaredTags,
+            IEnumerable<ResourceDefinition> resources,
+            IEnumerable<UnitDefinition> units,
+            IEnumerable<HeroDefinition> heroes,
+            IEnumerable<AbilityDefinition> abilities,
+            IEnumerable<BuildingDefinition> buildings,
+            IEnumerable<TechnologyDefinition> technologies,
+            IEnumerable<SettlementDefinition> settlements,
+            IEnumerable<DefenseStructureDefinition> defenseStructures,
+            GameRuleSet rules)
         {
             if (!id.IsValid)
             {
@@ -36,6 +54,7 @@ namespace AegisRTS.Gameplay.Content
             Buildings = Copy(buildings);
             Technologies = Copy(technologies);
             Settlements = Copy(settlements);
+            DefenseStructures = Copy(defenseStructures);
             Rules = rules;
         }
 
@@ -58,6 +77,8 @@ namespace AegisRTS.Gameplay.Content
         public IReadOnlyList<TechnologyDefinition> Technologies { get; }
 
         public IReadOnlyList<SettlementDefinition> Settlements { get; }
+
+        public IReadOnlyList<DefenseStructureDefinition> DefenseStructures { get; }
 
         public GameRuleSet Rules { get; }
 
@@ -95,6 +116,11 @@ namespace AegisRTS.Gameplay.Content
             }
 
             foreach (SettlementDefinition definition in Settlements)
+            {
+                yield return definition;
+            }
+
+            foreach (DefenseStructureDefinition definition in DefenseStructures)
             {
                 yield return definition;
             }
