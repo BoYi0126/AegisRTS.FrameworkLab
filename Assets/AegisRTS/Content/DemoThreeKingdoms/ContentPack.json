@@ -1,7 +1,7 @@
 {
   "id": "demo.three-kingdoms",
   "displayName": "Three Kingdoms Demo Pack",
-  "declaredTags": ["resource", "unit", "infantry", "hero", "ability", "structure", "settlement", "technology"],
+  "declaredTags": ["resource", "unit", "infantry", "hero", "ability", "structure", "settlement", "technology", "ai-profile"],
   "resources": [
     { "id": "three-kingdoms.provisions", "displayName": "Provisions", "tags": ["resource"] }
   ],
@@ -87,6 +87,20 @@
       "armor": 18,
       "prefabId": "PF_Structure_Placeholder",
       "tags": ["structure"]
+    }
+  ],
+  "aiProfiles": [
+    {
+      "id": "three-kingdoms.aggressive-ai",
+      "displayName": "Aggressive Warlord AI",
+      "aggression": 0.85,
+      "defenseBias": 0.4,
+      "economyBias": 0.55,
+      "riskTolerance": 0.75,
+      "siegePreference": 0.8,
+      "decisionIntervalSeconds": 0.45,
+      "desiredArmySize": 4,
+      "tags": ["ai-profile"]
     }
   ],
   "rules": {

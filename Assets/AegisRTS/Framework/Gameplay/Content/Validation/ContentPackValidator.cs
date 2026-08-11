@@ -135,6 +135,18 @@ namespace AegisRTS.Gameplay.Content.Validation
                 ValidatePrefab(definition.Id, definition.PrefabId, assets, issues);
             }
 
+            foreach (AiProfileDefinition definition in pack.AiProfiles.Where(item => item != null))
+            {
+                ValidateUnitRange(definition.Id, definition.Aggression, "AI aggression", issues);
+                ValidateUnitRange(definition.Id, definition.DefenseBias, "AI defense bias", issues);
+                ValidateUnitRange(definition.Id, definition.EconomyBias, "AI economy bias", issues);
+                ValidateUnitRange(definition.Id, definition.RiskTolerance, "AI risk tolerance", issues);
+                ValidateUnitRange(definition.Id, definition.SiegePreference, "AI siege preference", issues);
+                ValidatePositiveStat(definition.Id, definition.DecisionIntervalSeconds, "AI decision interval", issues);
+                if (definition.DesiredArmySize <= 0)
+                    Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "AI desired army size must be greater than zero.");
+            }
+
             ValidateTechnologyCycles(pack.Technologies.Where(item => item != null), technologyIds, issues);
             return new ContentValidationResult(issues);
         }
@@ -329,6 +341,13 @@ namespace AegisRTS.Gameplay.Content.Validation
         private static bool IsKnownSiegeArea(string value) =>
             value == "outer-area" || value == "walls" || value == "gates" || value == "towers" ||
             value == "breach" || value == "inner-area" || value == "capture-objective";
+
+        private static void ValidateUnitRange(DefinitionId ownerId, double value, string label,
+            ICollection<ContentValidationIssue> issues)
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value) || value < 0d || value > 1d)
+                Add(issues, ContentValidationIssueCode.InvalidStat, ownerId, $"{label} must be between zero and one.");
+        }
 
         private static void ValidateTechnologyCycles(
             IEnumerable<TechnologyDefinition> technologies,

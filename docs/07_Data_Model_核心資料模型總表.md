@@ -150,3 +150,22 @@ Siege
 - Siege unit 不建立額外 entity type；既有 Unit 的 tags、Faction 與 `AttackProfile` 經 query adapter 提供攻城能力。
 - Gate／Wall destruction 產生 breach；Core／defender／commander／objective 狀態轉成共用 `CaptureCondition` flags。
 - Siege capture 不直接寫 owner，而是呼叫 Settlement capture transaction，維持 Faction／Territory indices 一致。
+
+## Phase 10 AI Runtime Model
+
+```text
+AiAgent
+├─ AiProfile ── aggression / defense / economy / risk / siege / cadence
+├─ AiWorldSnapshot (blackboard)
+│  └─ economy / units / armies / settlements / strength / threat / target / route / siege progress
+├─ Utility Scores
+│  └─ Action / StrategicGoal / DecisionLayer / Score
+└─ Decision State
+   └─ selected goal / layer / action / decision count / stalled count / last error
+```
+
+- Strategic／Operational／Tactical／Unit 是責任層級，不是互相持有的四套 AI manager。
+- `AiWorldSnapshot` 是一次決策使用的 immutable 黑板；AI 不保存或修改 Unity object。
+- `AiProfileDefinition` 是 Content Pack authoring data，runtime 轉成驗證後的 `AiProfile`。
+- `AiActionResult.MadeProgress` 驅動 deadlock detection；超過 threshold 後 Recover 取得最高 utility。
+- `AiStrategicMapAnalyzer` 從 Settlement／Territory query 選擇高價值敵方目標並輸出 deterministic route。

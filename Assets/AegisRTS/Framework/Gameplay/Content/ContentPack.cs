@@ -21,7 +21,7 @@ namespace AegisRTS.Gameplay.Content
             IEnumerable<SettlementDefinition> settlements,
             GameRuleSet rules)
             : this(id, displayName, declaredTags, resources, units, heroes, abilities, buildings,
-                technologies, settlements, null, rules)
+                technologies, settlements, null, null, rules)
         {
         }
 
@@ -37,6 +37,25 @@ namespace AegisRTS.Gameplay.Content
             IEnumerable<TechnologyDefinition> technologies,
             IEnumerable<SettlementDefinition> settlements,
             IEnumerable<DefenseStructureDefinition> defenseStructures,
+            GameRuleSet rules)
+            : this(id, displayName, declaredTags, resources, units, heroes, abilities, buildings,
+                technologies, settlements, defenseStructures, null, rules)
+        {
+        }
+
+        public ContentPack(
+            DefinitionId id,
+            string displayName,
+            IEnumerable<ContentTag> declaredTags,
+            IEnumerable<ResourceDefinition> resources,
+            IEnumerable<UnitDefinition> units,
+            IEnumerable<HeroDefinition> heroes,
+            IEnumerable<AbilityDefinition> abilities,
+            IEnumerable<BuildingDefinition> buildings,
+            IEnumerable<TechnologyDefinition> technologies,
+            IEnumerable<SettlementDefinition> settlements,
+            IEnumerable<DefenseStructureDefinition> defenseStructures,
+            IEnumerable<AiProfileDefinition> aiProfiles,
             GameRuleSet rules)
         {
             if (!id.IsValid)
@@ -55,6 +74,7 @@ namespace AegisRTS.Gameplay.Content
             Technologies = Copy(technologies);
             Settlements = Copy(settlements);
             DefenseStructures = Copy(defenseStructures);
+            AiProfiles = Copy(aiProfiles);
             Rules = rules;
         }
 
@@ -79,6 +99,8 @@ namespace AegisRTS.Gameplay.Content
         public IReadOnlyList<SettlementDefinition> Settlements { get; }
 
         public IReadOnlyList<DefenseStructureDefinition> DefenseStructures { get; }
+
+        public IReadOnlyList<AiProfileDefinition> AiProfiles { get; }
 
         public GameRuleSet Rules { get; }
 
@@ -121,6 +143,11 @@ namespace AegisRTS.Gameplay.Content
             }
 
             foreach (DefenseStructureDefinition definition in DefenseStructures)
+            {
+                yield return definition;
+            }
+
+            foreach (AiProfileDefinition definition in AiProfiles)
             {
                 yield return definition;
             }

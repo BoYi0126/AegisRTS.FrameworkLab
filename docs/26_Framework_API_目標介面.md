@@ -385,3 +385,32 @@ commandBus.Dispatch(new CaptureSiegeCommand(siegeId));
 - Commands：Start、AttackDefenseStructure、SetGateState、EnterSiegeArea、ReportSiegeCondition、CompleteSiegeWave、CaptureSiege。
 - Events：SiegeStarted、DefenseStructureDamaged／Destroyed、GateStateChanged、BreachCreated、SiegeAreaEntered、SiegeCompleted。
 - `SiegeCombatEventBridge`：將 `UnitDiedEvent` 投影成 DefendersCleared／CommanderKilled capture conditions。
+
+## Phase 10 Utility AI API
+
+```csharp
+var ai = new AiSystem(new UtilityAiPlanner(), events);
+ai.Register(
+    factionId,
+    AiProfile.FromDefinition(aiProfileDefinition),
+    worldQuery,
+    actionExecutor);
+
+ai.Tick(deltaSeconds);
+
+if (ai.TryGetState(factionId, out AiAgentSnapshot state))
+{
+    // state.Goal / Layer / Action / Scores / TargetId
+    // state.Strength / Threat / Route / StalledDecisionCount
+}
+```
+
+- `AiSystem`：管理多個 Faction agents、decision cadence、Utility 選擇、progress／stall tracking 與 debug snapshots。
+- `UtilityAiPlanner.Score`：對所有 action 產生排序後的 immutable `AiActionScore`；同分以 action enum 穩定決定。
+- `IAiWorldQuery.Observe`：將 Economy／Recruitment／Army／Territory／Siege 等 read models 聚合成黑板。
+- `IAiActionExecutor.Execute`：composition boundary；把選中 action 轉成既有 Recruit／Army／Siege commands。
+- `AiStrategicMapAnalyzer.SelectEnemySettlement`：以 territory value 選擇敵方 settlement。
+- `AiStrategicMapAnalyzer.FindRoute`：在 Territory graph 上以 deterministic BFS 產生 route。
+- `AiProfileDefinition`／`AiProfile`：aggression、defense／economy bias、risk、siege preference、decision interval、desired army size。
+- `AiDecisionMadeEvent`：提供 goal、layer、action、score 與 made-progress 給 Debug UI、telemetry 或 replay diagnostics。
+- 連續未進展達 `MaximumStalledDecisions` 時選擇 Recover；Wait 可表達正在等待 recruitment／production，不需 busy loop。

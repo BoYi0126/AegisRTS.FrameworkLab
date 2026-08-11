@@ -1,7 +1,7 @@
 {
   "id": "demo.neutral",
   "displayName": "Neutral Debug Pack",
-  "declaredTags": ["resource", "unit", "infantry", "hero", "ability", "structure", "settlement", "technology"],
+  "declaredTags": ["resource", "unit", "infantry", "hero", "ability", "structure", "settlement", "technology", "ai-profile"],
   "resources": [
     { "id": "neutral.supplies", "displayName": "Supplies", "tags": ["resource"] }
   ],
@@ -87,6 +87,20 @@
       "armor": 12,
       "prefabId": "PF_Structure_Placeholder",
       "tags": ["structure"]
+    }
+  ],
+  "aiProfiles": [
+    {
+      "id": "neutral.balanced-ai",
+      "displayName": "Balanced Debug AI",
+      "aggression": 0.55,
+      "defenseBias": 0.55,
+      "economyBias": 0.6,
+      "riskTolerance": 0.5,
+      "siegePreference": 0.55,
+      "decisionIntervalSeconds": 0.5,
+      "desiredArmySize": 3,
+      "tags": ["ai-profile"]
     }
   ],
   "rules": {

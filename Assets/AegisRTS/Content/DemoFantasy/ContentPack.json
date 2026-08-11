@@ -1,7 +1,7 @@
 {
   "id": "demo.fantasy",
   "displayName": "Fantasy Demo Pack",
-  "declaredTags": ["resource", "unit", "mechanical", "hero", "magic", "ability", "structure", "settlement", "technology"],
+  "declaredTags": ["resource", "unit", "mechanical", "hero", "magic", "ability", "structure", "settlement", "technology", "ai-profile"],
   "resources": [
     { "id": "fantasy.mana", "displayName": "Mana", "tags": ["resource", "magic"] }
   ],
@@ -87,6 +87,20 @@
       "armor": 22,
       "prefabId": "PF_Structure_Placeholder",
       "tags": ["structure", "magic"]
+    }
+  ],
+  "aiProfiles": [
+    {
+      "id": "fantasy.arcane-ai",
+      "displayName": "Arcane Siege AI",
+      "aggression": 0.65,
+      "defenseBias": 0.5,
+      "economyBias": 0.7,
+      "riskTolerance": 0.6,
+      "siegePreference": 0.9,
+      "decisionIntervalSeconds": 0.4,
+      "desiredArmySize": 3,
+      "tags": ["ai-profile", "magic"]
     }
   ],
   "rules": {

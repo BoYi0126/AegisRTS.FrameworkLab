@@ -112,6 +112,14 @@ namespace AegisRTS.Gameplay.Content.Serialization
                     item.MaxHealth, item.Armor, item.PrefabId, Tags(item.Tags)));
             }
 
+            var aiProfiles = new List<AiProfileDefinition>();
+            foreach (AiProfileDocument item in document.AiProfiles ?? Array.Empty<AiProfileDocument>())
+            {
+                aiProfiles.Add(new AiProfileDefinition(Id(item.Id), item.DisplayName, item.Aggression,
+                    item.DefenseBias, item.EconomyBias, item.RiskTolerance, item.SiegePreference,
+                    item.DecisionIntervalSeconds, item.DesiredArmySize, Tags(item.Tags)));
+            }
+
             GameRuleSet rules = document.Rules == null
                 ? null
                 : new GameRuleSet(
@@ -135,6 +143,7 @@ namespace AegisRTS.Gameplay.Content.Serialization
                 technologies,
                 settlements,
                 defenseStructures,
+                aiProfiles,
                 rules);
         }
 
@@ -190,6 +199,7 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public TechnologyDocument[] Technologies { get; set; }
         public SettlementDocument[] Settlements { get; set; }
         public DefenseStructureDocument[] DefenseStructures { get; set; }
+        public AiProfileDocument[] AiProfiles { get; set; }
         public GameRuleSetDocument Rules { get; set; }
     }
 
@@ -262,6 +272,17 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public double MaxHealth { get; set; }
         public double Armor { get; set; }
         public string PrefabId { get; set; }
+    }
+
+    internal sealed class AiProfileDocument : DefinitionDocument
+    {
+        public double Aggression { get; set; }
+        public double DefenseBias { get; set; }
+        public double EconomyBias { get; set; }
+        public double RiskTolerance { get; set; }
+        public double SiegePreference { get; set; }
+        public double DecisionIntervalSeconds { get; set; }
+        public int DesiredArmySize { get; set; }
     }
 
     internal sealed class ResourceCostDocument
