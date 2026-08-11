@@ -86,14 +86,17 @@ FrameworkLab 同時負責：
 27. `31_GamePhase_G01_G04_世界觀勢力兵種英雄.md`
 28. `32_GamePhase_G05_G08_地圖劇本美術音訊.md`
 29. `33_GamePhase_G09_G12_平衡教學Polish發布.md`
+30. `34_PlayablePrototype_01_總覽與範圍.md`
+31. `35_PlayablePrototype_01_分階段實作計畫.md`
+32. `36_PlayablePrototype_01_現況缺口與驗收矩陣.md`
 
 ### Agent / Art
-30. `40_Agent_總執行規則.md`
-31. `41_Agent_Phase執行Prompt.md`
-32. `42_Agent_CodeReview與驗收Prompt.md`
-33. `50_AI_Art_Pipeline.md`
-34. `51_Art_Bible_Template.md`
-35. `60_第一階段實際執行順序.md`
+33. `40_Agent_總執行規則.md`
+34. `41_Agent_Phase執行Prompt.md`
+35. `42_Agent_CodeReview與驗收Prompt.md`
+36. `50_AI_Art_Pipeline.md`
+37. `51_Art_Bible_Template.md`
+38. `60_第一階段實際執行順序.md`
 
 ## 最終驗證
 

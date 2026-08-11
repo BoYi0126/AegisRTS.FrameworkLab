@@ -4,10 +4,70 @@
 
 ## Current Status
 
-- Current Phase：Definition of Done 總驗收完成；原專案 Unity EditMode 159/159、PlayMode 19/19，乾淨安裝專案 EditMode 6/6、PlayMode 3/3 通過。
+- Current Phase：PlayablePrototype_01 規劃完成；PP00 尚未開始，最高優先級為中立 Content、graybox scene、composition skeleton、entity registry、tick order 與 boot tests。
 - Active Branch：`main`
+- Last Trusted Runtime Validation：Framework DoD（本次文件工作未重跑）— 原專案 EditMode 159/159、PlayMode 19/19；乾淨安裝專案 EditMode 6/6、PlayMode 3/3。
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — PlayablePrototype_01 詳細規劃與紀錄規範
+
+- Status：Completed
+- Goal：建立 system-first、world-neutral、placeholder 的玩家可操作 Prototype 詳細規格，盤點 Framework 已完成能力與產品層缺口，排定實作優先級，並把未來每次開發都必須留下詳細紀錄寫入正式治理文件。
+- Baseline：
+  - Branch／Git：`main`；開始時 `HEAD`／`origin/main` 同為 `aa0bfce Finish Definition of Done`，工作樹乾淨。
+  - Existing Evidence：Framework Phase 01～16、API contract 與 DoD 已完成；最近可信結果為 FrameworkLab EditMode 159/159、PlayMode 19/19，package validation EditMode 6/6、PlayMode 3/3。
+- Scope：
+  - In：Prototype 目標／非目標、Definition of Playable、中立 defaults、產品層架構、PP00～PP08、現況矩陣、優先級、acceptance、debug／test requirements、詳細進度紀錄規則與 Agent 流程。
+  - Out／Deferred：本次不建立 Unity scene、Content Pack、C#、tests、Windows build、正式世界觀或美術；PP00～PP08 均尚未實作。
+- Changed：
+  - `docs/34_PlayablePrototype_01_總覽與範圍.md`：定義 system-first 決策、現況、完整玩家流程、Definition of Playable、scope、PrototypeNeutral defaults、產品層 components 與禁止事項。
+  - `docs/35_PlayablePrototype_01_分階段實作計畫.md`：建立 M1～M5 與 PP00～PP08，每階段包含 Goal、Tasks、Acceptance 及第一個建議執行 prompt。
+  - `docs/36_PlayablePrototype_01_現況缺口與驗收矩陣.md`：逐項標示 Completed／Partial／Missing／Deferred，列出 P0～P3、15 項 end-to-end acceptance、debug 與測試最低要求。
+  - `docs/09_DevelopmentProgress_開發進度紀錄規範.md`：新增 12 項詳細紀錄最低標準、Current Status 維護規則與擴充範本。
+  - `docs/40_Agent_總執行規則.md`、`41_Agent_Phase執行Prompt.md`、`42_Agent_CodeReview與驗收Prompt.md`：強制現況矩陣、詳細紀錄、未完成項目與 Git evidence；資料不足不可判定 PASS。
+  - `docs/00_README_開發總覽.md`、`30_GameProduction_總覽.md`、`60_第一階段實際執行順序.md`：把 PlayablePrototype 文件與先系統、後 G01／Art 的決策加入正式閱讀／執行順序。
+  - `DevelopmentProgress.md`：新增本詳細紀錄並更新 Current Status。
+- Behavior：
+  - Before：Framework 各系統與自動 Vertical Slice 已完成，但 Game Production 文件會直接從 G01 開始，沒有描述如何先把系統接成玩家可操作流程；進度規範只要求摘要欄位。
+  - After：正式流程先執行 world-neutral PP00～PP08，再進入 G01；文件明確指出 Attack 仍是 RTS Sandbox log、各 systems 尚未整合、Save／Load 尚未覆蓋整體 Prototype，並要求未來留下可重現的詳細紀錄。
+- Architecture / API / Data：
+  - Architecture：Prototype 留在 `Assets/AegisRTS/Demo/PlayablePrototype` 的產品層，composition 不成為 God Manager；Player／AI／HUD／Scenario 共用 CommandBus，query／snapshot 為 read side，package Runtime 只有通用 defect 才允許修改。
+  - API：N/A；本次只建立規格，未修改 runtime public API。文件規劃重用既有 Commands、Routers、Queries、Events、`IUnitSpawnSink` 與 persistence boundaries。
+  - Data：規劃新的 `PrototypeNeutral` Content Pack／Scenario／Theme 與 role-based IDs；本次未建立或變更 JSON schema。
+- Tests / Validation：
+  - 文件完整讀取：00、03、04、09、27、30～33、40～42 與最新 `DevelopmentProgress.md`。
+  - Repository inventory：確認 `Sandbox_RTS` 玩家操作、各 system sandboxes、19 個 PlayMode tests、Vertical Slice public composition、command routers、HUD／Save boundaries。
+  - 新文件規模：34 共 179 lines、35 共 257 lines、36 共 147 lines。
+  - `git diff --check`：PASS（全部 tracked changes）。
+  - Markdown integrity：11 個變更／新增文件皆無 trailing whitespace、code fences 成對；11 個 `docs/*.md` references 全部存在。
+  - Unity EditMode／PlayMode：NOT RUN；本次沒有 runtime、scene、asset、package 或 JSON 變更，沿用結果只列為 baseline，不宣稱為本次測試。
+- Acceptance：
+  - 詳細 Prototype 規格：PASS — 目標、scope、架構、defaults 與 Definition of Playable 已文件化。
+  - 現在哪些已做／未做：PASS — 19 類能力矩陣與五項 integration blockers 已列出。
+  - 建議先做哪些：PASS — P0～P3、M1～M5 與 PP00 first prompt 已列出。
+  - 多階段可執行計畫：PASS — PP00～PP08 均有 Tasks／Acceptance。
+  - 未來詳細紀錄規範：PASS — 09、40、41、42 已同步強制要求。
+  - Runtime playable implementation：NOT RUN — 本次明確為規劃工作，PP00 尚未開始。
+- Completed：
+  - 完成 Prototype 規格、roadmap、gap／priority／acceptance matrix 與 detailed-record governance。
+  - 明確決定先整合系統、延後世界觀與 production art。
+- Not Completed / Deferred：
+  - PP00～PP08：Missing／未開始，P0 起點為 PP00。
+  - G01～G12：Deferred，待 Playable Prototype PASS 後執行。
+  - Art Bible／production assets：Deferred，待正式勢力與視覺需求確定。
+- Known Issues / Risks：
+  - 規格很完整但尚未由 Unity scene 證明；第一個技術風險是跨 system entity registration／cleanup，Priority P0。
+  - `VerticalSliceSimulation` 是自動 regression composition，不應直接改成玩家 God Manager；應建立獨立 Prototype composition。
+  - Save DTO 已完成，但跨全部 Prototype systems 的 restore ordering 尚未實作，Priority P1。
+  - package 仍為 `UNLICENSED`，不阻擋內部 Prototype，但阻擋正式公開散布。
+- Git：
+  - Branch：`main`。
+  - Working Tree：本筆紀錄所在文件變更尚未提交；實際為 3 個新增 Prototype docs 與 8 個治理／總覽／進度文件，沒有 runtime／asset／package 變更。
+  - Commit／Push：NOT DONE；等待使用者指定或後續明確要求。
+- Next：
+  1. 執行 `docs/35_PlayablePrototype_01_分階段實作計畫.md` 的 PP00，且只完成 PP00 scope。
+  2. PP00 通過 Code Review 後執行 PP01，優先取得玩家可操作的真實戰鬥閉環。
 
 ## 2026-08-11 — Definition of Done 總驗收
 

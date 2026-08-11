@@ -30,8 +30,11 @@ DevelopmentProgress.md
 11. 執行可執行驗證。
 12. 不滿足 Acceptance Criteria 不宣稱完成。
 13. 依實際變更與驗證結果更新 DevelopmentProgress.md，並與實作一起提交。
+14. 開始前建立現況矩陣，區分 Completed、Partial、Missing、Deferred，避免重做正常模組。
+15. DevelopmentProgress 必須依 09 的詳細標準記錄 baseline、scope、files、behavior、API／Data、tests count、acceptance evidence、未完成項目與 Git 狀態。
+16. 若任務跨多次工作階段，持續更新同一筆 In Progress 紀錄；未通過驗收不得標記 Completed。
 
-完成後輸出 Changed / Architecture / API / Tests / Acceptance / Known Issues / Next。
+完成後輸出 Changed / Architecture / Files / API / Tests / Acceptance / Not Completed / Known Issues / Git / Next。
 
 現在執行：
 <填入 Phase 文件路徑>

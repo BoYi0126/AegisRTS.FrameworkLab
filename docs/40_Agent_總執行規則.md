@@ -12,4 +12,6 @@ C:\projects\Unity\AegisRTS.FrameworkLab
 
 任何修改 repository 的工作在結束前都必須依 `docs/09_DevelopmentProgress_開發進度紀錄規範.md` 更新根目錄 `DevelopmentProgress.md`。紀錄必須反映實際測試與 Git 狀態，不得把未執行項目寫成通過。
 
+所有開發紀錄必須是詳細紀錄：列出 baseline、scope in／out、主要 files／assets、行為前後差異、Architecture／API／Data、實際 tests 與結果數、逐項 acceptance、Completed、Not Completed／Deferred、Known Issues、Git 狀態與排序後 Next。不得只寫概括摘要。大型任務跨工作階段時更新同一筆 `In Progress` 紀錄，完成條件未滿足不得改成 `Completed`。
+
 完成報告：Changed、Architecture、Files、API、Tests、Validation、Known Issues、Next。
