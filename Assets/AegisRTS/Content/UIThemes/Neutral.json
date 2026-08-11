@@ -1,0 +1,12 @@
+{
+  "id": "ui.neutral",
+  "displayName": "Neutral Framework",
+  "background": "#101820F2",
+  "panel": "#263342EE",
+  "primary": "#4AA3D8",
+  "accent": "#F0C65A",
+  "text": "#F4F7FA",
+  "mutedText": "#B8C4CE",
+  "scale": 1.0,
+  "panelOpacity": 0.92
+}

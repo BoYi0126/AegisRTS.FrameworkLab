@@ -1,0 +1,12 @@
+{
+  "id": "ui.fantasy",
+  "displayName": "Arcane Fantasy",
+  "background": "#100C24F2",
+  "panel": "#2A1E52EE",
+  "primary": "#7657D8",
+  "accent": "#61D6C8",
+  "text": "#F3EEFF",
+  "mutedText": "#B9AEE0",
+  "scale": 1.0,
+  "panelOpacity": 0.90
+}

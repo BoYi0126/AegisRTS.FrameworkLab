@@ -1,0 +1,12 @@
+{
+  "id": "ui.three-kingdoms",
+  "displayName": "Three Kingdoms Lacquer",
+  "background": "#1C0F0BF2",
+  "panel": "#4B2118EE",
+  "primary": "#A83B2D",
+  "accent": "#D8B25C",
+  "text": "#F7E8C5",
+  "mutedText": "#C9A982",
+  "scale": 1.0,
+  "panelOpacity": 0.94
+}

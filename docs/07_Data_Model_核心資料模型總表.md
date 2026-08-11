@@ -193,3 +193,20 @@ Scenario Runtime
 - continuous Hold 在 fact 不再符合 target 時將 `HeldSeconds` 歸零；Protect 等目標可用 failure fact 轉成 Failed／Defeat。
 - `EmitSignal` action 只發布具名 event，讓 composition adapter 執行 start setup 或劇本演出，不讓核心引用 Unity object。
 - Snapshot 複製 objectives 與 facts 為唯讀集合，可供 Phase 12 UI 與 Phase 13 Save／Replay／Debug 使用。
+
+## Phase 12 UI / UX Presentation Model
+
+```text
+Gameplay Queries → IHudQuery → HudSnapshot
+                                 ├─ 10 HudPanelViewModels
+Gameplay Events  → ViewModel     └─ HudEntries
+UI Intent        → IHudCommandSink → shared Gameplay Command flow
+
+HudThemeDefinition
+└─ colors / scale / opacity (presentation only)
+```
+
+- `HudSnapshot`／`HudPanelViewModel`／`HudEntry` 是 immutable presentation data，不是第二份 Gameplay state。
+- `RtsHudViewModel` 以 invalidation event 控制 query refresh，並擁有短生命週期 notification queue。
+- `HudThemeDefinition` 只描述視覺 tokens；切換 theme 不重建或修改 Gameplay systems。
+- 十個 `HudPanelId` 固定 layout responsibility；隱藏／內容差異由 query snapshot 決定。

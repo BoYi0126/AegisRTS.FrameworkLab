@@ -4,10 +4,38 @@
 
 ## Current Status
 
-- Current Phase：Phase 11 GameMode／Scenario／Objective 完成；Unity EditMode 117/117、PlayMode 14/14 通過。
+- Current Phase：Phase 12 UI／UX 完成；Unity EditMode 125/125、PlayMode 15/15 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 12 UI / UX
+
+- Status：Completed
+- Goal：完成十個 RTS HUD panels、Query／Event／Command UI boundary 與資料驅動 themes，驗收替換世界觀 Theme 不修改 Gameplay。
+- Changed：
+  - 新增 `HudSnapshot`、`HudPanelViewModel`、`HudEntry`、`RtsHudViewModel` 與十個 `HudPanelId`。
+  - 新增 `IHudQuery`／`IHudCommandSink`，UI refresh 與 intent 派送不直接寫 Gameplay state。
+  - 新增 event-driven invalidation、bounded notification queue、dismiss 與 command result。
+  - 新增 `HudThemeDefinition`／`HudThemeJsonLoader` 與 Neutral／Three Kingdoms／Fantasy JSON themes。
+  - 新增 `RtsHudPresenter`，以同一 layout 顯示 Resource、Selection、Command、Ability、Army、Settlement、Minimap、Notification、Objective、Pause。
+  - `Sandbox_AI` 加入 `HudSandboxBootstrap` 與 Theme assets，驗證三次 theme swap。
+  - 新增 8 個 EditMode cases、1 個 PlayMode case，更新 07、21、26 與本進度文件。
+- Architecture / API / Data：
+  - UI layer 只讀 immutable query snapshot、訂閱 event、派送 command；authoritative gameplay state 沒有移入 Presentation。
+  - Theme data 僅包含 visual tokens，不包含世界觀 gameplay rules 或 runtime values。
+  - Notification 是 presentation-owned transient state；resource、selection、army、settlement、objective 仍由來源 system 查詢。
+- Tests / Validation：
+  - Unity EditMode Test Runner：PASS，125/125 passed、0 failed；Phase 12 新增 8 cases。
+  - Unity PlayMode Test Runner：PASS，15/15 passed、0 failed；Phase 12 新增 1 Sandbox case。
+  - 三 theme、固定十 panel layout、query cache／invalidation、notification、command delegation、theme swap no mutation：PASS。
+  - Theme JSON syntax、`git diff --check`：PASS。
+- Known Issues / Risks：
+  - FrameworkLab renderer 使用 IMGUI placeholder；正式產品可保留 ViewModel 並替換 UI Toolkit／uGUI view。
+  - Minimap 目前只提供 query panel，尚未接 render texture、fog overlay、ping 與 click-to-world。
+  - Localization、gamepad focus、screen reader、safe area 與完整 responsive breakpoints 留給 production UX polish。
+- Next：
+  - 進入 Phase 13 Save／Replay／Debug／Test，序列化 authoritative snapshots 與 Scenario metadata。
 
 ## 2026-08-11 — Phase 11 GameMode / Scenario / Objective
 

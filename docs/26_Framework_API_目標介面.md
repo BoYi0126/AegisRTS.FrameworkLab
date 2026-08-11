@@ -440,3 +440,23 @@ if (scenarios.TryGetSnapshot(out ScenarioSnapshot state))
 - `IsSystemAllowed`：composition root 查詢 GameMode 是否允許指定 system ID。
 - Events：`ScenarioStartedEvent`、`ObjectiveStatusChangedEvent`、`ScenarioActionExecutedEvent`、`ScenarioCompletedEvent`。
 - `ScenarioActionType.EmitSignal`：把 data-authored setup／劇情 hook 交給外部 adapter；adapter 再派送既有 Gameplay commands。
+
+## Phase 12 UI / UX API
+
+```csharp
+var hud = new RtsHudViewModel(hudQuery, hudCommandSink, events);
+HudSnapshot snapshot = hud.Snapshot;
+
+var presenter = gameObject.AddComponent<RtsHudPresenter>();
+presenter.Configure(hud, themes, "ui.neutral");
+presenter.SwitchTheme("ui.fantasy");
+
+hud.Execute(new HudCommand("unit.move", targetId));
+```
+
+- `IHudQuery.Query`：composition layer 聚合 Selection、Economy、Army、Settlement、Territory 與 Scenario read models。
+- `IHudCommandSink.Dispatch`：把 UI intent 轉送到既有 CommandBus；ViewModel／Presenter 不直接 mutation。
+- `HudInvalidatedEvent`：authoritative state event bridge 通知 ViewModel 下一次讀取時 refresh。
+- `HudNotificationEvent`：Info／Success／Warning／Error notification input，ViewModel 依 capacity 保存。
+- `HudThemeJsonLoader`／`HudThemeDefinition`：載入 validated visual tokens。
+- `RtsHudPresenter.LayoutSignature`：驗證 Theme 替換不改 layout responsibility。
