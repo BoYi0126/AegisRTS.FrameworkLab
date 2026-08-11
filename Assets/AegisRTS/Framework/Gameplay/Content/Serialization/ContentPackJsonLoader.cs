@@ -74,7 +74,7 @@ namespace AegisRTS.Gameplay.Content.Serialization
             {
                 heroes.Add(new HeroDefinition(
                     Id(item.Id), item.DisplayName, item.MaxHealth, item.MovementSpeed, item.PrefabId,
-                    Costs(item.Costs), Ids(item.AbilityIds), Tags(item.Tags)));
+                    Costs(item.Costs), Ids(item.AbilityIds), Tags(item.Tags), item.Leadership));
             }
 
             var buildings = new List<BuildingDefinition>();
@@ -185,6 +185,7 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public string PrefabId { get; set; }
         public ResourceCostDocument[] Costs { get; set; }
         public string[] AbilityIds { get; set; }
+        public double Leadership { get; set; }
     }
 
     internal sealed class AbilityDocument : DefinitionDocument

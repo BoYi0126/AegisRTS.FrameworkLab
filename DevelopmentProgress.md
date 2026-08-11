@@ -4,10 +4,40 @@
 
 ## Current Status
 
-- Current Phase：Phase 05 Unit Combat / Ability 完成；Unity EditMode 52/52、PlayMode 4/4 通過。
+- Current Phase：Phase 06 Hero / Army / Command 完成；Unity EditMode 60/60、PlayMode 6/6 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 06 Hero / Army / Command
+
+- Status：Completed
+- Goal：以 unit entity 上的 Hero component 建立 leadership／ability 資料，完成 Army composition、commander、optional morale／supply 與九種共用 commands，驗收 Hero + 20 infantry 建軍、拆分、合併與換 commander。
+- Changed：
+  - 新增 `HeroProfile`、`HeroSnapshot`、`IHeroQuery` 與 `HeroSystem`，不建立第二套 Combat。
+  - `HeroDefinition`、JSON loader、validator 與三個 demo Content Packs 新增 world-neutral `leadership`。
+  - 新增 `ArmySystem`、army models／snapshots／events、unit membership、commander 與 optional morale／supply。
+  - 新增 Create／Merge／Split／AssignCommander／Move／Attack／AttackSettlement／Defend／Retreat commands 與 `ArmyCommandRouter`。
+  - 新增 `IArmyOrderExecutor`、`GameplayArmyOrderExecutor`，串接既有 Movement／Combat API。
+  - 新增 `IArmyMembershipSink` 與 `CombatArmyMembershipSink`，讓軍團拆分／合併後 Combat snapshot 的 ArmyId 保持同步。
+  - `Sandbox_Combat` 加入獨立 `ArmySandboxBootstrap`、21 actors、command/event counters 與 debug HUD。
+  - 新增 8 個 Phase 06 EditMode cases、2 個 PlayMode cases，更新 07、15、26 與本進度文件。
+- Architecture / API / Data：
+  - Hero 是 unit entity 的 supplementary component；Combat／Movement state 仍由既有系統擁有。
+  - ArmySystem 是 composition authoritative owner，跨系統同步透過 sink，不直接持有 Unity object。
+  - 所有 army commands 走同一個 CommandBus validator／handler flow；非法跨 faction merge、非 hero commander、重複 membership 在 mutation 前拒絕。
+  - Army order execution 經 `IArmyOrderExecutor` adapter；state-only tests／sandbox 與 production Movement＋Combat coordinator 可替換。
+- Tests / Validation：
+  - Unity EditMode Test Runner：PASS，60/60 passed、0 failed；Phase 06 新增 8 cases。
+  - Unity PlayMode Test Runner：PASS，6/6 passed、0 failed；Phase 06 新增 2 Sandbox cases。
+  - Hero + 20 infantry acceptance：PASS；21 members 建軍、10 members 拆分、合併回 21 members、commander change、membership propagation 全部通過。
+  - 九種 command routing、invalid validation、optional morale／supply、event flow、router disposal：PASS。
+- Known Issues / Risks：
+  - Defend 保存 defense order 並移動至指定點；arrival 後 hold／engagement policy 尚待 coordinator。
+  - Morale／Supply 消耗與潰退門檻尚未接 Economy／AI／Scenario rules。
+  - AttackSettlement 目前由 Phase 05 Combat target 處理；settlement type／ownership validation 待 Phase 07。
+- Next：
+  - 進入 Phase 07 Faction / Settlement / Territory，建立 ownership query 並補強 AttackSettlement validation。
 
 ## 2026-08-11 — Phase 05 Unit Combat / Ability
 

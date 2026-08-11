@@ -12,7 +12,8 @@ namespace AegisRTS.Gameplay.Content.Definitions
             string prefabId,
             IEnumerable<ResourceCost> costs,
             IEnumerable<DefinitionId> abilityIds,
-            IEnumerable<ContentTag> tags)
+            IEnumerable<ContentTag> tags,
+            double leadership = 0d)
             : base(id, displayName, tags)
         {
             MaxHealth = maxHealth;
@@ -20,6 +21,7 @@ namespace AegisRTS.Gameplay.Content.Definitions
             PrefabId = prefabId ?? string.Empty;
             Costs = Copy(costs);
             AbilityIds = Copy(abilityIds);
+            Leadership = leadership;
         }
 
         public double MaxHealth { get; }
@@ -31,5 +33,7 @@ namespace AegisRTS.Gameplay.Content.Definitions
         public IReadOnlyList<ResourceCost> Costs { get; }
 
         public IReadOnlyList<DefinitionId> AbilityIds { get; }
+
+        public double Leadership { get; }
     }
 }

@@ -21,6 +21,7 @@ namespace AegisRTS.Tests.EditMode
             Assert.That(pack.Resources.Count, Is.EqualTo(1));
             Assert.That(pack.Units.Count, Is.EqualTo(1));
             Assert.That(pack.Heroes.Count, Is.EqualTo(1));
+            Assert.That(pack.Heroes[0].Leadership, Is.GreaterThan(0));
             Assert.That(pack.Abilities.Count, Is.EqualTo(1));
             Assert.That(pack.Buildings.Count, Is.EqualTo(1));
             Assert.That(pack.Technologies.Count, Is.EqualTo(1));

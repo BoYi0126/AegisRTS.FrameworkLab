@@ -57,6 +57,11 @@ namespace AegisRTS.Gameplay.Content.Validation
             {
                 ValidateActor(definition.Id, definition.MaxHealth, definition.MovementSpeed, definition.PrefabId,
                     definition.Costs, definition.AbilityIds, resourceIds, abilityIds, assets, issues);
+                if (!IsFiniteNonNegative(definition.Leadership))
+                {
+                    Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id,
+                        "Hero leadership must be finite and non-negative.");
+                }
             }
 
             foreach (AbilityDefinition definition in pack.Abilities.Where(item => item != null))

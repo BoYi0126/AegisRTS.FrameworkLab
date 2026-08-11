@@ -26,6 +26,7 @@
       "displayName": "Debug Commander",
       "maxHealth": 250,
       "movementSpeed": 4.5,
+      "leadership": 70,
       "prefabId": "PF_Hero_Placeholder",
       "costs": [{ "resourceId": "neutral.supplies", "amount": 150 }],
       "abilityIds": ["neutral.rally"],

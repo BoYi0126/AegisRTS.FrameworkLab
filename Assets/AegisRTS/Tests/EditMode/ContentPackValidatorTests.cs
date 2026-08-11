@@ -58,6 +58,22 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void Validate_DetectsInvalidHeroLeadership()
+        {
+            PackParts parts = ContentPackTestFactory.CreateValidParts();
+            parts.Heroes.Clear();
+            parts.Heroes.Add(new HeroDefinition(
+                new DefinitionId("test.bad-hero"), "Bad Hero", 100d, 4d, "PF_Hero_Placeholder",
+                Array.Empty<ResourceCost>(), Array.Empty<DefinitionId>(),
+                ContentPackTestFactory.Tags("hero"), leadership: -1d));
+
+            ContentValidationResult result = _validator.Validate(parts.Build(), ContentPackTestFactory.Assets);
+
+            Assert.That(result.Issues.Any(issue =>
+                issue.Code == ContentValidationIssueCode.InvalidStat && issue.Message.Contains("leadership")), Is.True);
+        }
+
+        [Test]
         public void Validate_DetectsTechnologyCycle()
         {
             PackParts parts = ContentPackTestFactory.CreateValidParts();

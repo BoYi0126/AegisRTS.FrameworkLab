@@ -44,6 +44,13 @@ namespace AegisRTS.Gameplay.Combat
             return true;
         }
 
+        public bool UpdateArmyAssignment(EntityId entityId, EntityId armyId)
+        {
+            if (!_combatants.TryGetValue(entityId, out Combatant combatant)) return false;
+            combatant.ArmyId = armyId;
+            return true;
+        }
+
         public int IssueAttack(AttackTargetCommand command)
         {
             if (command == null) throw new ArgumentNullException(nameof(command));
@@ -353,7 +360,7 @@ namespace AegisRTS.Gameplay.Combat
             return new CombatantSnapshot(
                 combatant.EntityId,
                 combatant.Profile.FactionId,
-                combatant.Profile.ArmyId,
+                combatant.ArmyId,
                 combatant.State,
                 combatant.TargetId,
                 combatant.Position,
@@ -409,9 +416,10 @@ namespace AegisRTS.Gameplay.Combat
         private sealed class Combatant
         {
             public Combatant(EntityId entityId, CombatantProfile profile, WorldPoint position)
-            { EntityId = entityId; Profile = profile; Position = position; Health = profile.MaxHealth; State = CombatantState.Idle; }
+            { EntityId = entityId; Profile = profile; ArmyId = profile.ArmyId; Position = position; Health = profile.MaxHealth; State = CombatantState.Idle; }
             public EntityId EntityId { get; }
             public CombatantProfile Profile { get; }
+            public EntityId ArmyId { get; set; }
             public WorldPoint Position { get; set; }
             public double Health { get; set; }
             public CombatantState State { get; set; }

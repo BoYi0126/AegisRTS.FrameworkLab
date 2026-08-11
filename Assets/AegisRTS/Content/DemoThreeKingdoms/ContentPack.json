@@ -26,6 +26,7 @@
       "displayName": "Field Commander",
       "maxHealth": 300,
       "movementSpeed": 4.8,
+      "leadership": 85,
       "prefabId": "PF_Hero_Placeholder",
       "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 180 }],
       "abilityIds": ["three-kingdoms.rally"],

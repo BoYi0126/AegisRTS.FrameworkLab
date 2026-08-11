@@ -67,3 +67,25 @@ AbilityProfile
 - `EntityId` 表示 runtime identity；definition ID 表示 content identity，兩者不可混用。
 - `StatusEffectProfile` 是 immutable 規則；duration、DoT tick 與 shield remaining amount 是每個 combatant 的 runtime instance state。
 - Faction 決定敵我傷害篩選，ArmyId 保留跨 Phase 的軍團歸屬；Combat 不直接依賴未完成的 Faction／Army service。
+
+## Phase 06 Hero / Army Runtime Model
+
+```text
+Unit Entity
+├─ Movement state (existing)
+├─ Combat state (existing)
+└─ Hero component (optional)
+   └─ DefinitionId / FactionId / Leadership / AbilityIds / ArmyId
+
+Army
+├─ ArmyId / FactionId / CommanderId
+├─ UnitIds / Formation
+├─ Morale / Supply (optional rules)
+└─ Order
+   └─ Idle / Move / Attack / AttackSettlement / Defend / Retreat
+```
+
+- Hero 是既有 unit entity 的額外 component，不繼承或複製 Combat state。
+- `HeroDefinition.Leadership` 是 world-neutral authoring stat；runtime 使用 `HeroProfile`。
+- `ArmySystem` 是 unit-to-army membership 的 authoritative owner，並透過 `IArmyMembershipSink` 同步需要顯示 ArmyId 的其他 runtime read model。
+- `ArmySnapshot.UnitIds` 為複製後的唯讀排序集合，外部無法修改軍團 composition。

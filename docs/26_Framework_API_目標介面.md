@@ -238,3 +238,46 @@ if (combat.TryGetState(entityId, out CombatantSnapshot state))
 - `DamageAppliedEvent`、`ProjectileLaunchedEvent`、`StatusAppliedEvent`、`UnitDiedEvent`、`AbilityUsedEvent` 是 immutable simulation events。
 - `UnityCombatDriver` 負責 frame tick、transform position bridge 與 event-driven projectile visual。
 - `UnityCombatView` 只渲染 snapshot（血條、受傷顏色、死亡外觀），不持有 authoritative HP 或傷害規則。
+
+## Phase 06 Hero / Army / Command API
+
+```csharp
+var heroes = new HeroSystem();
+heroes.Register(heroUnitId, HeroProfile.FromDefinition(heroDefinition, factionId));
+
+var armies = new ArmySystem(
+    heroes,
+    ArmyRuleOptions.From(gameRuleSet),
+    new GameplayArmyOrderExecutor(movement, combat),
+    new CombatArmyMembershipSink(combat),
+    events);
+
+armies.RegisterMember(heroUnitId, factionId);
+armies.RegisterMember(infantryId, factionId);
+
+using var router = new ArmyCommandRouter(commandBus, armies);
+commandBus.Dispatch(new CreateArmyCommand(armyId, factionId, memberIds, heroUnitId));
+commandBus.Dispatch(new SplitArmyCommand(armyId, newArmyId, splitMemberIds));
+commandBus.Dispatch(new MergeArmiesCommand(armyId, newArmyId));
+commandBus.Dispatch(new AssignArmyCommanderCommand(armyId, replacementHeroId));
+```
+
+### Hero component
+
+- `HeroSystem`／`IHeroQuery`：管理 unit entity 上的 Hero／Leadership／Ability component 與 ArmyId，不建立 HeroCombatSystem。
+- `HeroProfile.FromDefinition`：從 `HeroDefinition` 建立 runtime component；Faction 是 runtime ownership，不寫入 content definition。
+- Commander 必須是 army member、已註冊 hero，且與 army 同 faction。
+
+### Army composition and rules
+
+- `ArmySystem`／`IArmyQuery`：建立、拆分、合併 army，查詢 immutable snapshot 與 unit membership。
+- `ArmyRuleOptions.From(GameRuleSet)`：啟用或停用 Morale／Supply；disabled rule 不接受數值調整。
+- `AdjustMorale`／`AdjustSupply`：只在對應 rule enabled 時更新，結果限制於 0–100。
+- `IArmyMembershipSink`：Army composition 更新的 adapter boundary；`CombatArmyMembershipSink` 讓 Combat snapshot 反映最新 ArmyId。
+
+### Commands and orders
+
+- Commands：`CreateArmyCommand`、`MergeArmiesCommand`、`SplitArmyCommand`、`AssignArmyCommanderCommand`、`MoveArmyCommand`、`AttackArmyCommand`、`AttackSettlementArmyCommand`、`DefendArmyCommand`、`RetreatArmyCommand`。
+- `ArmyCommandRouter`：為每種 command 同時註冊 validator 與 handler，Player／AI／Scenario／Test 共用相同 flow。
+- `IArmyOrderExecutor`：隔離 Army order state 與執行 backend；`GameplayArmyOrderExecutor` 接到既有 Movement／Combat。
+- Events：`ArmyCreatedEvent`、`ArmiesMergedEvent`、`ArmySplitEvent`、`ArmyCommanderAssignedEvent`、`ArmyOrderIssuedEvent`。

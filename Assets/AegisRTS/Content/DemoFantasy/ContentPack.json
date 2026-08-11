@@ -26,6 +26,7 @@
       "displayName": "Archmage",
       "maxHealth": 220,
       "movementSpeed": 4.6,
+      "leadership": 75,
       "prefabId": "PF_Hero_Placeholder",
       "costs": [{ "resourceId": "fantasy.mana", "amount": 200 }],
       "abilityIds": ["fantasy.arcane-pulse"],
