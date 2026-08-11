@@ -4,10 +4,40 @@
 
 ## Current Status
 
-- Current Phase：Phase 12 UI／UX 完成；Unity EditMode 125/125、PlayMode 15/15 通過。
+- Current Phase：Phase 13 Save／Replay／Debug／Test 完成；Unity EditMode 136/136、PlayMode 16/16 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 13 Save / Replay / Debug / Test
+
+- Status：Completed
+- Goal：完成 pure GameState save/load、metadata、deterministic replay、development debug console 與 battle-state reload acceptance。
+- Changed：
+  - 新增 typed `GameStateDocument`，涵蓋 faction／settlement／unit／hero／army／resource／building／technology／objective／clock／random。
+  - 新增 `SaveEnvelope`／`SaveMetadata`、SHA-256 integrity、strict version compatibility 與 fingerprint。
+  - 新增 capture source／restore sink／coordinator，以及 memory／atomic file stores。
+  - `SeededRandom` 與 `GameClock` 新增 state capture／restore。
+  - 新增 Replay InitialState／Seed／Tick／Sequence／Command、recorder、serializer 與 player。
+  - 新增九種 Debug Console commands、quoted tokenizer、enable gate 與 executor boundary。
+  - Persistence assembly 改為 `noEngineReferences=true`；`Sandbox_AI` 加入 battle save/reload acceptance。
+  - 新增 11 個 EditMode cases、1 個 PlayMode case，更新 07、22、26 與本進度文件。
+- Architecture / API / Data：
+  - Persistence 只依賴 Core／Gameplay contracts，不保存 concrete manager 或 Unity reference。
+  - capture／restore 聚合由 composition root 負責；各 authoritative system 不被 Save service 取代。
+  - Replay 保存 command data 與 deterministic order，實際 command reconstruction 由 injected sink 完成。
+  - Debug Console 預設 disabled，只產生 validated request 並委派 executor。
+- Tests / Validation：
+  - Unity EditMode Test Runner：PASS，136/136 passed、0 failed；Phase 13 新增 11 cases。
+  - Unity PlayMode Test Runner：PASS，16/16 passed、0 failed；Phase 13 新增 1 Sandbox case。
+  - Battle HP／resources／objective／clock／random mutation 後 restore fingerprint：PASS。
+  - checksum tamper、version rejection、Replay stable order、Random continuation、Clock restore、九種 debug commands：PASS。
+- Known Issues / Risks：
+  - Save compatibility 目前採 exact version；正式 release 前需建立 explicit migration chain 與 compatibility fixtures。
+  - 尚未實作 async／compressed／cloud saves、incremental checkpoint 或 replay seek snapshots。
+  - 正式 game composition 仍需為每個 authoritative system 實作 capture／restore adapter 與 replay command factory。
+- Next：
+  - 進入 Phase 14 Performance，建立 budgets、pooling、spatial partition、LOD／tick throttling 與 profiling acceptance。
 
 ## 2026-08-11 — Phase 12 UI / UX
 

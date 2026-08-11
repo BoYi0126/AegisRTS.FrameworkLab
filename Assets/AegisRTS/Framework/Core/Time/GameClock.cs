@@ -3,6 +3,23 @@ using System.Globalization;
 
 namespace AegisRTS.Core.Time
 {
+    public readonly struct GameClockState
+    {
+        public GameClockState(double totalSeconds, double totalUnscaledSeconds, double deltaSeconds,
+            double unscaledDeltaSeconds, ulong tickCount, bool paused, double speed)
+        {
+            TotalSeconds = totalSeconds; TotalUnscaledSeconds = totalUnscaledSeconds; DeltaSeconds = deltaSeconds;
+            UnscaledDeltaSeconds = unscaledDeltaSeconds; TickCount = tickCount; Paused = paused; Speed = speed;
+        }
+        public double TotalSeconds { get; }
+        public double TotalUnscaledSeconds { get; }
+        public double DeltaSeconds { get; }
+        public double UnscaledDeltaSeconds { get; }
+        public ulong TickCount { get; }
+        public bool Paused { get; }
+        public double Speed { get; }
+    }
+
     /// <summary>
     /// Advances simulation time from caller-supplied unscaled time.
     /// </summary>
@@ -78,6 +95,19 @@ namespace AegisRTS.Core.Time
             TickCount = 0;
             IsPaused = false;
             Speed = 1d;
+        }
+
+        public GameClockState CaptureState() => new GameClockState(TotalSeconds, TotalUnscaledSeconds,
+            DeltaSeconds, UnscaledDeltaSeconds, TickCount, IsPaused, Speed);
+
+        public void Restore(GameClockState state)
+        {
+            if (state.TotalSeconds < 0d || state.TotalUnscaledSeconds < 0d || state.DeltaSeconds < 0d ||
+                state.UnscaledDeltaSeconds < 0d || double.IsNaN(state.Speed) || double.IsInfinity(state.Speed) || state.Speed <= 0d)
+                throw new ArgumentOutOfRangeException(nameof(state));
+            TotalSeconds = state.TotalSeconds; TotalUnscaledSeconds = state.TotalUnscaledSeconds;
+            DeltaSeconds = state.DeltaSeconds; UnscaledDeltaSeconds = state.UnscaledDeltaSeconds;
+            TickCount = state.TickCount; IsPaused = state.Paused; Speed = state.Speed;
         }
 
         /// <summary>Returns a concise state string suitable for diagnostics tools.</summary>

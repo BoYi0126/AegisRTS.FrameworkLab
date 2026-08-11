@@ -460,3 +460,27 @@ hud.Execute(new HudCommand("unit.move", targetId));
 - `HudNotificationEvent`：Info／Success／Warning／Error notification input，ViewModel 依 capacity 保存。
 - `HudThemeJsonLoader`／`HudThemeDefinition`：載入 validated visual tokens。
 - `RtsHudPresenter.LayoutSignature`：驗證 Theme 替換不改 layout responsibility。
+
+## Phase 13 Save / Replay / Debug API
+
+```csharp
+var saves = new GameStateSaveService("1.0.0", frameworkVersion, contentVersion);
+var coordinator = new GameStateCoordinator(saves);
+
+string json = coordinator.Save(captureSource, saves.CreateMetadata(scenarioId));
+SaveEnvelope loaded = coordinator.Load(json, restoreSink);
+
+var recorder = new ReplayRecorder(loaded, seed);
+recorder.Record(tick, "unit.move", payloadJson);
+var player = new ReplayPlayer(recorder.Build(), replayCommandSink);
+player.AdvanceTo(targetTick);
+```
+
+- `GameStateDocument`：完整 typed pure-data save root。
+- `GameStateSaveService.Serialize／Deserialize`：metadata compatibility、SHA-256 validation 與 JSON envelope。
+- `Fingerprint`：比較 save/load 前後核心 state，不依賴 Unity scene／view。
+- `IGameStateCaptureSource`／`IGameStateRestoreSink`：composition-owned system aggregation／restore boundary。
+- `ISaveStore`：Memory／File slot storage，與 state serialization 分離。
+- `SeededRandom.CaptureState／Restore`、`GameClock.CaptureState／Restore`：deterministic continuation。
+- `ReplayRecorder`／`ReplayPlayer`：InitialState＋Seed＋ordered Tick commands。
+- `DebugConsole`／`IDebugCommandExecutor`：development command parsing／delegation；預設 disabled。

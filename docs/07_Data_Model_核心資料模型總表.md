@@ -210,3 +210,26 @@ HudThemeDefinition
 - `RtsHudViewModel` 以 invalidation event 控制 query refresh，並擁有短生命週期 notification queue。
 - `HudThemeDefinition` 只描述視覺 tokens；切換 theme 不重建或修改 Gameplay systems。
 - 十個 `HudPanelId` 固定 layout responsibility；隱藏／內容差異由 query snapshot 決定。
+
+## Phase 13 Save / Replay Model
+
+```text
+SaveEnvelope
+├─ Metadata ── SaveVersion / FrameworkVersion / ContentVersion / ScenarioId / Timestamp
+├─ GameStateDocument
+│  ├─ Faction / Settlement / Unit / Hero / Army
+│  ├─ ResourceAccount / Building / Technology / Objective
+│  └─ Clock / Random / Extensions
+└─ SHA-256 Checksum
+
+ReplayDocument
+├─ Initial SaveEnvelope
+├─ Seed
+└─ Commands ── Tick / Sequence / CommandId / PayloadJson
+```
+
+- Save DTO 只保存 persistent values 與 stable IDs；runtime service／Unity object 不可序列化。
+- capture source 與 restore sink 由 composition root 實作，因此每個 authoritative system 仍擁有自己的 runtime state。
+- Clock 保存 scaled／unscaled time、delta、tick、pause、speed；Random 保存 seed、draw count、internal PCG state。
+- Checksum 同時覆蓋 metadata 與 state；任何內容 mutation 在 restore 前被拒絕。
+- Replay 同 tick 使用 sequence 維持 command dispatch order，只允許向前推進。

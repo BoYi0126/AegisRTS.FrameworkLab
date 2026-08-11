@@ -3,6 +3,15 @@ using System.Globalization;
 
 namespace AegisRTS.Core.Random
 {
+    public readonly struct SeededRandomState
+    {
+        public SeededRandomState(int seed, ulong drawCount, ulong internalState)
+        { Seed = seed; DrawCount = drawCount; InternalState = internalState; }
+        public int Seed { get; }
+        public ulong DrawCount { get; }
+        public ulong InternalState { get; }
+    }
+
     /// <summary>
     /// Deterministic PCG-based random source whose sequence is stable across supported runtimes.
     /// </summary>
@@ -91,6 +100,14 @@ namespace AegisRTS.Core.Random
             }
 
             return NextDouble() < probability;
+        }
+
+        public SeededRandomState CaptureState() => new SeededRandomState(Seed, DrawCount, _state);
+
+        public static SeededRandom Restore(SeededRandomState state)
+        {
+            var random = new SeededRandom(state.Seed) { _state = state.InternalState, DrawCount = state.DrawCount };
+            return random;
         }
 
         /// <summary>Returns a concise state string suitable for diagnostics tools.</summary>
