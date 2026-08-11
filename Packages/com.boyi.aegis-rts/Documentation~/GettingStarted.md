@@ -30,3 +30,5 @@ Keep background-specific data and assets outside `Runtime/`. The runtime package
 - `AegisRTS.Gameplay`: authoritative pure C# RTS state and rules.
 - `AegisRTS.Presentation`: Unity input, camera, movement, combat, and HUD adapters.
 - `AegisRTS.Persistence`: save, load, replay, and debug command boundaries.
+
+Continue with [Framework API](FrameworkApi.md) for the setup, command, and persistence entry points.

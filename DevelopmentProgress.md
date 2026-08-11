@@ -4,10 +4,35 @@
 
 ## Current Status
 
-- Current Phase：Phase 16 Package / Framework 化完成；原專案 Unity EditMode 156/156、PlayMode 19/19，乾淨安裝專案 EditMode 3/3、PlayMode 3/3 通過。
+- Current Phase：Framework API 目標介面契約完成；原專案 Unity EditMode 159/159、PlayMode 19/19，乾淨安裝專案 EditMode 6/6 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Framework API 目標介面契約
+
+- Status：Completed
+- Goal：執行 `docs/26_Framework_API_目標介面.md`，把 CreateFaction、CreateSettlement、SpawnUnit、CreateArmy、IssueCommand、Recruit、Build、Research、StartSiege、CaptureSettlement、AddResource、StartScenario、Save、Load 對應到可安裝 package 的穩定公共入口。
+- Changed：
+  - 在目標介面文件新增 15 個目標操作到 subsystem／CommandBus／Persistence API 的對照表。
+  - 新增 package `Documentation~/FrameworkApi.md`，並由 package README 與 Getting Started 導向此文件。
+  - 新增 3 個 `FrameworkApiContractTests`，鎖定 setup／spawn／resource、共用 commands、save／load 的 public package contracts。
+  - 更新 package changelog。
+- Architecture / API / Data：
+  - 不新增同時擁有 Combat、Economy、AI、Persistence、Presentation 狀態的全域 façade；setup 由 composition root 負責，runtime intent 繼續透過既有 CommandBus 與 routers。
+  - `IUnitSpawnSink` 保留為產品層 spawn adapter，避免 Framework 假設每種遊戲的 unit 需要註冊哪些 optional systems／views。
+  - 本次未修改 runtime method signature 或資料格式，新增的是可發布文件與 API 相容性測試。
+- Tests / Validation：
+  - Unity EditMode：PASS，159/159。
+  - Unity PlayMode：PASS，19/19。
+  - `C:\projects\Unity\AegisRTS.PackageValidation` EditMode：PASS，6/6；確認 file-installed package 可編譯並執行新增契約測試。
+  - 三份 Unity logs 掃描 `Unhandled`、`NullReferenceException`、`Compilation failed`、`error CS`、`Aborting batchmode`：無匹配。
+  - `git diff --check`：PASS。
+- Known Issues / Risks：
+  - 本次未重跑乾淨安裝專案 PlayMode；改動僅限文件與 Editor-only package contract tests，原專案完整 PlayMode 19/19 已通過。
+  - package 仍為 `UNLICENSED`，正式公開散布前需選定授權。
+- Next：
+  - 執行 `docs/27_Definition_of_Done_總驗收.md` 的 release 前複核；若要發布 immutable release，再由使用者授權建立 tag。
 
 ## 2026-08-11 — Phase 16 Package / Framework 化
 

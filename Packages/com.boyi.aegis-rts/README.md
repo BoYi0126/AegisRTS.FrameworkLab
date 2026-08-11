@@ -10,6 +10,6 @@ In Unity Package Manager choose **Add package from disk...** and select this pac
 "com.boyi.aegis-rts": "https://github.com/BoYi0126/AegisRTS.FrameworkLab.git?path=/Packages/com.boyi.aegis-rts#main"
 ```
 
-Import Basic RTS, Basic Combat, or Basic Siege from the package Samples tab. See `Documentation~/GettingStarted.md` before authoring a content pack.
+Import Basic RTS, Basic Combat, or Basic Siege from the package Samples tab. See `Documentation~/GettingStarted.md` before authoring a content pack, and `Documentation~/FrameworkApi.md` for the public operation map.
 
 Version: 1.0.0

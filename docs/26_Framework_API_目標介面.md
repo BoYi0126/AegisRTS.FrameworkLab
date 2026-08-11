@@ -4,6 +4,26 @@
 
 核心 API 必須同時可由 Player、AI、Scenario、Test 使用，不能只靠 Inspector 操作。
 
+## 目標操作對照
+
+| 目標操作 | 公開入口 | 邊界 |
+| --- | --- | --- |
+| CreateFaction | `FactionSystem.Register` | Composition setup |
+| CreateSettlement | `SettlementSystem.Register` | Composition setup |
+| SpawnUnit | `IUnitSpawnSink.SpawnUnit`，並由 composition 註冊到需要的 gameplay systems | Spawn adapter |
+| CreateArmy | `CreateArmyCommand`＋`ArmyCommandRouter` | CommandBus |
+| IssueCommand | `CommandBus.Dispatch<TCommand>` | CommandBus |
+| Recruit | `RecruitUnitCommand`＋`RecruitmentCommandRouter` | CommandBus |
+| Build | `ConstructBuildingCommand`＋`BuildingCommandRouter` | CommandBus |
+| Research | `ResearchTechnologyCommand`＋`TechnologyCommandRouter` | CommandBus |
+| StartSiege | `StartSiegeCommand`＋`SiegeCommandRouter` | CommandBus |
+| CaptureSettlement | `CaptureSettlementCommand`＋`SettlementCommandRouter`；攻城流程使用 `CaptureSiegeCommand` | CommandBus |
+| AddResource | `EconomySystem.AddResource` | Economy owner mutation |
+| StartScenario | `StartScenarioCommand`＋`ScenarioCommandRouter` | CommandBus |
+| Save／Load | `GameStateCoordinator.Save`／`Load` | Persistence boundary |
+
+Framework 不提供同時持有 Combat、Economy、AI、Persistence 與 Presentation 狀態的全域 façade。產品可在 composition root 建立便利入口，但必須委派到上表契約，且不得複製 domain state 或繞過 validator。Package 內的 `FrameworkApiContractTests` 會鎖定這些公開入口。
+
 ## Phase 01 Core API
 
 `AegisRTS.Core` 是 Pure C# assembly，`noEngineReferences` 啟用且不引用 Gameplay 或 Presentation。所有時間步進與訊息派送均由呼叫端明確驅動，不依賴 MonoBehaviour lifecycle。

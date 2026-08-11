@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Added the packaged Framework API operation map and public contract tests.
+
 ## [1.0.0] - 2026-08-11
 
 - Initial SemVer release.
