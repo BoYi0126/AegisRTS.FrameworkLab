@@ -4,10 +4,37 @@
 
 ## Current Status
 
-- Current Phase：Phase 15 Vertical Slice 完成；Unity EditMode 154/154、PlayMode 19/19 通過。
+- Current Phase：Phase 16 Package / Framework 化完成；原專案 Unity EditMode 156/156、PlayMode 19/19，乾淨安裝專案 EditMode 3/3、PlayMode 3/3 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 16 Package / Framework 化
+
+- Status：Completed
+- Goal：輸出可透過 UPM 安裝的 `com.boyi.aegis-rts`，提供三個 samples，並在第二個乾淨 Unity project 完成 install／import／compile／play／custom content 驗收。
+- Changed：
+  - 將 Core／Gameplay／Presentation／Persistence 從 Assets 搬至 `Packages/com.boyi.aegis-rts/Runtime`，package 成為唯一 Framework source of truth。
+  - 新增 SemVer `1.0.0` `package.json`、CHANGELOG、README、Getting Started 與 Git／disk 安裝方式。
+  - 新增 Editor Content Pack validation menu 與 2 個 package smoke tests。
+  - 新增 Basic RTS、Basic Combat、Basic Siege 三個可匯入 samples，各含 asmdef、scene、bootstrap 與說明。
+  - 更新 package lock、專案結構／Phase 16／API／DoD／README 與本進度文件。
+- Architecture / API / Data：
+  - `Runtime` 不包含 Three Kingdoms／Fantasy Content；背景 JSON／assets 與 Demo composition 留在 Lab 專案。
+  - package assemblies 保留原名稱與 dependency direction，既有 Demo／Tests 不需改 namespace 或 API。
+  - `Samples~` 不參與 package runtime compile，匯入後以各自 sample asmdef 編譯。
+- Tests / Validation：
+  - 原專案 Unity EditMode：PASS，156/156（含 2 package smoke）；PlayMode：PASS，19/19。
+  - 新建 `C:\projects\Unity\AegisRTS.PackageValidation` 並以 `file:` dependency 安裝：PASS。
+  - Package Manager import Basic RTS／Basic Combat／Basic Siege：PASS；三個 scenes compile／play，PlayMode 3/3。
+  - 消費端建立 `consumer.my-first-pack`，`ContentPackJsonLoader`＋`ContentPackValidator`：PASS；乾淨專案 EditMode 3/3。
+  - Runtime world-specific string scan：PASS；package structure／SemVer／JSON／GUID／Git diff 稽核待提交前完成。
+- Known Issues / Risks：
+  - package 目前標記 `UNLICENSED`；正式公開散布前需由擁有者選定授權條款。
+  - Git URL 安裝將追蹤指定 branch；正式 release 建議改用 immutable tag，例如 `#v1.0.0`。
+  - Samples 使用 primitive／IMGUI acceptance visuals，定位為 integration examples，不是 production art。
+- Next：
+  - 建立 `v1.0.0` release tag／release notes（需使用者明確授權後執行），並在目標硬體進行 Player build profiling。
 
 ## 2026-08-11 — Phase 15 Vertical Slice
 

@@ -1,0 +1,33 @@
+{
+  "name": "com.boyi.aegis-rts",
+  "version": "1.0.0",
+  "displayName": "AegisRTS Framework",
+  "description": "Data-driven RTS framework with combat, armies, economy, siege, AI, scenarios, UI, persistence, and performance infrastructure.",
+  "unity": "6000.0",
+  "keywords": ["rts", "strategy", "framework", "data-driven"],
+  "author": {
+    "name": "BoYi"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "com.unity.inputsystem": "1.20.0",
+    "com.unity.test-framework": "1.7.0"
+  },
+  "samples": [
+    {
+      "displayName": "Basic RTS",
+      "description": "Hero-led army composition and movement order sample.",
+      "path": "Samples~/BasicRTS"
+    },
+    {
+      "displayName": "Basic Combat",
+      "description": "Pure gameplay combat with a Unity visualization.",
+      "path": "Samples~/BasicCombat"
+    },
+    {
+      "displayName": "Basic Siege",
+      "description": "Gate breach, entry, and capture sample.",
+      "path": "Samples~/BasicSiege"
+    }
+  ]
+}

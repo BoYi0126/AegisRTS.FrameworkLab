@@ -534,3 +534,15 @@ session.Resume();
 - `VerticalSliceLoop.Tick／RunToCompletion`：deterministic stage progression；Waiting 不跳階，Defeated 立即終止。
 - `VerticalSliceSimulation`：共用 composition，透過既有 domain API 完成收入、招募、軍團、戰鬥、AI 反攻、攻城與佔領。
 - `GameSessionController`：以 `IGameSessionBackend` 隔離 New／Load／Restart 的 scene／persistence 實作。
+
+## Phase 16 Package API
+
+```json
+"com.boyi.aegis-rts": "https://github.com/BoYi0126/AegisRTS.FrameworkLab.git?path=/Packages/com.boyi.aegis-rts#main"
+```
+
+- Package ID：`com.boyi.aegis-rts`；目前 SemVer：`1.0.0`；最低 Unity manifest version：`6000.0`。
+- Runtime assemblies：`AegisRTS.Core`、`AegisRTS.Gameplay`、`AegisRTS.Presentation`、`AegisRTS.Persistence`。
+- Editor assembly：`AegisRTS.Tools`，提供 `Tools/AegisRTS/Validate Content Pack...`。
+- Samples：Basic RTS、Basic Combat、Basic Siege；經 Package Manager import 後可直接開啟對應 scene。
+- Consumer content 透過 `ContentPackJsonLoader`／`ContentPackValidator` 建立，不需修改 package Runtime。

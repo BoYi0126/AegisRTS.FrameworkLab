@@ -19,4 +19,14 @@ AegisRTS FrameworkLab 是可重複用於不同世界觀的 RTS／領土／攻城
 
 開始任何開發前先閱讀 [`DevelopmentProgress.md`](DevelopmentProgress.md)；每次修改 repository 都必須依 [`docs/09_DevelopmentProgress_開發進度紀錄規範.md`](docs/09_DevelopmentProgress_開發進度紀錄規範.md) 同步更新進度。
 
-Framework 原始碼在 `Assets/AegisRTS/Framework`，世界觀內容在 `Assets/AegisRTS/Content`，示範與 Sandbox 在 `Assets/AegisRTS/Demo`，測試在 `Assets/AegisRTS/Tests`。
+Framework 原始碼與 UPM 發行包在 `Packages/com.boyi.aegis-rts`，世界觀內容在 `Assets/AegisRTS/Content`，示範與 Sandbox 在 `Assets/AegisRTS/Demo`，專案測試在 `Assets/AegisRTS/Tests`。
+
+## 安裝 Framework Package
+
+在另一個 Unity 專案的 Package Manager 選擇 **Add package from git URL...**，輸入：
+
+```text
+https://github.com/BoYi0126/AegisRTS.FrameworkLab.git?path=/Packages/com.boyi.aegis-rts#main
+```
+
+也可選擇 **Add package from disk...** 並指定 `Packages/com.boyi.aegis-rts/package.json`。安裝後可從 Samples 分頁匯入 Basic RTS、Basic Combat 或 Basic Siege。

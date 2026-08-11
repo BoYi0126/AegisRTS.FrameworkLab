@@ -1,0 +1,19 @@
+{
+  "name": "AegisRTS.Package.Tests",
+  "rootNamespace": "AegisRTS.Package.Tests",
+  "references": [
+    "AegisRTS.Core",
+    "AegisRTS.Gameplay",
+    "AegisRTS.Persistence"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": ["TestAssemblies"]
+}

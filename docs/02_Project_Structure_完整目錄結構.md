@@ -87,3 +87,5 @@ Packages/com.boyi.aegis-rts/
 ├─ Documentation~
 └─ package.json
 ```
+
+Phase 16 已完成此結構；`Packages/com.boyi.aegis-rts/Runtime` 是 Framework 唯一原始碼位置，`Assets/AegisRTS` 只保留背景內容、Demo composition 與專案驗收測試，避免同一專案編譯兩份 assembly。

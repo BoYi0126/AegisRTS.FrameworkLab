@@ -1,0 +1,14 @@
+{
+  "name": "AegisRTS.Sample.BasicCombat",
+  "rootNamespace": "AegisRTS.Samples.BasicCombat",
+  "references": ["AegisRTS.Core", "AegisRTS.Gameplay"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

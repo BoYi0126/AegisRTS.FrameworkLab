@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.boyi.aegis-rts": {
+      "version": "file:com.boyi.aegis-rts",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.inputsystem": "1.20.0",
+        "com.unity.test-framework": "1.7.0"
+      }
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.14",
       "depth": 0,

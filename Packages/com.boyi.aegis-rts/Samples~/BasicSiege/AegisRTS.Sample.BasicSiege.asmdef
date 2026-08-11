@@ -1,0 +1,14 @@
+{
+  "name": "AegisRTS.Sample.BasicSiege",
+  "rootNamespace": "AegisRTS.Samples.BasicSiege",
+  "references": ["AegisRTS.Core", "AegisRTS.Gameplay"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
