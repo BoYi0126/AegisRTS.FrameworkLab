@@ -1,0 +1,73 @@
+{
+  "id": "demo.neutral",
+  "displayName": "Neutral Debug Pack",
+  "declaredTags": ["resource", "unit", "infantry", "hero", "ability", "structure", "settlement", "technology"],
+  "resources": [
+    { "id": "neutral.supplies", "displayName": "Supplies", "tags": ["resource"] }
+  ],
+  "abilities": [
+    { "id": "neutral.rally", "displayName": "Rally", "cooldownSeconds": 8, "range": 10, "tags": ["ability"] }
+  ],
+  "units": [
+    {
+      "id": "neutral.infantry",
+      "displayName": "Debug Infantry",
+      "maxHealth": 100,
+      "movementSpeed": 4,
+      "prefabId": "PF_Unit_Placeholder",
+      "costs": [{ "resourceId": "neutral.supplies", "amount": 50 }],
+      "abilityIds": [],
+      "tags": ["unit", "infantry"]
+    }
+  ],
+  "heroes": [
+    {
+      "id": "neutral.commander",
+      "displayName": "Debug Commander",
+      "maxHealth": 250,
+      "movementSpeed": 4.5,
+      "prefabId": "PF_Hero_Placeholder",
+      "costs": [{ "resourceId": "neutral.supplies", "amount": 150 }],
+      "abilityIds": ["neutral.rally"],
+      "tags": ["hero"]
+    }
+  ],
+  "buildings": [
+    {
+      "id": "neutral.outpost",
+      "displayName": "Debug Outpost",
+      "maxHealth": 800,
+      "prefabId": "PF_Structure_Placeholder",
+      "costs": [{ "resourceId": "neutral.supplies", "amount": 200 }],
+      "tags": ["structure"]
+    }
+  ],
+  "technologies": [
+    {
+      "id": "neutral.training",
+      "displayName": "Basic Training",
+      "costs": [{ "resourceId": "neutral.supplies", "amount": 100 }],
+      "prerequisiteIds": [],
+      "tags": ["technology"]
+    }
+  ],
+  "settlements": [
+    {
+      "id": "neutral.keep",
+      "displayName": "Debug Keep",
+      "maxHealth": 2000,
+      "prefabId": "PF_Settlement_Placeholder",
+      "startingResourceIds": ["neutral.supplies"],
+      "tags": ["settlement"]
+    }
+  ],
+  "rules": {
+    "moraleEnabled": false,
+    "supplyEnabled": true,
+    "heroCaptureEnabled": false,
+    "heroPermanentDeath": false,
+    "populationEnabled": true,
+    "fogOfWarEnabled": false,
+    "destructibleWalls": true
+  }
+}

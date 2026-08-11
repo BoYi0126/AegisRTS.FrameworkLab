@@ -1,0 +1,73 @@
+{
+  "id": "demo.fantasy",
+  "displayName": "Fantasy Demo Pack",
+  "declaredTags": ["resource", "unit", "mechanical", "hero", "magic", "ability", "structure", "settlement", "technology"],
+  "resources": [
+    { "id": "fantasy.mana", "displayName": "Mana", "tags": ["resource", "magic"] }
+  ],
+  "abilities": [
+    { "id": "fantasy.arcane-pulse", "displayName": "Arcane Pulse", "cooldownSeconds": 7, "range": 14, "tags": ["ability", "magic"] }
+  ],
+  "units": [
+    {
+      "id": "fantasy.golem",
+      "displayName": "Golem",
+      "maxHealth": 180,
+      "movementSpeed": 3.2,
+      "prefabId": "PF_Unit_Placeholder",
+      "costs": [{ "resourceId": "fantasy.mana", "amount": 70 }],
+      "abilityIds": [],
+      "tags": ["unit", "mechanical", "magic"]
+    }
+  ],
+  "heroes": [
+    {
+      "id": "fantasy.archmage",
+      "displayName": "Archmage",
+      "maxHealth": 220,
+      "movementSpeed": 4.6,
+      "prefabId": "PF_Hero_Placeholder",
+      "costs": [{ "resourceId": "fantasy.mana", "amount": 200 }],
+      "abilityIds": ["fantasy.arcane-pulse"],
+      "tags": ["hero", "magic"]
+    }
+  ],
+  "buildings": [
+    {
+      "id": "fantasy.arcane-tower",
+      "displayName": "Arcane Tower",
+      "maxHealth": 850,
+      "prefabId": "PF_Structure_Placeholder",
+      "costs": [{ "resourceId": "fantasy.mana", "amount": 260 }],
+      "tags": ["structure", "magic"]
+    }
+  ],
+  "technologies": [
+    {
+      "id": "fantasy.runic-mastery",
+      "displayName": "Runic Mastery",
+      "costs": [{ "resourceId": "fantasy.mana", "amount": 130 }],
+      "prerequisiteIds": [],
+      "tags": ["technology", "magic"]
+    }
+  ],
+  "settlements": [
+    {
+      "id": "fantasy.arcane-fortress",
+      "displayName": "Arcane Fortress",
+      "maxHealth": 2400,
+      "prefabId": "PF_Settlement_Placeholder",
+      "startingResourceIds": ["fantasy.mana"],
+      "tags": ["settlement", "magic"]
+    }
+  ],
+  "rules": {
+    "moraleEnabled": false,
+    "supplyEnabled": false,
+    "heroCaptureEnabled": false,
+    "heroPermanentDeath": true,
+    "populationEnabled": true,
+    "fogOfWarEnabled": true,
+    "destructibleWalls": true
+  }
+}

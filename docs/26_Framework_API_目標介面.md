@@ -78,3 +78,35 @@ machine.Stop();
 - `GameClock`、`SeededRandom`、`CommandBus`、`EventBus`、`StateMachine` 提供 `GetDebugSummary()`；Bus 與 State Machine 可將生命週期事件送至 `IDiagnosticSink`。
 
 Command Bus、Event Bus、State Machine 與 Entity ID Generator 預設由單一 simulation thread 擁有；`DiagnosticBuffer` 可安全接受多執行緒寫入。
+
+## Phase 02 Data-Driven / Content Pack API
+
+Gameplay definition 與 Content Pack API 同樣是 Pure C#，不持有 `GameObject` 或其他 Unity runtime object。
+
+### Deserialize / Validate / Activate
+
+```csharp
+ContentPack pack = jsonLoader.Load(json);
+ContentPackLoadResult result = contentPackService.Load(pack, assetCatalog);
+
+if (result.Succeeded)
+{
+    UnitDefinition unit = result.Catalog.GetRequired<UnitDefinition>(unitId);
+}
+```
+
+- `ContentPackJsonLoader.Load`：將 JSON authoring data 轉成 immutable definitions；格式錯誤拋出 `ContentPackFormatException`。
+- `ContentPackValidator.Validate`：一次回傳所有 duplicate ID、missing reference、invalid stat／cost、technology cycle、missing prefab／tag 問題。
+- `IContentAssetCatalog`：由 Unity 或 Test adapter 提供 prefab ID existence check，Gameplay 不直接依賴 AssetDatabase 或 GameObject。
+- `ContentPackService.Load`：驗證成功才 atomically 切換 `ActiveCatalog`；失敗時保留前一個 catalog。
+- `ContentCatalog.TryGet<TDefinition>`／`GetRequired<TDefinition>`：以 `DefinitionId` 進行 exact typed query。
+
+### Definition 與規則
+
+- `DefinitionId`：trim、lowercase 並限制穩定字元；reference 不使用 display name。
+- `ContentTag`：content-neutral classification；使用前必須由 pack 宣告。
+- `ResourceDefinition`、`UnitDefinition`、`HeroDefinition`、`AbilityDefinition`、`BuildingDefinition`、`TechnologyDefinition`、`SettlementDefinition`：載入後為 read-only。
+- `ResourceCost`：以 Resource Definition ID 表達成本。
+- `GameRuleSet`：提供 Morale、Supply、Hero Capture／Death、Population、Fog of War、Destructible Walls switches。
+
+`ContentPackService`、`ContentCatalog` 與 `ContentValidationResult` 提供 `GetDebugSummary()` 或可直接取得 validation issues，供 Debug／Validation tools 顯示。

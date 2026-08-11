@@ -15,6 +15,10 @@ C:\projects\Unity\AegisRTS.FrameworkLab
 │     │  │  ├─ StateMachine
 │     │  │  └─ Diagnostics
 │     │  ├─ Gameplay
+│     │  │  ├─ Content
+│     │  │  │  ├─ Definitions
+│     │  │  │  ├─ Serialization
+│     │  │  │  └─ Validation
 │     │  │  ├─ Units
 │     │  │  ├─ Movement
 │     │  │  ├─ Formation

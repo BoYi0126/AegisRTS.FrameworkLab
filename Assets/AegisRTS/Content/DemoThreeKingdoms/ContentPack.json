@@ -1,0 +1,73 @@
+{
+  "id": "demo.three-kingdoms",
+  "displayName": "Three Kingdoms Demo Pack",
+  "declaredTags": ["resource", "unit", "infantry", "hero", "ability", "structure", "settlement", "technology"],
+  "resources": [
+    { "id": "three-kingdoms.provisions", "displayName": "Provisions", "tags": ["resource"] }
+  ],
+  "abilities": [
+    { "id": "three-kingdoms.rally", "displayName": "Rally the Troops", "cooldownSeconds": 10, "range": 12, "tags": ["ability"] }
+  ],
+  "units": [
+    {
+      "id": "three-kingdoms.spearman",
+      "displayName": "Spearman",
+      "maxHealth": 115,
+      "movementSpeed": 4.2,
+      "prefabId": "PF_Unit_Placeholder",
+      "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 55 }],
+      "abilityIds": [],
+      "tags": ["unit", "infantry"]
+    }
+  ],
+  "heroes": [
+    {
+      "id": "three-kingdoms.commander",
+      "displayName": "Field Commander",
+      "maxHealth": 300,
+      "movementSpeed": 4.8,
+      "prefabId": "PF_Hero_Placeholder",
+      "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 180 }],
+      "abilityIds": ["three-kingdoms.rally"],
+      "tags": ["hero"]
+    }
+  ],
+  "buildings": [
+    {
+      "id": "three-kingdoms.watchtower",
+      "displayName": "Watchtower",
+      "maxHealth": 950,
+      "prefabId": "PF_Structure_Placeholder",
+      "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 240 }],
+      "tags": ["structure"]
+    }
+  ],
+  "technologies": [
+    {
+      "id": "three-kingdoms.discipline",
+      "displayName": "Military Discipline",
+      "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 120 }],
+      "prerequisiteIds": [],
+      "tags": ["technology"]
+    }
+  ],
+  "settlements": [
+    {
+      "id": "three-kingdoms.walled-city",
+      "displayName": "Walled City",
+      "maxHealth": 2600,
+      "prefabId": "PF_Settlement_Placeholder",
+      "startingResourceIds": ["three-kingdoms.provisions"],
+      "tags": ["settlement"]
+    }
+  ],
+  "rules": {
+    "moraleEnabled": true,
+    "supplyEnabled": true,
+    "heroCaptureEnabled": true,
+    "heroPermanentDeath": false,
+    "populationEnabled": true,
+    "fogOfWarEnabled": true,
+    "destructibleWalls": true
+  }
+}
