@@ -1,6 +1,7 @@
 using System;
 using AegisRTS.Core.Commands;
 using AegisRTS.Core.Entities;
+using AegisRTS.Gameplay.Formation;
 using AegisRTS.Gameplay.Units;
 using AegisRTS.Presentation.Camera;
 using AegisRTS.Presentation.Selection;
@@ -36,6 +37,7 @@ namespace AegisRTS.Presentation.Input
         private float _lastClickTime = float.NegativeInfinity;
 
         public SelectionService Selection => _selection;
+        public FormationType ActiveFormation { get; private set; } = FormationType.Box;
 
         public void Initialize(SelectionService selection, CommandBus commands, RtsCameraController cameraController)
         {
@@ -62,6 +64,8 @@ namespace AegisRTS.Presentation.Input
             if (_stop.WasPressedThisFrame()) DispatchStop();
             if (_hold.WasPressedThisFrame()) DispatchHold();
             if (_focus.WasPressedThisFrame()) _cameraController.FocusSelection(_selection, FindViews());
+            if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
+                ActiveFormation = ActiveFormation == FormationType.Box ? FormationType.Line : FormationType.Box;
             ProcessControlGroups();
         }
 
@@ -115,7 +119,11 @@ namespace AegisRTS.Presentation.Input
                 : TryRaycast(pointer, out hit)
                     ? ContextTarget.Ground(ToWorldPoint(hit.point))
                     : ContextTarget.Ground(ToWorldPoint(ScreenToGround(pointer)));
-            ICommand command = ContextCommandResolver.Resolve(_selection.SelectedIds, target, _queueCommand.IsPressed());
+            ICommand command = ContextCommandResolver.Resolve(
+                _selection.SelectedIds,
+                target,
+                _queueCommand.IsPressed(),
+                ActiveFormation);
             Dispatch(command);
         }
 

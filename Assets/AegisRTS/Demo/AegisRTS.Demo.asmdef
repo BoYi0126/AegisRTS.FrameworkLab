@@ -5,7 +5,8 @@
     "AegisRTS.Core",
     "AegisRTS.Gameplay",
     "AegisRTS.Presentation",
-    "AegisRTS.Persistence"
+    "AegisRTS.Persistence",
+    "Unity.AI.Navigation"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

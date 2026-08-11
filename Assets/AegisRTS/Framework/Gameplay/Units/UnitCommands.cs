@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AegisRTS.Core.Commands;
 using AegisRTS.Core.Entities;
+using AegisRTS.Gameplay.Formation;
 
 namespace AegisRTS.Gameplay.Units
 {
@@ -72,10 +73,19 @@ namespace AegisRTS.Gameplay.Units
 
     public sealed class MoveUnitsCommand : UnitCommand
     {
-        public MoveUnitsCommand(IEnumerable<EntityId> actorIds, WorldPoint destination, bool queue = false)
-            : base(actorIds, queue) => Destination = destination;
+        public MoveUnitsCommand(
+            IEnumerable<EntityId> actorIds,
+            WorldPoint destination,
+            bool queue = false,
+            FormationType formation = FormationType.Box)
+            : base(actorIds, queue)
+        {
+            Destination = destination;
+            Formation = formation;
+        }
 
         public WorldPoint Destination { get; }
+        public FormationType Formation { get; }
     }
 
     public abstract class TargetedUnitCommand : UnitCommand

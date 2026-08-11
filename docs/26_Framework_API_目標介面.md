@@ -153,3 +153,49 @@ selection.RecallControlGroup(1);
 - `UnitySelectableView`：Entity descriptor 與 scene renderer 的 bridge；selection highlight 使用 `MaterialPropertyBlock`，不複製 shared material。
 - `UnityRtsInputAdapter`：將 Input System actions、drag rectangle 與 raycast 轉成 Selection API 或共用 Gameplay commands。
 - `RtsSandboxBootstrap`：僅作 composition root 與 debug acceptance visualization，不是全域 God Manager。
+
+## Phase 04 Movement / Navigation / Formation API
+
+Phase 04 維持 `Move Command → MovementSystem → INavigationAdapter → Unity View`。Gameplay 決定 order、formation 與狀態轉移；Unity adapter 只回答路徑與驅動 View。
+
+### Formation
+
+```csharp
+IReadOnlyList<FormationSlot> slots = FormationPlanner.Plan(
+    destination,
+    actorCount,
+    FormationType.Box,
+    spacing: 1.8,
+    forwardX,
+    forwardZ);
+```
+
+- `FormationType.Line`：單列並以 destination heading 的 right vector 展開。
+- `FormationType.Box`：使用接近方形的 rows／columns；不把 group actors 送往同一點。
+- slot index 與 actor assignment 依排序後的 `EntityId` 穩定產生。
+
+### Movement system
+
+```csharp
+movement.Register(entityId, initialPosition);
+MovementCommandResult result = movement.IssueMove(command);
+movement.Tick(deltaSeconds);
+
+if (movement.TryGetState(entityId, out MovementStateSnapshot state))
+{
+    // state.Status / Destination / Velocity / RepathCount / StuckSeconds
+}
+```
+
+- `MovementSystem.IssueMove`：replace 或 queue order，為每個 actor 配置 formation slot，再交由 navigation adapter 驗證。
+- `IssueStop`／`IssueHold`：清除 queue 並停止 navigation；下一個 Move 可解除 hold。
+- `Tick`：同步 position／velocity／remaining distance，判斷 arrival、partial／invalid path、低速 stuck，最多自動 repath 3 次。
+- `MovementStatus`：`Idle`、`Moving`、`Arrived`、`Unreachable`、`Stuck`、`Holding`。
+- `Snapshot` 與 `GetDebugSummary()`：提供 deterministic read/debug view，不暴露可修改的 runtime record。
+
+### Navigation adapter
+
+- `INavigationAdapter.SetDestination`：回傳 accepted、resolved destination、path corner count 或 rejection reason。
+- `INavigationAdapter.TryGetSnapshot`：回傳 position、velocity、remaining distance、path state 與是否位於 navigation surface。
+- `NavMeshMovementAdapter`：使用 `NavMesh.SamplePosition`、`NavMesh.CalculatePath` 與 `NavMeshAgent.SetPath`；只接受完整 path。
+- `UnityMovementDriver`：從 Unity frame loop 呼叫 `MovementSystem.Tick`，不加入 gameplay decision。

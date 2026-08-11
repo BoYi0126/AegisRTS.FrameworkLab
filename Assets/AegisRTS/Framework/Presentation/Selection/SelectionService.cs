@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AegisRTS.Core.Commands;
 using AegisRTS.Core.Entities;
 using AegisRTS.Core.Events;
+using AegisRTS.Gameplay.Formation;
 using AegisRTS.Gameplay.Units;
 
 namespace AegisRTS.Presentation.Selection
@@ -185,11 +186,15 @@ namespace AegisRTS.Presentation.Selection
     /// <summary>Maps a context target to the same gameplay commands used by AI and tests.</summary>
     public static class ContextCommandResolver
     {
-        public static ICommand Resolve(IReadOnlyList<EntityId> actors, ContextTarget target, bool queue)
+        public static ICommand Resolve(
+            IReadOnlyList<EntityId> actors,
+            ContextTarget target,
+            bool queue,
+            FormationType formation = FormationType.Box)
         {
             if (actors == null) throw new ArgumentNullException(nameof(actors));
             if (actors.Count == 0) return null;
-            if (!target.HasEntity) return new MoveUnitsCommand(actors, target.Point, queue);
+            if (!target.HasEntity) return new MoveUnitsCommand(actors, target.Point, queue, formation);
             if (target.Descriptor.Kind == SelectableKind.Settlement)
                 return new InteractTargetCommand(actors, target.Descriptor.EntityId, queue);
             if (target.Descriptor.Affiliation == SelectionAffiliation.Enemy)
