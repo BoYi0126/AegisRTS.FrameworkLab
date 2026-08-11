@@ -199,3 +199,42 @@ if (movement.TryGetState(entityId, out MovementStateSnapshot state))
 - `INavigationAdapter.TryGetSnapshot`：回傳 position、velocity、remaining distance、path state 與是否位於 navigation surface。
 - `NavMeshMovementAdapter`：使用 `NavMesh.SamplePosition`、`NavMesh.CalculatePath` 與 `NavMeshAgent.SetPath`；只接受完整 path。
 - `UnityMovementDriver`：從 Unity frame loop 呼叫 `MovementSystem.Tick`，不加入 gameplay decision。
+
+## Phase 05 Unit Combat / Ability API
+
+```csharp
+var events = new EventBus();
+var combat = new CombatSystem(events);
+
+combat.Register(entityId, combatantProfile, initialPosition);
+combat.RegisterAbility(abilityProfile);
+combat.IssueAttack(new AttackTargetCommand(actorIds, targetId));
+combat.IssueAbility(new UseAbilityCommand(casterId, abilityId, targetId, targetPoint));
+combat.Tick(deltaSeconds);
+
+if (combat.TryGetState(entityId, out CombatantSnapshot state))
+{
+    // state.Health / State / TargetId / AttackCooldownRemaining / MovementSpeedMultiplier
+}
+```
+
+### Combat simulation
+
+- `CombatSystem`：Pure C# authoritative combat state；處理 attack、projectile、damage、status、ability cooldown 與 death。
+- `ICombatQuery`：提供 `TryGetState`、sorted `Snapshot` 與 `GetDebugSummary`，供 UI／AI／tests 使用。
+- `AttackProfile`：定義 damage type、range、cooldown、windup、projectile speed、splash radius 與 target tags。
+- `DefenseProfile`：定義 armor 與 physical／magical resistance；True damage 不套用 defense／resistance。
+- `CombatantProfile`：把 definition identity、faction、army、HP、attack、defense、tags、abilities 組成 runtime spawn configuration。
+
+### Ability and status
+
+- `UseAbilityCommand`：Unity-independent ability intent；可帶 caster、ability、unit target、point 與 direction。
+- `AbilityProfile`：定義 Self／Unit／Point／Area／Direction／Settlement 與 Active／Passive／Aura／Triggered／Toggle 分類。
+- `StatusEffectProfile`：支援 Buff／Debuff／Stun／Slow／Root／Shield／DamageOverTime。
+- 手動 command 只接受 Active／Toggle；Passive／Aura／Triggered 的觸發策略由擁有該規則的後續系統呼叫 combat API。
+
+### Events and Unity presentation
+
+- `DamageAppliedEvent`、`ProjectileLaunchedEvent`、`StatusAppliedEvent`、`UnitDiedEvent`、`AbilityUsedEvent` 是 immutable simulation events。
+- `UnityCombatDriver` 負責 frame tick、transform position bridge 與 event-driven projectile visual。
+- `UnityCombatView` 只渲染 snapshot（血條、受傷顏色、死亡外觀），不持有 authoritative HP 或傷害規則。
