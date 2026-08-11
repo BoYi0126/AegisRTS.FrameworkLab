@@ -4,10 +4,38 @@
 
 ## Current Status
 
-- Current Phase：Framework API 目標介面契約完成；原專案 Unity EditMode 159/159、PlayMode 19/19，乾淨安裝專案 EditMode 6/6 通過。
+- Current Phase：Definition of Done 總驗收完成；原專案 Unity EditMode 159/159、PlayMode 19/19，乾淨安裝專案 EditMode 6/6、PlayMode 3/3 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Definition of Done 總驗收
+
+- Status：Completed
+- Goal：執行 `docs/27_Definition_of_Done_總驗收.md`，重新驗證 11 個 Phase gates 與兩種背景、攻守城、Save／Load、AI 完整循環、第二專案 package 安裝等 Framework final gates。
+- Changed：
+  - 在 DoD 文件新增逐項 release-gate 矩陣、Framework 驗收證據、static validation 與 remaining release risks。
+  - 更新本進度文件；本次沒有修改 runtime code、API signature、scene、asset 或資料格式。
+- Architecture / API / Data：
+  - Core／Gameplay／Persistence 的 Pure C# 邊界維持不變；Core 無 references、Gameplay 只依賴 Core、Persistence 只依賴 Core／Gameplay。
+  - Package Runtime 世界觀字串掃描 0 hits，世界觀仍只由 Lab Content JSON 提供。
+  - N/A（API／Data）；本次是 release-gate 驗證，沒有新增或變更公開介面及資料 schema。
+- Tests / Validation：
+  - FrameworkLab Unity EditMode：PASS，159/159；PlayMode：PASS，19/19。
+  - `C:\projects\Unity\AegisRTS.PackageValidation` Unity EditMode：PASS，6/6；PlayMode：PASS，3/3。
+  - 四份 Unity logs 掃描未處理例外、compile errors、runner abort／failure：0 hits。
+  - Package：ID／SemVer／Unity version／3 samples 驗證 PASS；Basic RTS／Combat／Siege 各有 scene。
+  - Static architecture：Pure C# layers UnityEngine hits 0；Runtime 世界觀 hits 0；God Manager hits 0；舊 Assets Framework source 不存在。
+  - Asset integrity：307 GUID、0 duplicates、0 missing file `.meta`；六個 Demo scenes 已加入 Build Settings。
+  - Debug／read model：25 個 public `GetDebugSummary()`、21 個 public Snapshot types。
+  - 驗收前 Git baseline：`HEAD`／`origin/main` 同為 `bb80db2`，工作樹乾淨。
+- Known Issues / Risks：
+  - package 仍為 `UNLICENSED`，公開散布前需選定授權。
+  - Git install URL 目前使用 `#main`；正式 release 建議建立 immutable tag。
+  - Demo／samples 為 acceptance visuals，不包含 production art／完整 UX；目標硬體 Player build profiling 尚未執行。
+  - 規格文件的 Unity 6.3 LTS 與實際 `6000.5.7f1` 命名對應仍待確認。
+- Next：
+  - 將 DoD 與本進度紀錄一起 commit／push；其後由擁有者決定授權、release tag 與目標硬體 profiling。
 
 ## 2026-08-11 — Framework API 目標介面契約
 
