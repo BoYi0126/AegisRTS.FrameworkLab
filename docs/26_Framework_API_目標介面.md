@@ -110,3 +110,46 @@ if (result.Succeeded)
 - `GameRuleSet`：提供 Morale、Supply、Hero Capture／Death、Population、Fog of War、Destructible Walls switches。
 
 `ContentPackService`、`ContentCatalog` 與 `ContentValidationResult` 提供 `GetDebugSummary()` 或可直接取得 validation issues，供 Debug／Validation tools 顯示。
+
+## Phase 03 RTS Input / Selection / Camera API
+
+Phase 03 把 command intent 留在 Gameplay，把可測試的 selection／camera state 留在 Presentation model，再由 Unity adapter 處理 Input System、Physics raycast、screen projection 與 GameObject visual。
+
+### Shared unit commands
+
+```csharp
+ICommand command = new MoveUnitsCommand(
+    selectedIds,
+    new WorldPoint(x, y, z),
+    queue: shiftPressed);
+
+commandBus.Dispatch((MoveUnitsCommand)command);
+```
+
+- `WorldPoint`：不依賴 `UnityEngine.Vector3` 的 immutable world position。
+- `UnitCommand.ActorIds`：建構時複製、去重並驗證非空的 actor IDs；外部修改原集合不影響 command。
+- `MoveUnitsCommand`、`AttackTargetCommand`、`FollowTargetCommand`、`InteractTargetCommand`、`StopUnitsCommand`、`HoldUnitsCommand`：Player／AI／Scenario／Test 共用的 intent types。
+- `Queue` 只表達是否排入既有 command queue；實際移動、尋路與 formation execution 由後續 Phase 實作。
+
+### Selection
+
+```csharp
+selection.Register(descriptor);
+selection.SelectMany(idsInsideDragBox, SelectionModifier.Replace);
+selection.AssignControlGroup(1);
+selection.RecallControlGroup(1);
+```
+
+- `SelectableDescriptor`：只含 `EntityId`、definition ID、`SelectableKind` 與 `SelectionAffiliation`，不持有 GameObject。
+- `SelectionService`：提供 register／unregister、single／multi selection、replace／add／toggle／remove、same-definition selection 與 `0–9` control groups。
+- `ISelectionQuery`：讓 camera、UI 與其他 read-side adapter 查詢 selection，不暴露修改權限。
+- `SelectionChangedEvent`：selection 實際變更時才透過可選的 `EventBus` 發布 immutable snapshot。
+- `ContextCommandResolver`：Ground→Move、Enemy→Attack、Friendly→Follow、Settlement→Interact；neutral non-settlement 不產生未定義命令。
+
+### Camera / Unity adapters
+
+- `RtsCameraRigModel`：提供 `Pan`、`Focus`、`ZoomBy`，所有 pivot／zoom 都限制在建構時設定的 bounds。
+- `RtsCameraController`：套用 WASD、edge pan、middle drag、wheel zoom 與 focus-selected 到 Unity Camera transform。
+- `UnitySelectableView`：Entity descriptor 與 scene renderer 的 bridge；selection highlight 使用 `MaterialPropertyBlock`，不複製 shared material。
+- `UnityRtsInputAdapter`：將 Input System actions、drag rectangle 與 raycast 轉成 Selection API 或共用 Gameplay commands。
+- `RtsSandboxBootstrap`：僅作 composition root 與 debug acceptance visualization，不是全域 God Manager。

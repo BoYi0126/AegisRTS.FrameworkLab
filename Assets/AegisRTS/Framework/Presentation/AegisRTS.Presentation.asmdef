@@ -3,7 +3,8 @@
   "rootNamespace": "AegisRTS.Presentation",
   "references": [
     "AegisRTS.Core",
-    "AegisRTS.Gameplay"
+    "AegisRTS.Gameplay",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
