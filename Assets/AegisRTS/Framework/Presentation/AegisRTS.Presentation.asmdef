@@ -1,0 +1,17 @@
+{
+  "name": "AegisRTS.Presentation",
+  "rootNamespace": "AegisRTS.Presentation",
+  "references": [
+    "AegisRTS.Core",
+    "AegisRTS.Gameplay"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

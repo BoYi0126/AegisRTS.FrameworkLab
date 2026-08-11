@@ -1,0 +1,25 @@
+{
+  "name": "AegisRTS.Tests.PlayMode",
+  "rootNamespace": "AegisRTS.Tests.PlayMode",
+  "references": [
+    "AegisRTS.Core",
+    "AegisRTS.Gameplay",
+    "AegisRTS.Presentation",
+    "AegisRTS.Persistence",
+    "AegisRTS.Demo"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

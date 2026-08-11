@@ -1,0 +1,25 @@
+{
+  "name": "AegisRTS.Tests.EditMode",
+  "rootNamespace": "AegisRTS.Tests.EditMode",
+  "references": [
+    "AegisRTS.Core",
+    "AegisRTS.Gameplay",
+    "AegisRTS.Persistence"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "AegisRTS.Tools",
+  "rootNamespace": "AegisRTS.Tools",
+  "references": [
+    "AegisRTS.Core",
+    "AegisRTS.Gameplay",
+    "AegisRTS.Presentation",
+    "AegisRTS.Persistence"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
