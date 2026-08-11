@@ -46,11 +46,16 @@ namespace AegisRTS.Gameplay.Content.Validation
             var resourceIds = new HashSet<DefinitionId>(pack.Resources.Where(item => item != null).Select(item => item.Id));
             var abilityIds = new HashSet<DefinitionId>(pack.Abilities.Where(item => item != null).Select(item => item.Id));
             var technologyIds = new HashSet<DefinitionId>(pack.Technologies.Where(item => item != null).Select(item => item.Id));
+            var buildingIds = new HashSet<DefinitionId>(pack.Buildings.Where(item => item != null).Select(item => item.Id));
 
             foreach (UnitDefinition definition in pack.Units.Where(item => item != null))
             {
                 ValidateActor(definition.Id, definition.MaxHealth, definition.MovementSpeed, definition.PrefabId,
                     definition.Costs, definition.AbilityIds, resourceIds, abilityIds, assets, issues);
+                ValidateNonNegativeStat(definition.Id, definition.RecruitmentSeconds, "Recruitment duration", issues);
+                ValidateNonNegativeStat(definition.Id, definition.PopulationCost, "Population cost", issues);
+                ValidateReferences(definition.Id, definition.PrerequisiteBuildingIds, buildingIds, "building", issues);
+                ValidateReferences(definition.Id, definition.PrerequisiteTechnologyIds, technologyIds, "technology", issues);
             }
 
             foreach (HeroDefinition definition in pack.Heroes.Where(item => item != null))
@@ -84,12 +89,28 @@ namespace AegisRTS.Gameplay.Content.Validation
                 ValidatePositiveStat(definition.Id, definition.MaxHealth, "Building max health", issues);
                 ValidatePrefab(definition.Id, definition.PrefabId, assets, issues);
                 ValidateCosts(definition.Id, definition.Costs, resourceIds, issues);
+                ValidateNonNegativeStat(definition.Id, definition.BuildSeconds, "Build duration", issues);
+                ValidateNonNegativeStat(definition.Id, definition.PopulationCapacity, "Population capacity", issues);
+                ValidateReferences(definition.Id, definition.PrerequisiteBuildingIds, buildingIds, "building", issues);
+                ValidateReferences(definition.Id, definition.PrerequisiteTechnologyIds, technologyIds, "technology", issues);
+                foreach (ResourceProduction production in definition.Production)
+                {
+                    if (!resourceIds.Contains(production.ResourceId))
+                        Add(issues, ContentValidationIssueCode.MissingReference, definition.Id, $"Referenced resource '{production.ResourceId}' does not exist.");
+                    if (!IsFiniteNonNegative(production.AmountPerSecond))
+                        Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "Resource production must be finite and non-negative.");
+                }
             }
 
             foreach (TechnologyDefinition definition in pack.Technologies.Where(item => item != null))
             {
                 ValidateCosts(definition.Id, definition.Costs, resourceIds, issues);
                 ValidateReferences(definition.Id, definition.PrerequisiteIds, technologyIds, "technology", issues);
+                ValidateNonNegativeStat(definition.Id, definition.ResearchSeconds, "Research duration", issues);
+                foreach (TechnologyModifier modifier in definition.Modifiers)
+                    if (double.IsNaN(modifier.Additive) || double.IsInfinity(modifier.Additive) || double.IsNaN(modifier.Multiplier) ||
+                        double.IsInfinity(modifier.Multiplier) || modifier.Multiplier <= 0d)
+                        Add(issues, ContentValidationIssueCode.InvalidStat, definition.Id, "Technology modifier values are invalid.");
             }
 
             foreach (SettlementDefinition definition in pack.Settlements.Where(item => item != null))
@@ -271,6 +292,13 @@ namespace AegisRTS.Gameplay.Content.Validation
 
         private static bool IsFiniteNonNegative(double value) =>
             !double.IsNaN(value) && !double.IsInfinity(value) && value >= 0d;
+
+        private static void ValidateNonNegativeStat(DefinitionId ownerId, double value, string label,
+            ICollection<ContentValidationIssue> issues)
+        {
+            if (!IsFiniteNonNegative(value))
+                Add(issues, ContentValidationIssueCode.InvalidStat, ownerId, $"{label} must be finite and non-negative.");
+        }
 
         private static void ValidateCaptureRule(SettlementDefinition definition, ICollection<ContentValidationIssue> issues)
         {

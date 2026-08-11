@@ -66,7 +66,8 @@ namespace AegisRTS.Gameplay.Content.Serialization
             {
                 units.Add(new UnitDefinition(
                     Id(item.Id), item.DisplayName, item.MaxHealth, item.MovementSpeed, item.PrefabId,
-                    Costs(item.Costs), Ids(item.AbilityIds), Tags(item.Tags)));
+                    Costs(item.Costs), Ids(item.AbilityIds), Tags(item.Tags), item.RecruitmentSeconds,
+                    item.PopulationCost, Ids(item.PrerequisiteBuildingIds), Ids(item.PrerequisiteTechnologyIds)));
             }
 
             var heroes = new List<HeroDefinition>();
@@ -82,14 +83,16 @@ namespace AegisRTS.Gameplay.Content.Serialization
             {
                 buildings.Add(new BuildingDefinition(
                     Id(item.Id), item.DisplayName, item.MaxHealth, item.PrefabId,
-                    Costs(item.Costs), Tags(item.Tags)));
+                    Costs(item.Costs), Tags(item.Tags), item.BuildSeconds, Ids(item.PrerequisiteBuildingIds),
+                    Ids(item.PrerequisiteTechnologyIds), Production(item.Production), item.PopulationCapacity));
             }
 
             var technologies = new List<TechnologyDefinition>();
             foreach (TechnologyDocument item in document.Technologies ?? Array.Empty<TechnologyDocument>())
             {
                 technologies.Add(new TechnologyDefinition(
-                    Id(item.Id), item.DisplayName, Costs(item.Costs), Ids(item.PrerequisiteIds), Tags(item.Tags)));
+                    Id(item.Id), item.DisplayName, Costs(item.Costs), Ids(item.PrerequisiteIds), Tags(item.Tags),
+                    item.ResearchSeconds, Modifiers(item.Modifiers)));
             }
 
             var settlements = new List<SettlementDefinition>();
@@ -151,6 +154,18 @@ namespace AegisRTS.Gameplay.Content.Serialization
                 yield return new ResourceCost(Id(value.ResourceId), value.Amount);
             }
         }
+
+        private static IEnumerable<ResourceProduction> Production(IEnumerable<ResourceProductionDocument> values)
+        {
+            foreach (ResourceProductionDocument value in values ?? Array.Empty<ResourceProductionDocument>())
+                yield return new ResourceProduction(Id(value.ResourceId), value.AmountPerSecond);
+        }
+
+        private static IEnumerable<TechnologyModifier> Modifiers(IEnumerable<TechnologyModifierDocument> values)
+        {
+            foreach (TechnologyModifierDocument value in values ?? Array.Empty<TechnologyModifierDocument>())
+                yield return new TechnologyModifier(value.StatId, value.Additive, value.Multiplier);
+        }
     }
 
     internal sealed class ContentPackDocument
@@ -187,6 +202,10 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public ResourceCostDocument[] Costs { get; set; }
         public string[] AbilityIds { get; set; }
         public double Leadership { get; set; }
+        public double RecruitmentSeconds { get; set; }
+        public double PopulationCost { get; set; }
+        public string[] PrerequisiteBuildingIds { get; set; }
+        public string[] PrerequisiteTechnologyIds { get; set; }
     }
 
     internal sealed class AbilityDocument : DefinitionDocument
@@ -200,12 +219,19 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public double MaxHealth { get; set; }
         public string PrefabId { get; set; }
         public ResourceCostDocument[] Costs { get; set; }
+        public double BuildSeconds { get; set; }
+        public string[] PrerequisiteBuildingIds { get; set; }
+        public string[] PrerequisiteTechnologyIds { get; set; }
+        public ResourceProductionDocument[] Production { get; set; }
+        public double PopulationCapacity { get; set; }
     }
 
     internal sealed class TechnologyDocument : DefinitionDocument
     {
         public ResourceCostDocument[] Costs { get; set; }
         public string[] PrerequisiteIds { get; set; }
+        public double ResearchSeconds { get; set; }
+        public TechnologyModifierDocument[] Modifiers { get; set; }
     }
 
     internal sealed class SettlementDocument : DefinitionDocument
@@ -223,6 +249,19 @@ namespace AegisRTS.Gameplay.Content.Serialization
     {
         public string ResourceId { get; set; }
         public double Amount { get; set; }
+    }
+
+    internal sealed class ResourceProductionDocument
+    {
+        public string ResourceId { get; set; }
+        public double AmountPerSecond { get; set; }
+    }
+
+    internal sealed class TechnologyModifierDocument
+    {
+        public string StatId { get; set; }
+        public double Additive { get; set; }
+        public double Multiplier { get; set; } = 1d;
     }
 
     internal sealed class GameRuleSetDocument

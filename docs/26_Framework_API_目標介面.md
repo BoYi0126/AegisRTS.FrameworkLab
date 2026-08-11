@@ -324,3 +324,32 @@ commandBus.Dispatch(new CaptureSettlementCommand(
 - `TerritorySystem`／`ITerritoryQuery`：node／connection graph、owner、settlement mapping、visibility 與 value。
 - `Connect` 建立雙向 connection；snapshot connection IDs 依 EntityId 排序。
 - `SettlementArmyTargetValidator`：注入 `ArmySystem` 後，AttackSettlement 只接受存在、非己方、外交關係為 Hostile／War 的目標。
+
+## Phase 08 Economy / Recruitment / Building / Technology API
+
+```csharp
+var economy = new EconomySystem(gameRules.PopulationEnabled, events, stateBridge);
+economy.RegisterAccount(settlementId, startingResources, populationUsed, populationCapacity);
+
+var technologies = new TechnologySystem(pack.Technologies, economy, modifiers, stateBridge, events);
+var buildings = new BuildingSystem(pack.Buildings, economy, technologies, stateBridge, events);
+var recruitment = new RecruitmentSystem(pack.Units, economy, buildings, technologies, spawnSink, events);
+
+commandBus.Dispatch(new ConstructBuildingCommand(settlementId, factionId, buildingId));
+commandBus.Dispatch(new ResearchTechnologyCommand(settlementId, factionId, technologyId));
+commandBus.Dispatch(new RecruitUnitCommand(settlementId, factionId, unitId));
+
+economy.Tick(deltaSeconds);
+buildings.Tick(deltaSeconds);
+technologies.Tick(deltaSeconds);
+recruitment.Tick(deltaSeconds);
+```
+
+- `ResourceWallet`：以 `DefinitionId` 查詢、存入、檢查與原子扣除任意資源，不包含 Gold／Food 等固定欄位。
+- `EconomySystem`：管理 economy accounts、resource production 與 optional population reservation，提供 immutable snapshot。
+- `BuildingSystem`：驗證資源與 building／technology prerequisites，完成後套用 production／population effects。
+- `TechnologySystem`：驗證 DAG prerequisites，完成後記錄 Faction research state 並套用 `TechnologyModifierRegistry`。
+- `RecruitmentSystem`：依序執行 request→validate→cost／population reserve→queue→timer→`IUnitSpawnSink`。
+- `BuildingCommandRouter`、`TechnologyCommandRouter`、`RecruitmentCommandRouter`：將上述三種 request 接到共用 CommandBus validation／handler flow。
+- Events：`ResourceProducedEvent`、`BuildingCompletedEvent`、`TechnologyCompletedEvent`、`UnitRecruitedEvent`。
+- `GameplayEconomyStateBridge`：把 resource delta、building completion、technology completion 同步到 Phase 07 read model。

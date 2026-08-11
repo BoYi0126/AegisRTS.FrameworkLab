@@ -16,6 +16,10 @@
       "movementSpeed": 3.2,
       "prefabId": "PF_Unit_Placeholder",
       "costs": [{ "resourceId": "fantasy.mana", "amount": 70 }],
+      "recruitmentSeconds": 4,
+      "populationCost": 2,
+      "prerequisiteBuildingIds": ["fantasy.arcane-tower"],
+      "prerequisiteTechnologyIds": ["fantasy.runic-mastery"],
       "abilityIds": [],
       "tags": ["unit", "mechanical", "magic"]
     }
@@ -40,6 +44,11 @@
       "maxHealth": 850,
       "prefabId": "PF_Structure_Placeholder",
       "costs": [{ "resourceId": "fantasy.mana", "amount": 260 }],
+      "buildSeconds": 7,
+      "populationCapacity": 6,
+      "prerequisiteBuildingIds": [],
+      "prerequisiteTechnologyIds": [],
+      "production": [{ "resourceId": "fantasy.mana", "amountPerSecond": 6 }],
       "tags": ["structure", "magic"]
     }
   ],
@@ -49,6 +58,8 @@
       "displayName": "Runic Mastery",
       "costs": [{ "resourceId": "fantasy.mana", "amount": 130 }],
       "prerequisiteIds": [],
+      "researchSeconds": 6,
+      "modifiers": [{ "statId": "unit.damage", "additive": 4, "multiplier": 1.1 }],
       "tags": ["technology", "magic"]
     }
   ],

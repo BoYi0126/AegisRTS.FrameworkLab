@@ -113,3 +113,22 @@ TerritoryNode
 - TerritorySystem 更新 Faction territory index，因此 Faction snapshot 不需要掃描全部 territory 才能顯示領土。
 - `SettlementDefinition` authoring data 包含 `initialPopulation`、`maxDefense`、`captureRule`、`captureConditions`；runtime mutable state 不回寫 definition。
 - Resources、building、technology 與 AI profile 只保存 stable content ID，不依賴 display name 或世界觀類別。
+
+## Phase 08 Economy / Production Runtime Model
+
+```text
+EconomyAccount
+├─ ResourceWallet<DefinitionId, Balance>
+├─ ResourceProduction<DefinitionId, AmountPerSecond>
+└─ PopulationUsed / PopulationCapacity (optional rule)
+
+Building Job ── SettlementId / Definition / RemainingSeconds
+Technology Job ── FactionId / Definition / RemainingSeconds
+Recruitment Job ── SettlementId / FactionId / Definition / RemainingSeconds
+```
+
+- `ResourceWallet` 以 stable Resource Definition ID 儲存餘額，跨資源成本先完整驗證再原子扣除。
+- Definition 是成本、時間、前置條件、產出與 modifier 的 immutable authoring source；queue 與 timer 只存在 runtime system。
+- `BuildingSystem` 與 `TechnologySystem` 分別提供已完成狀態 query，作為建築、科技與單位的資料驅動 unlock 條件。
+- `TechnologyModifierRegistry` 依 Faction 與 world-neutral stat ID 聚合 additive／multiplicative modifier。
+- `GameplayEconomyStateBridge` 將 authoritative economy 變動投影到既有 Faction／Settlement snapshot；Unity spawn 經 `IUnitSpawnSink` 隔離。

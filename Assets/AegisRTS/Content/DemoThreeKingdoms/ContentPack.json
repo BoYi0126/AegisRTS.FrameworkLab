@@ -16,6 +16,10 @@
       "movementSpeed": 4.2,
       "prefabId": "PF_Unit_Placeholder",
       "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 55 }],
+      "recruitmentSeconds": 3.5,
+      "populationCost": 1,
+      "prerequisiteBuildingIds": ["three-kingdoms.watchtower"],
+      "prerequisiteTechnologyIds": ["three-kingdoms.discipline"],
       "abilityIds": [],
       "tags": ["unit", "infantry"]
     }
@@ -40,6 +44,11 @@
       "maxHealth": 950,
       "prefabId": "PF_Structure_Placeholder",
       "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 240 }],
+      "buildSeconds": 6,
+      "populationCapacity": 8,
+      "prerequisiteBuildingIds": [],
+      "prerequisiteTechnologyIds": [],
+      "production": [{ "resourceId": "three-kingdoms.provisions", "amountPerSecond": 5 }],
       "tags": ["structure"]
     }
   ],
@@ -49,6 +58,8 @@
       "displayName": "Military Discipline",
       "costs": [{ "resourceId": "three-kingdoms.provisions", "amount": 120 }],
       "prerequisiteIds": [],
+      "researchSeconds": 5,
+      "modifiers": [{ "statId": "unit.damage", "additive": 3, "multiplier": 1.08 }],
       "tags": ["technology"]
     }
   ],

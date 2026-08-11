@@ -16,6 +16,10 @@
       "movementSpeed": 4,
       "prefabId": "PF_Unit_Placeholder",
       "costs": [{ "resourceId": "neutral.supplies", "amount": 50 }],
+      "recruitmentSeconds": 3,
+      "populationCost": 1,
+      "prerequisiteBuildingIds": ["neutral.outpost"],
+      "prerequisiteTechnologyIds": ["neutral.training"],
       "abilityIds": [],
       "tags": ["unit", "infantry"]
     }
@@ -40,6 +44,11 @@
       "maxHealth": 800,
       "prefabId": "PF_Structure_Placeholder",
       "costs": [{ "resourceId": "neutral.supplies", "amount": 200 }],
+      "buildSeconds": 5,
+      "populationCapacity": 5,
+      "prerequisiteBuildingIds": [],
+      "prerequisiteTechnologyIds": [],
+      "production": [{ "resourceId": "neutral.supplies", "amountPerSecond": 4 }],
       "tags": ["structure"]
     }
   ],
@@ -49,6 +58,8 @@
       "displayName": "Basic Training",
       "costs": [{ "resourceId": "neutral.supplies", "amount": 100 }],
       "prerequisiteIds": [],
+      "researchSeconds": 4,
+      "modifiers": [{ "statId": "unit.damage", "additive": 2, "multiplier": 1.05 }],
       "tags": ["technology"]
     }
   ],
