@@ -34,6 +34,9 @@ namespace AegisRTS.Tests.PlayMode
             yield return new WaitForSeconds(4f);
 
             Assert.That(bootstrap.Driver.ProjectileVisualCount, Is.GreaterThanOrEqualTo(1));
+            Assert.That(bootstrap.Driver.ProjectileObjectCreatedCount, Is.GreaterThanOrEqualTo(1));
+            Assert.That(bootstrap.Driver.ProjectileObjectCreatedCount, Is.LessThanOrEqualTo(bootstrap.Driver.ProjectileVisualCount));
+            Assert.That(bootstrap.Driver.PooledProjectileCount, Is.GreaterThanOrEqualTo(1));
             Assert.That(bootstrap.Driver.DamageEventCount, Is.GreaterThanOrEqualTo(5));
             Assert.That(bootstrap.Driver.StatusEventCount, Is.GreaterThanOrEqualTo(2));
             Assert.That(bootstrap.Driver.DeathEventCount, Is.GreaterThanOrEqualTo(1));

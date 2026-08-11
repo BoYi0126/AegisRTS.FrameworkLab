@@ -233,3 +233,22 @@ ReplayDocument
 - Clock 保存 scaled／unscaled time、delta、tick、pause、speed；Random 保存 seed、draw count、internal PCG state。
 - Checksum 同時覆蓋 metadata 與 state；任何內容 mutation 在 restore 前被拒絕。
 - Replay 同 tick 使用 sequence 維持 command dispatch order，只允許向前推進。
+
+## Phase 14 Performance Runtime Model
+
+```text
+PerformanceSample
+├─ frame / simulation / AI / navigation ms
+├─ unit / projectile counts
+└─ GC / memory bytes
+
+TickScheduler ── SystemId / Frequency / Accumulator / Catch-up cap
+SpatialHash<T> ── Item / Position / Cell
+ObjectPool<T> ── Active / Available / Created / MaximumRetained
+SimulationLodDecision ── Tier / TickHz / Render / Simulate
+```
+
+- metrics 是 bounded sliding samples；snapshot 提供 average、P95 與 peaks，不保存 profiler object。
+- budget 是外部提供的 benchmark policy，Framework 只輸出 named violations。
+- spatial index 每個 item 只存在一個 cell，position update 保持 index 一致。
+- pool lifecycle callbacks 讓 Unity adapter 控制 activate／deactivate，不讓 Core 引用 GameObject。

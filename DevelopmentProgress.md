@@ -4,10 +4,38 @@
 
 ## Current Status
 
-- Current Phase：Phase 13 Save／Replay／Debug／Test 完成；Unity EditMode 136/136、PlayMode 16/16 通過。
+- Current Phase：Phase 14 Performance 完成；Unity EditMode 146/146、PlayMode 17/17 通過。
 - Active Branch：`main`
 - Unity Project Version：`6000.5.7f1`
 - Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+
+## 2026-08-11 — Phase 14 Performance
+
+- Status：Completed
+- Goal：先建立 profiling／metrics baseline，再完成 tick throttling、pooling、spatial query、LOD／culling decisions 與 100～1000 unit exploratory stress。
+- Changed：
+  - 新增 bounded `PerformanceMetricsCollector`、FPS／P95／subsystem／count／GC／memory snapshot。
+  - 新增 external `PerformanceBudget` 與 named violation evaluator，不硬寫目標硬體門檻。
+  - 新增 deterministic multi-frequency `TickScheduler` 與 catch-up cap。
+  - 新增 bounded `ObjectPool<T>`；`UnityCombatDriver` projectile visuals 已實際改用 pool。
+  - 新增 `SpatialHash<T>` insert／update／remove／radius query，支援 deterministic ordering。
+  - 新增 Full／Reduced／Coarse／Culled `SimulationLodPolicy`。
+  - 新增 100／300／500／1000 `PerformanceStressHarness` 與 Sandbox acceptance。
+  - 新增 10 個 EditMode cases、1 個 PlayMode case，補強 Combat projectile pool PlayMode assertions，更新 07、23、26 與本進度文件。
+- Architecture / API / Data：
+  - Core Performance 全部 Pure C#；Unity／Profiler adapter 只負責提供 samples 與套用 LOD decisions。
+  - Tick cadence、budget、cell size、pool cap、LOD distances 都是 composition／benchmark inputs。
+  - SpatialHash 是 query broad phase；Combat、Navigation 與 Physics authoritative responsibilities 不變。
+- Tests / Validation：
+  - Unity EditMode Test Runner：PASS，146/146 passed、0 failed；Phase 14 新增 10 cases。
+  - Unity PlayMode Test Runner：PASS，17/17 passed、0 failed；Phase 14 新增 1 Sandbox case。
+  - metrics、budgets、30／5／10 Hz、catch-up、pool reuse、projectile pool、spatial index、LOD、四種 stress scale：PASS。
+- Known Issues / Risks：
+  - exploratory elapsed／memory 不是正式 hardware benchmark；尚未指定 production target machine 與 quality／resolution。
+  - GPU instancing、render batching、occlusion、Animator LOD 與 NavMesh-specific profiling 尚需 Unity production adapter。
+  - Core stress harness 是 deterministic structural baseline，不取代 Player build Profiler capture 與 long-session soak。
+- Next：
+  - 進入 Phase 15 Vertical Slice，組合完整 Start→Income→Recruit→Army→Battle→Siege→Capture→Victory loop。
 
 ## 2026-08-11 — Phase 13 Save / Replay / Debug / Test
 

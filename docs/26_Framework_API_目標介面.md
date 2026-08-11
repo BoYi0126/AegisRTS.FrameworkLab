@@ -484,3 +484,28 @@ player.AdvanceTo(targetTick);
 - `SeededRandom.CaptureState／Restore`、`GameClock.CaptureState／Restore`：deterministic continuation。
 - `ReplayRecorder`／`ReplayPlayer`：InitialState＋Seed＋ordered Tick commands。
 - `DebugConsole`／`IDebugCommandExecutor`：development command parsing／delegation；預設 disabled。
+
+## Phase 14 Performance API
+
+```csharp
+var metrics = new PerformanceMetricsCollector(300);
+metrics.Record(new PerformanceSample(frameMs, simulationMs, aiMs, navigationMs,
+    unitCount, projectileCount, gcBytes, memoryBytes));
+
+var scheduler = new TickScheduler();
+scheduler.Register("simulation", 30, TickSimulation);
+scheduler.Register("ai", 5, TickAi);
+
+var spatial = new SpatialHash<EntityId>(cellSize: 8, sortComparer: entityComparer);
+IReadOnlyList<EntityId> nearby = spatial.Query(center, radius);
+
+var projectiles = new ObjectPool<ProjectileView>(factory, maximumRetained: 256);
+```
+
+- `PerformanceMetricsCollector.Snapshot`：FPS／average／P95／subsystem timings／peaks。
+- `PerformanceBudgetEvaluator`：以 benchmark-supplied budget 產生可讀 violations。
+- `TickScheduler`：不同 system cadence 與 spiral-of-death catch-up protection。
+- `ObjectPool<T>`：generic rent／return、lifecycle hooks、bounded retention 與 created／active counters。
+- `SpatialHash<T>`：local radius broad-phase，避免為每個 unit 掃描全世界 entity。
+- `SimulationLodPolicy.Evaluate`：依距離輸出 simulation／render tier。
+- `PerformanceStressHarness.Run`：100～1000 exploratory scale report，供 CI／hardware benchmark adapter 使用。
