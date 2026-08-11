@@ -17,6 +17,7 @@ C:\projects\Unity\AegisRTS.FrameworkLab
 ├─ ProjectSettings/
 ├─ UserSettings/
 ├─ docs/
+├─ DevelopmentProgress.md
 ├─ .gitignore
 └─ README.md
 ```
@@ -60,38 +61,39 @@ FrameworkLab 同時負責：
 6. `06_Git_版本控制與提交規範.md`
 7. `07_Data_Model_核心資料模型總表.md`
 8. `08_ContentPack_世界觀重用規範.md`
+9. `09_DevelopmentProgress_開發進度紀錄規範.md`
 
 ### Framework Phase
-9. `10_Phase01_Core基礎設施.md`
-10. `11_Phase02_DataDriven_ContentPack.md`
-11. `12_Phase03_RTS輸入選取與相機.md`
-12. `13_Phase04_移動尋路與編隊.md`
-13. `14_Phase05_單位戰鬥與能力.md`
-14. `15_Phase06_Hero_Army_Command.md`
-15. `16_Phase07_Faction_Settlement_Territory.md`
-16. `17_Phase08_Economy_Recruit_Build_Tech.md`
-17. `18_Phase09_Siege_城池攻防.md`
-18. `19_Phase10_AI.md`
-19. `20_Phase11_GameMode_Scenario_Objective.md`
-20. `21_Phase12_UI_UX.md`
-21. `22_Phase13_Save_Replay_Debug_Test.md`
-22. `23_Phase14_Performance.md`
-23. `24_Phase15_VerticalSlice.md`
-24. `25_Phase16_Package_Framework化.md`
+10. `10_Phase01_Core基礎設施.md`
+11. `11_Phase02_DataDriven_ContentPack.md`
+12. `12_Phase03_RTS輸入選取與相機.md`
+13. `13_Phase04_移動尋路與編隊.md`
+14. `14_Phase05_單位戰鬥與能力.md`
+15. `15_Phase06_Hero_Army_Command.md`
+16. `16_Phase07_Faction_Settlement_Territory.md`
+17. `17_Phase08_Economy_Recruit_Build_Tech.md`
+18. `18_Phase09_Siege_城池攻防.md`
+19. `19_Phase10_AI.md`
+20. `20_Phase11_GameMode_Scenario_Objective.md`
+21. `21_Phase12_UI_UX.md`
+22. `22_Phase13_Save_Replay_Debug_Test.md`
+23. `23_Phase14_Performance.md`
+24. `24_Phase15_VerticalSlice.md`
+25. `25_Phase16_Package_Framework化.md`
 
 ### Game Production
-25. `30_GameProduction_總覽.md`
-26. `31_GamePhase_G01_G04_世界觀勢力兵種英雄.md`
-27. `32_GamePhase_G05_G08_地圖劇本美術音訊.md`
-28. `33_GamePhase_G09_G12_平衡教學Polish發布.md`
+26. `30_GameProduction_總覽.md`
+27. `31_GamePhase_G01_G04_世界觀勢力兵種英雄.md`
+28. `32_GamePhase_G05_G08_地圖劇本美術音訊.md`
+29. `33_GamePhase_G09_G12_平衡教學Polish發布.md`
 
 ### Agent / Art
-29. `40_Agent_總執行規則.md`
-30. `41_Agent_Phase執行Prompt.md`
-31. `42_Agent_CodeReview與驗收Prompt.md`
-32. `50_AI_Art_Pipeline.md`
-33. `51_Art_Bible_Template.md`
-34. `60_第一階段實際執行順序.md`
+30. `40_Agent_總執行規則.md`
+31. `41_Agent_Phase執行Prompt.md`
+32. `42_Agent_CodeReview與驗收Prompt.md`
+33. `50_AI_Art_Pipeline.md`
+34. `51_Art_Bible_Template.md`
+35. `60_第一階段實際執行順序.md`
 
 ## 最終驗證
 

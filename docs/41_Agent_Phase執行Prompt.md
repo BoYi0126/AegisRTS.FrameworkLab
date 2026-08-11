@@ -10,8 +10,10 @@ C:\projects\Unity\AegisRTS.FrameworkLab
 docs/00_README_開發總覽.md
 docs/03_Naming_Namespace_Asmdef_命名規範.md
 docs/04_Architecture_核心架構與依賴規則.md
+docs/09_DevelopmentProgress_開發進度紀錄規範.md
 docs/27_Definition_of_Done_總驗收.md
 docs/40_Agent_總執行規則.md
+DevelopmentProgress.md
 以及我要你執行的 Phase 文件。
 
 任務：
@@ -27,6 +29,7 @@ docs/40_Agent_總執行規則.md
 10. 更新 API docs。
 11. 執行可執行驗證。
 12. 不滿足 Acceptance Criteria 不宣稱完成。
+13. 依實際變更與驗證結果更新 DevelopmentProgress.md，並與實作一起提交。
 
 完成後輸出 Changed / Architecture / API / Tests / Acceptance / Known Issues / Next。
 

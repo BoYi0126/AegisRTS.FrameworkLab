@@ -12,5 +12,6 @@
 8. 無錯誤 asmdef dependency。
 9. 不破壞既有 Sandbox。
 10. 可清楚 Git review。
+11. `DevelopmentProgress.md` 已記錄實際變更、驗證結果、已知問題與下一步，並會與對應變更一起提交。
 
 Framework 最終：兩種背景、攻城與守城、Save/Load、AI 完整循環、Package 可安裝到第二個 Unity project。

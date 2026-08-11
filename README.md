@@ -17,5 +17,6 @@ AegisRTS FrameworkLab 是可重複用於不同世界觀的 RTS／領土／攻城
 3. 開啟 `Assets/AegisRTS/Demo/Scenes/Bootstrap.unity` 並進入 Play Mode。
 4. 所有規格與執行順序請由 [`docs/00_README_開發總覽.md`](docs/00_README_開發總覽.md) 開始閱讀。
 
-Framework 原始碼在 `Assets/AegisRTS/Framework`，世界觀內容在 `Assets/AegisRTS/Content`，示範與 Sandbox 在 `Assets/AegisRTS/Demo`，測試在 `Assets/AegisRTS/Tests`。
+開始任何開發前先閱讀 [`DevelopmentProgress.md`](DevelopmentProgress.md)；每次修改 repository 都必須依 [`docs/09_DevelopmentProgress_開發進度紀錄規範.md`](docs/09_DevelopmentProgress_開發進度紀錄規範.md) 同步更新進度。
 
+Framework 原始碼在 `Assets/AegisRTS/Framework`，世界觀內容在 `Assets/AegisRTS/Content`，示範與 Sandbox 在 `Assets/AegisRTS/Demo`，測試在 `Assets/AegisRTS/Tests`。
