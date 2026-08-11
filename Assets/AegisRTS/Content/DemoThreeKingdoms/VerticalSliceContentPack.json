@@ -1,0 +1,40 @@
+{
+  "id": "vertical.three-kingdoms",
+  "displayName": "Three Kingdoms Vertical Slice",
+  "declaredTags": ["resource", "unit", "infantry", "archer", "cavalry", "siege-unit", "hero", "ability", "structure", "economy", "recruitment", "settlement", "technology", "ai-profile"],
+  "resources": [
+    { "id": "three-kingdoms.food", "displayName": "Food", "tags": ["resource"] },
+    { "id": "three-kingdoms.iron", "displayName": "Iron", "tags": ["resource"] }
+  ],
+  "abilities": [
+    { "id": "three-kingdoms.rally", "displayName": "Rally", "cooldownSeconds": 8, "range": 14, "tags": ["ability"] },
+    { "id": "three-kingdoms.challenge", "displayName": "Challenge", "cooldownSeconds": 10, "range": 10, "tags": ["ability"] }
+  ],
+  "units": [
+    { "id": "three-kingdoms.infantry", "displayName": "Shield Infantry", "maxHealth": 130, "movementSpeed": 4.0, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"three-kingdoms.food","amount":20}], "recruitmentSeconds": 0.05, "populationCost": 1, "abilityIds": [], "tags": ["unit","infantry"] },
+    { "id": "three-kingdoms.archer", "displayName": "Crossbowman", "maxHealth": 90, "movementSpeed": 4.2, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"three-kingdoms.food","amount":15},{"resourceId":"three-kingdoms.iron","amount":5}], "recruitmentSeconds": 0.05, "populationCost": 1, "abilityIds": [], "tags": ["unit","archer"] },
+    { "id": "three-kingdoms.cavalry", "displayName": "Tiger Cavalry", "maxHealth": 150, "movementSpeed": 7.0, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"three-kingdoms.food","amount":25},{"resourceId":"three-kingdoms.iron","amount":10}], "recruitmentSeconds": 0.05, "populationCost": 2, "abilityIds": [], "tags": ["unit","cavalry"] },
+    { "id": "three-kingdoms.siege-unit", "displayName": "Battering Ram", "maxHealth": 240, "movementSpeed": 2.5, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"three-kingdoms.iron","amount":30}], "recruitmentSeconds": 0.05, "populationCost": 2, "abilityIds": [], "tags": ["unit","siege-unit"] }
+  ],
+  "heroes": [
+    { "id": "three-kingdoms.player-hero", "displayName": "Player General", "maxHealth": 350, "movementSpeed": 5, "leadership": 90, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["three-kingdoms.rally"], "tags": ["hero"] },
+    { "id": "three-kingdoms.enemy-hero", "displayName": "Enemy General", "maxHealth": 340, "movementSpeed": 5, "leadership": 86, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["three-kingdoms.challenge"], "tags": ["hero"] }
+  ],
+  "buildings": [
+    { "id": "three-kingdoms.farm", "displayName": "Supply Farm", "maxHealth": 700, "prefabId": "PF_Structure_Placeholder", "costs": [], "buildSeconds": 1, "populationCapacity": 10, "production": [{"resourceId":"three-kingdoms.food","amountPerSecond":80},{"resourceId":"three-kingdoms.iron","amountPerSecond":50}], "tags": ["structure","economy"] },
+    { "id": "three-kingdoms.barracks", "displayName": "Barracks", "maxHealth": 900, "prefabId": "PF_Structure_Placeholder", "costs": [], "buildSeconds": 1, "populationCapacity": 20, "production": [], "tags": ["structure","recruitment"] }
+  ],
+  "technologies": [],
+  "settlements": [
+    { "id": "three-kingdoms.player-city", "displayName": "Player City", "maxHealth": 2500, "initialPopulation": 1200, "maxDefense": 140, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["three-kingdoms.food","three-kingdoms.iron"], "tags": ["settlement"] },
+    { "id": "three-kingdoms.village", "displayName": "Frontier Village", "maxHealth": 900, "initialPopulation": 300, "maxDefense": 50, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["three-kingdoms.food"], "tags": ["settlement"] },
+    { "id": "three-kingdoms.enemy-fortress", "displayName": "Enemy Fortress", "maxHealth": 3000, "initialPopulation": 1500, "maxDefense": 180, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["three-kingdoms.food","three-kingdoms.iron"], "tags": ["settlement"] }
+  ],
+  "defenseStructures": [
+    { "id": "three-kingdoms.fortress-gate", "displayName": "Fortress Gate", "structureTypeId": "gate", "siegeAreaId": "gates", "maxHealth": 120, "armor": 10, "prefabId": "PF_Structure_Placeholder", "tags": ["structure"] }
+  ],
+  "aiProfiles": [
+    { "id": "three-kingdoms.counterattack-ai", "displayName": "Counterattack Warlord", "aggression": 0.8, "defenseBias": 0.5, "economyBias": 0.5, "riskTolerance": 0.7, "siegePreference": 0.7, "decisionIntervalSeconds": 0.2, "desiredArmySize": 4, "tags": ["ai-profile"] }
+  ],
+  "rules": { "moraleEnabled": true, "supplyEnabled": true, "heroCaptureEnabled": true, "heroPermanentDeath": false, "populationEnabled": true, "fogOfWarEnabled": true, "destructibleWalls": true }
+}

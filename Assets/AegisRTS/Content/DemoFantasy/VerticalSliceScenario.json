@@ -1,0 +1,20 @@
+{
+  "id": "scenario.fantasy.vertical-slice",
+  "contentPackId": "vertical.fantasy",
+  "worldId": "fantasy",
+  "resourceIds": ["fantasy.gold", "fantasy.mana"],
+  "unitRoles": [
+    {"role":"infantry","unitId":"fantasy.infantry"},
+    {"role":"archer","unitId":"fantasy.archer"},
+    {"role":"cavalry","unitId":"fantasy.cavalry"},
+    {"role":"siege-unit","unitId":"fantasy.siege-unit"}
+  ],
+  "heroIds": ["fantasy.player-hero", "fantasy.enemy-hero"],
+  "economyBuildingId": "fantasy.mana-well",
+  "recruitmentBuildingId": "fantasy.guild-hall",
+  "playerCityId": "fantasy.player-city",
+  "villageId": "fantasy.village",
+  "enemyFortressId": "fantasy.enemy-fortress",
+  "gateId": "fantasy.fortress-gate",
+  "aiProfileId": "fantasy.counterattack-ai"
+}

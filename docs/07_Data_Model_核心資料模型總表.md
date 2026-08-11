@@ -252,3 +252,23 @@ SimulationLodDecision ── Tier / TickHz / Render / Simulate
 - budget 是外部提供的 benchmark policy，Framework 只輸出 named violations。
 - spatial index 每個 item 只存在一個 cell，position update 保持 index 一致。
 - pool lifecycle callbacks 讓 Unity adapter 控制 activate／deactivate，不讓 Core 引用 GameObject。
+
+## Phase 15 Vertical Slice Model
+
+```text
+VerticalSliceDefinition
+├─ ContentPackId / WorldId
+├─ 2 ResourceIds
+├─ UnitRoles ── Infantry / Archer / Cavalry / SiegeUnit
+├─ 2 HeroIds
+├─ EconomyBuildingId / RecruitmentBuildingId
+├─ PlayerCityId / VillageId / EnemyFortressId
+└─ GateId / AiProfileId
+
+VerticalSliceLoop ── CurrentStage / History / Result
+GameSessionController ── MainMenu / Playing / Paused / Settings / Victory / Defeat
+```
+
+- `VerticalSliceDefinition` 只將場景語意角色綁定到穩定 Definition ID，不保存 runtime entity。
+- Three Kingdoms 與 Fantasy 各有獨立資料，但共用同一個 `VerticalSliceSimulation` 與既有 Gameplay systems。
+- `GameSettings` 是最小 immutable session 設定；Unity UI 只呼叫 session API。

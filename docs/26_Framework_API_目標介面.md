@@ -509,3 +509,28 @@ var projectiles = new ObjectPool<ProjectileView>(factory, maximumRetained: 256);
 - `SpatialHash<T>`：local radius broad-phase，避免為每個 unit 掃描全世界 entity。
 - `SimulationLodPolicy.Evaluate`：依距離輸出 simulation／render tier。
 - `PerformanceStressHarness.Run`：100～1000 exploratory scale report，供 CI／hardware benchmark adapter 使用。
+
+## Phase 15 Vertical Slice API
+
+```csharp
+ContentPack pack = new ContentPackJsonLoader().Load(contentJson);
+VerticalSliceDefinition scenario = new VerticalSliceJsonLoader().Load(scenarioJson);
+
+using var simulation = new VerticalSliceSimulation(pack, scenario);
+var loop = new VerticalSliceLoop(simulation);
+loop.Begin();
+loop.RunToCompletion();
+
+var session = new GameSessionController(backend);
+session.NewGame();
+session.Pause();
+session.OpenSettings();
+session.ApplySettings(new GameSettings(0.8, 24, true));
+session.Resume();
+```
+
+- `VerticalSliceJsonLoader`：載入 world-neutral semantic bindings。
+- `VerticalSliceValidator.Validate`：驗證 2 resources、4 required roles、2 heroes、buildings、三個地點、gate、AI profile 與 Content Pack references。
+- `VerticalSliceLoop.Tick／RunToCompletion`：deterministic stage progression；Waiting 不跳階，Defeated 立即終止。
+- `VerticalSliceSimulation`：共用 composition，透過既有 domain API 完成收入、招募、軍團、戰鬥、AI 反攻、攻城與佔領。
+- `GameSessionController`：以 `IGameSessionBackend` 隔離 New／Load／Restart 的 scene／persistence 實作。

@@ -1,0 +1,40 @@
+{
+  "id": "vertical.fantasy",
+  "displayName": "Fantasy Vertical Slice",
+  "declaredTags": ["resource", "unit", "infantry", "archer", "cavalry", "siege-unit", "hero", "ability", "structure", "economy", "recruitment", "settlement", "technology", "ai-profile"],
+  "resources": [
+    { "id": "fantasy.gold", "displayName": "Gold", "tags": ["resource"] },
+    { "id": "fantasy.mana", "displayName": "Mana", "tags": ["resource"] }
+  ],
+  "abilities": [
+    { "id": "fantasy.aegis", "displayName": "Arcane Aegis", "cooldownSeconds": 8, "range": 14, "tags": ["ability"] },
+    { "id": "fantasy.war-cry", "displayName": "War Cry", "cooldownSeconds": 10, "range": 10, "tags": ["ability"] }
+  ],
+  "units": [
+    { "id": "fantasy.infantry", "displayName": "Guardian", "maxHealth": 130, "movementSpeed": 4.0, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"fantasy.gold","amount":20}], "recruitmentSeconds": 0.05, "populationCost": 1, "abilityIds": [], "tags": ["unit","infantry"] },
+    { "id": "fantasy.archer", "displayName": "Ranger", "maxHealth": 90, "movementSpeed": 4.2, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"fantasy.gold","amount":15},{"resourceId":"fantasy.mana","amount":5}], "recruitmentSeconds": 0.05, "populationCost": 1, "abilityIds": [], "tags": ["unit","archer"] },
+    { "id": "fantasy.cavalry", "displayName": "Gryphon Rider", "maxHealth": 150, "movementSpeed": 7.0, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"fantasy.gold","amount":25},{"resourceId":"fantasy.mana","amount":10}], "recruitmentSeconds": 0.05, "populationCost": 2, "abilityIds": [], "tags": ["unit","cavalry"] },
+    { "id": "fantasy.siege-unit", "displayName": "Rune Golem", "maxHealth": 240, "movementSpeed": 2.5, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"fantasy.mana","amount":30}], "recruitmentSeconds": 0.05, "populationCost": 2, "abilityIds": [], "tags": ["unit","siege-unit"] }
+  ],
+  "heroes": [
+    { "id": "fantasy.player-hero", "displayName": "Aegis Mage", "maxHealth": 350, "movementSpeed": 5, "leadership": 90, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["fantasy.aegis"], "tags": ["hero"] },
+    { "id": "fantasy.enemy-hero", "displayName": "Ash Warlord", "maxHealth": 340, "movementSpeed": 5, "leadership": 86, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["fantasy.war-cry"], "tags": ["hero"] }
+  ],
+  "buildings": [
+    { "id": "fantasy.mana-well", "displayName": "Mana Well", "maxHealth": 700, "prefabId": "PF_Structure_Placeholder", "costs": [], "buildSeconds": 1, "populationCapacity": 10, "production": [{"resourceId":"fantasy.gold","amountPerSecond":80},{"resourceId":"fantasy.mana","amountPerSecond":50}], "tags": ["structure","economy"] },
+    { "id": "fantasy.guild-hall", "displayName": "Guild Hall", "maxHealth": 900, "prefabId": "PF_Structure_Placeholder", "costs": [], "buildSeconds": 1, "populationCapacity": 20, "production": [], "tags": ["structure","recruitment"] }
+  ],
+  "technologies": [],
+  "settlements": [
+    { "id": "fantasy.player-city", "displayName": "Crystal City", "maxHealth": 2500, "initialPopulation": 1200, "maxDefense": 140, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["fantasy.gold","fantasy.mana"], "tags": ["settlement"] },
+    { "id": "fantasy.village", "displayName": "Moon Village", "maxHealth": 900, "initialPopulation": 300, "maxDefense": 50, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["fantasy.gold"], "tags": ["settlement"] },
+    { "id": "fantasy.enemy-fortress", "displayName": "Ash Fortress", "maxHealth": 3000, "initialPopulation": 1500, "maxDefense": 180, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["fantasy.gold","fantasy.mana"], "tags": ["settlement"] }
+  ],
+  "defenseStructures": [
+    { "id": "fantasy.fortress-gate", "displayName": "Runed Gate", "structureTypeId": "gate", "siegeAreaId": "gates", "maxHealth": 120, "armor": 10, "prefabId": "PF_Structure_Placeholder", "tags": ["structure"] }
+  ],
+  "aiProfiles": [
+    { "id": "fantasy.counterattack-ai", "displayName": "Counterattack Warlord", "aggression": 0.8, "defenseBias": 0.5, "economyBias": 0.5, "riskTolerance": 0.7, "siegePreference": 0.7, "decisionIntervalSeconds": 0.2, "desiredArmySize": 4, "tags": ["ai-profile"] }
+  ],
+  "rules": { "moraleEnabled": true, "supplyEnabled": true, "heroCaptureEnabled": true, "heroPermanentDeath": false, "populationEnabled": true, "fogOfWarEnabled": true, "destructibleWalls": true }
+}

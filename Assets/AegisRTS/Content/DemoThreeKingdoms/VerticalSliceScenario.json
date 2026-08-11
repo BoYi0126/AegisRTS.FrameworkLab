@@ -1,0 +1,20 @@
+{
+  "id": "scenario.three-kingdoms.vertical-slice",
+  "contentPackId": "vertical.three-kingdoms",
+  "worldId": "three-kingdoms",
+  "resourceIds": ["three-kingdoms.food", "three-kingdoms.iron"],
+  "unitRoles": [
+    {"role":"infantry","unitId":"three-kingdoms.infantry"},
+    {"role":"archer","unitId":"three-kingdoms.archer"},
+    {"role":"cavalry","unitId":"three-kingdoms.cavalry"},
+    {"role":"siege-unit","unitId":"three-kingdoms.siege-unit"}
+  ],
+  "heroIds": ["three-kingdoms.player-hero", "three-kingdoms.enemy-hero"],
+  "economyBuildingId": "three-kingdoms.farm",
+  "recruitmentBuildingId": "three-kingdoms.barracks",
+  "playerCityId": "three-kingdoms.player-city",
+  "villageId": "three-kingdoms.village",
+  "enemyFortressId": "three-kingdoms.enemy-fortress",
+  "gateId": "three-kingdoms.fortress-gate",
+  "aiProfileId": "three-kingdoms.counterattack-ai"
+}

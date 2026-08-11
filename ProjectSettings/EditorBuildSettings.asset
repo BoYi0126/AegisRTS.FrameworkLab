@@ -20,5 +20,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AegisRTS/Demo/Scenes/Sandbox_AI.unity
     guid: b562354075bc4679bde7b6f47344b7a1
+  - enabled: 1
+    path: Assets/AegisRTS/Demo/Scenes/VerticalSlice_01.unity
+    guid: 1a150000000000000000000000000015
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
