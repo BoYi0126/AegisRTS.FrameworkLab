@@ -8,11 +8,12 @@ namespace AegisRTS.Demo.PlayablePrototype
 {
     public sealed class PrototypeEntityRecord
     {
-        public PrototypeEntityRecord(EntityId entityId, string definitionId, EntityId factionId, WorldPoint spawnPosition,
+        public PrototypeEntityRecord(EntityId entityId, string definitionId, string prefabId, EntityId factionId, WorldPoint spawnPosition,
             double movementSpeed, CombatantProfile combatProfile, bool isHero)
         {
             EntityId = entityId;
             DefinitionId = definitionId ?? throw new ArgumentNullException(nameof(definitionId));
+            PrefabId = prefabId ?? throw new ArgumentNullException(nameof(prefabId));
             FactionId = factionId;
             SpawnPosition = spawnPosition;
             MovementSpeed = movementSpeed;
@@ -22,6 +23,7 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         public EntityId EntityId { get; }
         public string DefinitionId { get; }
+        public string PrefabId { get; }
         public EntityId FactionId { get; }
         public WorldPoint SpawnPosition { get; }
         public double MovementSpeed { get; }

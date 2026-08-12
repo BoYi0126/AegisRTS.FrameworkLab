@@ -13,7 +13,7 @@
 
 ## 目前結論
 
-`PlayablePrototype_01` 的 PP00～PP08 程式、Content、scene、HUD、Save／Load、自動測試與 Windows Development Build 已建立。自動化流程可完成 New Game → Economy → Recruit → Army → Battle → Siege → Capture → Victory，另有可重現的 Defeat path。
+`PlayablePrototype_01` 的 PP00～PP08 程式、Content、scene、HUD、Save／Load、自動測試與 Windows Development Build 已建立。自動化流程可完成 New Game → Economy → Recruit → Army → Battle → Siege → Capture → Victory，另有可重現的 Defeat path。步兵已使用 GLB 衍生的靜態 L2 Prefab；英雄與其他兵種仍使用 primitive placeholder。
 
 目前可宣稱 PP00～PP08 的系統優先 Prototype 已完成，但不可宣稱正式遊戲或 G01～G12 完成，原因如下：
 
@@ -31,6 +31,14 @@
 3. 確認 Console 沒有 compile error 或 missing script。
 4. 按 Play。Scene 預設直接建立 New Game；也可按 `Menu` 回主選單測試 New Game／Load Game。
 5. 左側 HUD 顯示 session、objective、systems、resources、population、queues、combat、siege、AI 與最近命令；右側顯示 notifications。
+
+如要單獨重驗步兵美術接線，使用 Unity menu：
+
+```text
+AegisRTS → Playable Prototype → Run Infantry Smoke Validation
+```
+
+它會以 additive scene 進入 Play Mode，驗證雙方步兵、LOD、Team Color renderers 與 anchors，將截圖輸出至同層的 `AegisRTS.BuildValidation/Infantry_GameView.png`，完成後回復原本 Editor scene。
 
 新手說明是 modal：顯示時底層 HUD 與 RTS input 都不可互動。按「我了解了，開始遊戲」、`Enter`、數字鍵盤 `Enter` 或 `Esc` 可關閉；`F1` 可再次開啟／關閉。
 

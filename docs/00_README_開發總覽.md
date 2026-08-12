@@ -97,9 +97,13 @@ FrameworkLab 同時負責：
 36. `40_Agent_總執行規則.md`
 37. `41_Agent_Phase執行Prompt.md`
 38. `42_Agent_CodeReview與驗收Prompt.md`
-39. `50_AI_Art_Pipeline.md`
-40. `51_Art_Bible_Template.md`
-41. `60_第一階段實際執行順序.md`
+39. `43_Unit_Engagement_兵種交戰模式.md`
+40. `44_Selection_Driven_Command_Panel_選取驅動指揮面板.md`
+41. `50_AI_Art_Pipeline.md`
+42. `51_Art_Bible_Template.md`
+43. `ArtSpecs/00_美術製作總覽與AI任務索引.md`
+44. `ArtSpecs/07_製作批次與目前整合缺口.md`
+45. `60_第一階段實際執行順序.md`
 
 ## 最終驗證
 

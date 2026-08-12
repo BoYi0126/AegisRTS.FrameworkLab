@@ -1,3 +1,4 @@
+using System;
 using AegisRTS.Core.Entities;
 using UnityEngine;
 using EntityId = AegisRTS.Core.Entities.EntityId;
@@ -14,6 +15,7 @@ namespace AegisRTS.Presentation.Selection
         [SerializeField] private SelectableKind kind = SelectableKind.Unit;
         [SerializeField] private SelectionAffiliation affiliation = SelectionAffiliation.Friendly;
         [SerializeField] private Renderer targetRenderer;
+        [SerializeField] private Renderer[] targetRenderers = Array.Empty<Renderer>();
 
         private SelectionService _selection;
         private Color _baseColor = Color.white;
@@ -31,7 +33,8 @@ namespace AegisRTS.Presentation.Selection
             SelectableKind selectableKind,
             SelectionAffiliation selectableAffiliation,
             SelectionService selection,
-            Color baseColor)
+            Color baseColor,
+            Renderer[] selectionRenderers = null)
         {
             entityId = id.Value;
             definitionId = contentDefinitionId;
@@ -39,7 +42,17 @@ namespace AegisRTS.Presentation.Selection
             affiliation = selectableAffiliation;
             _selection = selection;
             _baseColor = baseColor;
-            targetRenderer = targetRenderer != null ? targetRenderer : GetComponentInChildren<Renderer>();
+            if (selectionRenderers != null && selectionRenderers.Length > 0)
+                targetRenderers = selectionRenderers;
+            if (targetRenderers == null || targetRenderers.Length == 0)
+            {
+                targetRenderer = targetRenderer != null ? targetRenderer : GetComponentInChildren<Renderer>();
+                targetRenderers = targetRenderer != null ? new[] { targetRenderer } : Array.Empty<Renderer>();
+            }
+            else
+            {
+                targetRenderer = targetRenderers[0];
+            }
             _propertyBlock = new MaterialPropertyBlock();
             _selection.Register(Descriptor);
             SetSelected(false);
@@ -47,11 +60,14 @@ namespace AegisRTS.Presentation.Selection
 
         public void SetSelected(bool selected)
         {
-            if (targetRenderer == null) return;
             if (_propertyBlock == null) _propertyBlock = new MaterialPropertyBlock();
-            targetRenderer.GetPropertyBlock(_propertyBlock);
-            _propertyBlock.SetColor(BaseColor, selected ? Color.Lerp(_baseColor, Color.white, 0.65f) : _baseColor);
-            targetRenderer.SetPropertyBlock(_propertyBlock);
+            foreach (Renderer renderer in targetRenderers ?? Array.Empty<Renderer>())
+            {
+                if (renderer == null) continue;
+                renderer.GetPropertyBlock(_propertyBlock);
+                _propertyBlock.SetColor(BaseColor, selected ? Color.Lerp(_baseColor, Color.white, 0.65f) : _baseColor);
+                renderer.SetPropertyBlock(_propertyBlock);
+            }
         }
 
         public void SetAffiliation(SelectionAffiliation selectableAffiliation, Color baseColor)

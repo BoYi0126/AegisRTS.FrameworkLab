@@ -1,0 +1,9 @@
+PF_Unit_Infantry
+├─ GameplayRoot              (0, 0, 0)
+├─ VisualRoot                (0, 0, 0)
+│  ├─ CHR_Infantry_A_v001_LOD0
+│  ├─ CHR_Infantry_A_v001_LOD1
+│  └─ MAT_Infantry_TeamColor (runtime swappable)
+├─ SelectionAnchor           (0, 0.02, 0)
+├─ HealthBarAnchor           (0, 2.10, 0)
+└─ GroundContact             (0, 0, 0)

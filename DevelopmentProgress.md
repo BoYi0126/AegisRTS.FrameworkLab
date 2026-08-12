@@ -6,10 +6,148 @@
 
 - Current Phase：PlayablePrototype_01 已切換為 `fortified-city` 要塞城市規則；第一個玩家攻城垂直切片（主堡直募、固定城牆、可修城門、主堡壓制後佔領）為 `Completed`，玩家守城與隨機武將模式尚未完成。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 31/31；Windows Development Build PASS（173,603,484 bytes）；960×540 executable 實際點選我方主堡、我方英雄、敵方主堡後，指揮面板依序自動切為內政、兵種設定、攻城行動，Player log 0 error hits。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 31/31；Windows Development Build PASS（173,603,484 bytes）；2026-08-12 互動式 Unity Editor 步兵整合 smoke PASS，實際 Game View 顯示雙方步兵 Prefab、LOD／Team Color renderers、anchors 與血條，編譯 0 errors。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：下一輪先補玩家守城／AI 正式攻城與維修資源成本，再建立 deterministic Match Setup／Random Commander Roster 分發；世界觀與 production art 仍延後。
+- Highest Priority：系統面仍先補玩家守城／AI 正式攻城與維修資源成本；美術下一步先取得步兵 L3 rig／Idle、Move、Attack、Hit、Death 動畫，再依序接弓兵、指揮官、城門、城牆與要塞主堡，不先大量製作世界觀資產。
 - Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam，不是產品功能缺口。
+
+## 2026-08-12 — Infantry GLB Prototype 整合
+
+- Status：Completed（Prototype L2；Release／L3 尚未完成）
+- Goal：在使用者完成 GLB 方案 A（安裝 glTFast）後，將步兵 LOD0／LOD1 套入 `PlayablePrototype_01`，完成單一 Team Color 流程、Content prefab ID、選取／血條與實機畫面驗證。
+- Baseline：
+  - Branch：`main`；工作樹已有尚未提交的 ArtSpecs、ArtSource 與文件變更，全部保留。
+  - Package：使用者新增 `com.unity.cloud.gltfast` 6.19.0；Unity 能成功匯入四個 GLB。
+  - Asset：四個 GLB 的紅／藍幾何相同；LOD0 4,376 triangles、LOD1 1,512 triangles，每個來源拆成 Base 與 Team Color 材質。沒有 rig、skin 或 animation clips。
+- Scope：
+  - In：Runtime L2 資產、LOD、URP materials、Team Color、Prefab、Content Pack／spawn 串接、朝向、選取與血條、tests、smoke tool 與文件。
+  - Out／Deferred：骨架／動畫、正式 Normal／ORM、弓兵與其他單位、授權資料補齊、發布驗收。
+- Changed：
+  - 將 Blue LOD0／LOD1 與 BaseColor／Normal／ORM 複製至 `Assets/AegisRTS/Content/Shared/Art/Units/Infantry/`；Red 版本只保留於 `ArtSource` 追溯，避免 Runtime 重複幾何。
+  - 新增 `InfantryArtPrefabBuilder`：把 GLB 的 106／52 個 mesh parts 合併成每 LOD 兩個 renderer，建立四個衍生 mesh、兩個 URP Lit material、LODGroup、anchors、collider 與 `PF_Unit_Infantry` Resources Prefab。
+  - 新增 `PrototypeUnitArtCatalog`／`PrototypeUnitArtView`；Content Pack 的 `unit.infantry.prefabId` 改為 `PF_Unit_Infantry`，未知 ID 仍安全回退 primitive。
+  - `PrototypeEntityRegistry` 保存 `prefabId`；Bootstrap 依 prefab ID 建立美術、套用雙方陣營色、使用 Prefab health-bar anchor，並讓單位朝移動方向旋轉。
+  - `UnitySelectableView` 支援多個 LOD renderer，選取高亮不再只處理單一 renderer。
+  - 新增 Unity menu `AegisRTS/Playable Prototype/Run Infantry Smoke Validation`，可在既有 Editor 中做 Play Mode runtime 驗證與截圖並回復原 scene。
+- Behavior：
+  - Before：所有步兵以 Capsule primitive 顯示，Content Pack 的 prefab ID 是 placeholder，沒有 LOD 或模型陣營色。
+  - After：開局玩家與敵方步兵使用同一份靜態 L2 Prefab，分別呈藍／紅 Team Color，支援選取、移動轉向、血條與 LOD；英雄及其他兵種仍保持 placeholder。
+- Architecture / API / Data：
+  - Gameplay definition 只攜帶穩定 `prefabId`；Unity Resources 與材質處理留在 Demo／Content presentation boundary，package Gameplay 沒有新增 Unity dependency。
+  - Team Color 與選取使用 `MaterialPropertyBlock`，不為每個單位複製 material。
+  - Save schema 未變更；視覺由 restore 後 registry 的 definition／prefab ID 重建。
+- Tests / Validation：
+  - `dotnet restore AegisRTS.FrameworkLab.slnx` + `dotnet build ... --no-restore`：PASS，0 warnings、0 errors（修正 Unity 6 已棄用的 FindObjects overload 後）。
+  - Unity Prefab builder：PASS；LOD0 4,376 triangles、LOD1 1,512 triangles、每 LOD 2 renderers。
+  - Unity Editor Play Mode smoke：PASS；2 個 `PrototypeUnitArtView`、每個 2 個 Team Color renderers、LODGroup 與 Selection／HealthBar anchors 全部存在。
+  - 實際 Game View screenshot：PASS，1920×1152，可見我方藍色與敵方紅色步兵及血條；輸出於 repository 同層 `AegisRTS.BuildValidation/Infantry_GameView.png`。
+- Acceptance：
+  - GLB 匯入、尺寸、Pivot、LOD triangles、合併 renderer、Prefab 載入、雙方生成、Team Color、selection／health anchors：PASS。
+  - Runtime 仍能在其他 unit art 未交付時以 primitive fallback 啟動：PASS。
+  - Production／Release asset：BLOCKED，缺少授權追溯、完整生成紀錄、正式材質與 L3 rig／animation。
+- Known Issues / Risks：
+  - 目前模型不含骨架與動畫；移動時只有 transform 轉向與位移，Idle／Move／Attack／Hit／Death 不會播放。
+  - BaseColor 是色帶、Normal／ORM 是近乎均值的 placeholder；目前以 URP Lit 常數材質呈現，視覺品質不是最終版。
+  - Resources catalog 目前只有步兵映射；後續單位應逐一新增，不應把產品資產引用放進 Framework package。
+- Git：
+  - Branch：`main`。
+  - Commit／Push：未執行；本次使用者沒有要求。
+- Next：
+  1. 向美術 AI 取得同一造型、同一比例的 Rigged L3 檔，至少含 Idle／Move／Attack／Hit／Death clips 與武器 socket。
+  2. 接 Animator Controller 與 combat／movement presentation events；再驗證移動、攻擊、死亡與 20～100 單位效能。
+  3. 補齊生成工具、Prompt／Seed／Job ID、人工修改與商用授權後，才能將狀態由 Release Blocked 改為 Production Accepted。
+
+## 2026-08-12 — Infantry AI 美術交付分類入庫
+
+- Status：Completed（來源檔分類完成；Unity 匯入與遊戲整合未開始）
+- Goal：將 Repository Root 的 `Unit_03_Infantry_Full_v001` AI 交付包移到可長期追溯的美術來源區，依概念、模型、貼圖、預覽、UV、文件與工具分類；避免尚未驗證的 GLB、預覽圖與 Editor script 直接進入 Unity `Assets`。
+- Baseline：
+  - Branch／Git：`main`；開始時前一筆 ArtSpecs／README／DevelopmentProgress 變更仍未 commit，另有未追蹤 `Unit_03_Infantry_Full_v001/`。
+  - Incoming Delivery：25 files、4,201,771 bytes；包含 L1 兩張概念圖、L2 四個 GLB、五張材質貼圖、九張預覽／UV 圖、四份報告資料與一個 Unity Editor validator。
+  - Import Capability：`Packages/manifest.json` 沒有 GLB／glTF importer；交付沒有 FBX、`.blend`／Maya 原始檔、L3 rig／animation 或完整 AI 生成／授權紀錄。
+- Scope：
+  - In：建立 `ArtSource` 規範、搬移並分類原始交付、建立單資產 Manifest、更新專案結構與 AI Art Pipeline 文件、驗證檔案完整性與 Git diff。
+  - Out／Deferred：安裝 glTF importer、轉換 FBX、修改／啟用交付方 Validator、Unity Model Import、Material／Prefab、Team Color runtime、L3 骨架動畫、Content Pack／Bootstrap 串接與實機畫面驗收。
+- Changed：
+  - `ArtSource/README.md`：定義來源交付與 Unity Runtime Asset 分流、版本目錄與狀態詞彙。
+  - `ArtSource/Units/Infantry/CHR_Infantry_A/v001/`：將 25 個原始交付檔分類至 `Concepts`、`Models`、`Textures`、`Previews/Camera`、`Previews/Dimensions`、`UV`、`Documentation`、`Tools/UnityEditor`。
+  - `ArtSource/Units/Infantry/CHR_Infantry_A/v001/ASSET_MANIFEST.md`：記錄檔案分類、交付數據、阻塞原因、驗收狀態與進入 `Assets` 前的必要工作。
+  - `docs/02_Project_Structure_完整目錄結構.md`：加入 `ArtSource` 與 `Assets/AegisRTS/Content/Shared/Art` 的責任邊界。
+  - `docs/50_AI_Art_Pipeline.md`：補上 AI／外包來源檔的收件、驗收與 Runtime 分流流程。
+- Behavior：
+  - Before：完整 AI 包平放 Repository Root，L1／L2、Runtime 候選與驗收資料混在同一交付階層，且容易整包拖進 Unity。
+  - After：來源包位於 `ArtSource/Units/Infantry/CHR_Infantry_A/v001` 並依用途分類；Unity `Assets` 沒有被未支援 GLB 或非 Runtime 圖片污染。
+- Architecture / API / Data：
+  - Architecture：新增 source-art boundary；`ArtSource` 不參與 Unity import／assembly，正式共用美術日後才進 `Assets/AegisRTS/Content/Shared/Art`。
+  - API：N/A，未修改 C# API；交付方 `InfantryL2Validator.cs` 只保存於 `ArtSource`，不參與編譯。
+  - Data：N/A，未修改 Content Pack、Prefab ID 或 Save schema。
+- Tests / Validation：
+  - Source inventory：搬移前 25 files／4,201,771 bytes；分類後排除新建 Manifest 仍為 25 files／4,201,771 bytes，PASS。
+  - Classification scan：所有原始檔均落入指定分類，原 Repository Root 交付路徑已移走，PASS。
+  - `git diff --check`：於本筆完成前執行。
+  - Unity EditMode／PlayMode／Build：NOT RUN；本次沒有將資產放入 `Assets`、沒有 runtime 或編譯變更。
+- Acceptance：
+  - 建立合適來源資料夾：PASS — `ArtSource/Units/Infantry/CHR_Infantry_A/v001`。
+  - 依檔案用途分類：PASS — 8 個明確分類與單資產 Manifest。
+  - 原始交付無遺失：PASS — 數量與總 bytes 一致。
+  - 不誤啟用未驗證資產：PASS — GLB 與 Validator 均保持在 `Assets` 外。
+  - Unity 遊戲內顯示 Infantry：NOT RUN — 缺 importer／FBX 與後續整合，不在本次範圍。
+- Completed：來源檔入庫、分類、狀態標記、專案規範與後續整合清單。
+- Not Completed / Deferred：格式匯入決策、Unity 實測、單一 Team Color 網格／材質、L3、Prefab 與 Prototype 替換。
+- Known Issues / Risks：四個 GLB 分為藍／紅重複網格，正式 Runtime 應改成單一幾何與可替換隊伍色；交付 Preview 是數學投影而非 Unity 截圖；授權與生成紀錄不完整，正式發布前必須補齊。
+- Git：
+  - Branch：`main`
+  - Working Tree：`ArtSource/`、本筆文件與前一筆 ArtSpecs 仍為未提交變更。
+  - Commit／Push：未執行；使用者本次未要求。
+- Next：
+  1. 向交付 AI 索取 FBX 或可編輯來源檔，以及完整 Prompt／Tool／Seed／License 紀錄；這比立即增加 importer 風險低。
+  2. 決定 GLB importer 或 FBX 流程後，先匯入單一 LOD0／LOD1 候選並做 Unity 尺寸、Pivot、材質與 Game View 驗收。
+  3. 驗收通過後建立共用 Infantry Runtime 資產與 Prefab，再處理 L3 動畫。
+
+## 2026-08-12 — AI 可委派美術規格包
+
+- Status：Completed（文件規格完成；正式美術資產與 Unity 整合未開始）
+- Goal：建立可逐份交給其他 AI 的 RTS 美術製作規格，鎖定單位／建築世界尺寸、960×540 至 2560×1440 畫面適配、相機可讀性、材質／陣營色、動畫／VFX、輸出與驗收條件；保留後續世界觀替換空間。
+- Baseline：
+  - Branch／Git：`main`；開始時本任務尚無美術規格變更。
+  - Existing Evidence：Playable Prototype 使用 Primitive Graybox；一般單位 NavMeshAgent 半徑 0.38 m、高 2.0 m；相機 Pitch 55°、Zoom 8–40、預設 31；Game View／IMGUI 讀取 `Screen.width/height`。
+  - Player Settings：`fullscreenMode: 1`、`defaultIsNativeResolution: 1`、`resizableWindow: 0`、default fields 1024×768；全螢幕可採原生解析度，任意可調視窗尚未完成。
+- Scope：
+  - In：共同技術／視覺規格、解析度／Camera／安全區、尺寸總表、AI L1／L2／L3 交付、全部現有 Hero／Unit 美術原型的獨立規格（敵方指揮官第一版共用指揮官模型與換色）、fortified-city 建築、經濟／訓練預備建築、UI 肖像與圖示規格、製作批次與整合缺口。
+  - Out／Deferred：生成圖片或 3D 模型、匯入 Unity、修改 PlayerSettings、Canvas/UI Toolkit 重構、依兵種 Agent 尺寸、Anchor 驅動血條、正式 Projectile／動畫／VFX／音效與世界觀美術。
+- Changed：
+  - `docs/00_README_開發總覽.md`：把交戰模式、選取驅動面板與 ArtSpecs 入口補入正式文件閱讀索引。
+  - `docs/ArtSpecs/00_美術製作總覽與AI任務索引.md`：規格包入口、文件索引、交付層級與完成定義。
+  - `docs/ArtSpecs/01_技術規格_比例座標與輸出.md` 至 `08_UI肖像圖示與選取標記.md`：公尺尺度、軸向／Pivot、網格／貼圖預算、相機／解析度、安全區、風格／隊伍色、動畫／VFX、AI 交付、尺寸總表、批次與 UI 配套規格。
+  - `docs/ArtSpecs/Unit_01_指揮官.md` 至 `Unit_06_攻城兵器.md`：每個 Hero／Unit 的獨立 AI 任務文件、尺寸、輪廓、材質、動畫、Prompt 與驗收。
+  - `docs/ArtSpecs/Building_01_我方主堡.md` 至 `Building_07_訓練營_預備.md`：目前要塞模式與未來建造模式的獨立建築規格。
+- Behavior：
+  - Before：只有通用 AI Art Pipeline／Art Bible 模板，沒有能直接約束模型大小、視窗可讀性或逐資產交付的文件。
+  - After：可將單一 Unit／Building 文件獨立交給 AI；所有資產統一以 1 Unity Unit = 1 m 製作，並以 960×540、55° Pitch、60° FOV、31 m 作最低可讀性驗收。
+- Architecture / API / Data：
+  - Architecture：只新增文件；明確區分 `GameplayRoot`／NavMesh 碰撞與 `VisualRoot`，未修改 runtime ownership 或 assembly dependency。
+  - API：N/A，沒有程式 API 變更。
+  - Data：N/A，沒有修改 Content Pack 或 Save schema；文件中的 Asset ID 對應現有 `hero.*`、`unit.*`、`building.*`、`settlement.*` 與 `structure.gate`。
+- Tests / Validation：
+  - 文件一致性：檢查 ArtSpecs 索引、Asset ID、尺寸、解析度、Agent 與現有 ContentPack／Bootstrap／Camera／PlayerSettings 對照。
+  - `git diff --check`：於本筆完成前執行；本次為 docs-only，不執行 EditMode、PlayMode 或 Windows Build，不改寫上次可信 runtime 測試結果。
+- Acceptance：
+  - 每個單位獨立 `.md`：PASS — 指揮官、副官、步兵、弓兵、騎兵、攻城兵器各一份。
+  - 單位與建築公尺尺寸：PASS — 個別文件與 `06_尺寸總表.md`。
+  - 當前視窗解析度適配規格：PASS — Camera 全視窗、UI reference／anchor、安全區與四種解析度驗收已定義。
+  - 可直接交給其他 AI：PASS — 每份資產含自足摘要、技術條件、Prompt、禁止項與驗收。
+  - 正式資產與遊戲整合：NOT RUN — 本次只建立規格，不生成或匯入資產。
+- Completed：13 份資產獨立規格與 9 份共同／管理規格；優先 Batch A／B／C 已排序。
+- Not Completed / Deferred：正式圖片／模型與程式整合；騎兵／攻城兵器較大 Agent；Prefab Anchor 血條；可調視窗與多比例實機驗收。
+- Known Issues / Risks：其他 AI 若只產 PNG，只能算 L1；AI 生成 3D 仍需人工檢查拓撲、授權、尺寸與 Unity 匯入。現有所有單位共用 0.38 m Agent，不能直接以大體積騎兵／衝車模型宣稱整合完成。
+- Git：
+  - Branch：`main`
+  - Working Tree：本任務新增 `docs/ArtSpecs/` 並修改 `DevelopmentProgress.md`，尚未 commit／push。
+  - Commit／Push：未執行；使用者本次未要求。
+- Next：
+  1. 將 `Unit_03_步兵.md` 與 `Unit_04_弓兵.md` 分別交給 AI 先產 L1 四視圖與剪影。
+  2. 人工確認輪廓後，再委派指揮官、城門、城牆、要塞主堡 L1。
+  3. L1 通過後只挑步兵與弓兵進 L2，先完成 Unity 尺寸、Team Color 與 Projectile 整合，再擴大產量。
 
 ## 2026-08-12 — 選取內容自動切換指揮面板
 

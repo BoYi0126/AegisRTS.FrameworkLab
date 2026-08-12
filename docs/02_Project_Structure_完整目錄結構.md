@@ -69,10 +69,17 @@ C:\projects\Unity\AegisRTS.FrameworkLab
 │        └─ PlayMode
 ├─ Packages
 ├─ ProjectSettings
+├─ ArtSource
+│  ├─ Units
+│  ├─ Buildings
+│  ├─ UI
+│  └─ VFX
 ├─ docs
 ├─ .gitignore
 └─ README.md
 ```
+
+`ArtSource/` 保存 AI／外包的概念圖、來源模型、預覽、UV、報告與授權紀錄，不由 Unity 自動匯入。只有通過格式、授權、尺寸與 Unity 驗收的 Runtime 檔案，才複製到 `Assets/AegisRTS/Content/Shared/Art/`。來源交付與正式遊戲資產不可混為同一狀態。
 
 避免把所有東西扁平放在 `Assets/Scripts`、`Assets/Prefabs`、`Assets/Scenes`。
 

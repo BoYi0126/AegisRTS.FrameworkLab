@@ -975,7 +975,7 @@ namespace AegisRTS.Demo.PlayablePrototype
                 var profile = new CombatantProfile(definition.Id.Value, factionId, definition.MaxHealth, attack,
                     new DefenseProfile(3d), tags: new[] { "unit", "hero" },
                     abilityIds: definition.AbilityIds.Select(value => value.Value));
-                RegisterEntity(new PrototypeEntityRecord(id, definition.Id.Value, factionId, position,
+                RegisterEntity(new PrototypeEntityRecord(id, definition.Id.Value, definition.PrefabId, factionId, position,
                     definition.MovementSpeed, profile, true));
             }
             catch
@@ -998,7 +998,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             if (!tags.Contains("unit")) tags.Add("unit");
             var profile = new CombatantProfile(definition.Id.Value, factionId, definition.MaxHealth,
                 attack, new DefenseProfile(cavalry ? 4d : 1d), tags: tags);
-            RegisterEntity(new PrototypeEntityRecord(id, definition.Id.Value, factionId, position,
+            RegisterEntity(new PrototypeEntityRecord(id, definition.Id.Value, definition.PrefabId, factionId, position,
                 definition.MovementSpeed, profile, false));
         }
 

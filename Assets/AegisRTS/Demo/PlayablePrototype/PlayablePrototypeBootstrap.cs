@@ -325,36 +325,42 @@ namespace AegisRTS.Demo.PlayablePrototype
             var root = new GameObject($"{record.DefinitionId}_{record.EntityId.Value}");
             root.transform.SetParent(_unitRoot);
             root.transform.position = ToVector(record.SpawnPosition);
-            PrimitiveType primitive = record.IsHero ? PrimitiveType.Capsule :
-                record.DefinitionId.Contains("siege") ? PrimitiveType.Cube : PrimitiveType.Capsule;
-            GameObject visual = GameObject.CreatePrimitive(primitive);
-            visual.name = "Visual";
-            visual.transform.SetParent(root.transform, false);
-            visual.transform.localPosition = new Vector3(0f, record.IsHero ? 1.1f : 0.8f, 0f);
-            visual.transform.localScale = record.IsHero ? new Vector3(1.1f, 1.1f, 1.1f) : new Vector3(0.8f, 0.8f, 0.8f);
             Color color = record.FactionId == PrototypeSystemComposition.PlayerFactionId
                 ? new Color(0.12f, 0.52f, 0.95f)
                 : new Color(0.92f, 0.18f, 0.15f);
-            SetColor(visual, color);
+            GameObject visual;
+            PrototypeUnitArtView artView;
+            if (!PrototypeUnitArtCatalog.TryInstantiate(record.PrefabId, root.transform, color, out visual, out artView))
+            {
+                PrimitiveType primitive = record.IsHero ? PrimitiveType.Capsule :
+                    record.DefinitionId.Contains("siege") ? PrimitiveType.Cube : PrimitiveType.Capsule;
+                visual = GameObject.CreatePrimitive(primitive);
+                visual.name = "Visual";
+                visual.transform.SetParent(root.transform, false);
+                visual.transform.localPosition = new Vector3(0f, record.IsHero ? 1.1f : 0.8f, 0f);
+                visual.transform.localScale = record.IsHero ? new Vector3(1.1f, 1.1f, 1.1f) : new Vector3(0.8f, 0.8f, 0.8f);
+                SetColor(visual, color);
+            }
+            float healthBarY = artView != null ? artView.GetHealthBarLocalY(root.transform, 2.35f) : 2.35f;
             var selectable = root.AddComponent<UnitySelectableView>();
             selectable.Configure(record.EntityId, record.DefinitionId,
                 record.IsHero ? SelectableKind.Hero : SelectableKind.Unit,
                 record.FactionId == PrototypeSystemComposition.PlayerFactionId ? SelectionAffiliation.Friendly : SelectionAffiliation.Enemy,
-                _selection, color);
+                _selection, color, artView != null ? artView.TeamColorRenderers : null);
 
             GameObject healthBack = GameObject.CreatePrimitive(PrimitiveType.Cube);
             healthBack.name = "Health_Back";
             healthBack.transform.SetParent(root.transform, false);
-            healthBack.transform.localPosition = new Vector3(0f, 2.35f, 0f);
+            healthBack.transform.localPosition = new Vector3(0f, healthBarY, 0f);
             healthBack.transform.localScale = new Vector3(1.25f, 0.12f, 0.12f);
             SetColor(healthBack, Color.black);
             GameObject healthFill = GameObject.CreatePrimitive(PrimitiveType.Cube);
             healthFill.name = "Health_Fill";
             healthFill.transform.SetParent(root.transform, false);
-            healthFill.transform.localPosition = new Vector3(0f, 2.35f, -0.08f);
+            healthFill.transform.localPosition = new Vector3(0f, healthBarY, -0.08f);
             healthFill.transform.localScale = new Vector3(1.2f, 0.08f, 0.08f);
             SetColor(healthFill, new Color(0.2f, 0.9f, 0.25f));
-            _views.Add(record.EntityId, new UnitView(root, healthFill.transform));
+            _views.Add(record.EntityId, new UnitView(root, healthFill.transform, healthBarY));
         }
 
         private void RemoveUnitView(EntityId entityId)
@@ -371,10 +377,15 @@ namespace AegisRTS.Demo.PlayablePrototype
             {
                 if (!Composition.Movement.TryGetState(item.Key, out var movement) ||
                     !Composition.Combat.TryGetState(item.Key, out CombatantSnapshot combat)) continue;
-                item.Value.Root.transform.position = ToVector(movement.Position);
+                Vector3 nextPosition = ToVector(movement.Position);
+                Vector3 direction = nextPosition - item.Value.Root.transform.position;
+                direction.y = 0f;
+                if (direction.sqrMagnitude > 0.000001f)
+                    item.Value.Root.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+                item.Value.Root.transform.position = nextPosition;
                 float ratio = (float)Math.Max(0d, Math.Min(1d, combat.Health / combat.MaxHealth));
                 item.Value.HealthFill.localScale = new Vector3(1.2f * ratio, 0.08f, 0.08f);
-                item.Value.HealthFill.localPosition = new Vector3(-0.6f * (1f - ratio), 2.35f, -0.08f);
+                item.Value.HealthFill.localPosition = new Vector3(-0.6f * (1f - ratio), item.Value.HealthBarY, -0.08f);
             }
         }
 
@@ -1167,9 +1178,15 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         private sealed class UnitView
         {
-            public UnitView(GameObject root, Transform healthFill) { Root = root; HealthFill = healthFill; }
+            public UnitView(GameObject root, Transform healthFill, float healthBarY)
+            {
+                Root = root;
+                HealthFill = healthFill;
+                HealthBarY = healthBarY;
+            }
             public GameObject Root { get; }
             public Transform HealthFill { get; }
+            public float HealthBarY { get; }
         }
     }
 }

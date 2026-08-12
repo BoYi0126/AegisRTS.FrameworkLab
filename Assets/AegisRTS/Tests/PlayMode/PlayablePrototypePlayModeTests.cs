@@ -33,7 +33,7 @@ namespace AegisRTS.Tests.PlayMode
         {
             ContentPack pack = new ContentPackJsonLoader().Load(Read("ContentPack.json"));
             ContentValidationResult validation = new ContentPackValidator().Validate(pack,
-                new ContentAssetCatalog(new[] { "PF_Unit_Placeholder", "PF_Hero_Placeholder", "PF_Structure_Placeholder", "PF_Settlement_Placeholder" }));
+                new ContentAssetCatalog(new[] { "PF_Unit_Infantry", "PF_Unit_Placeholder", "PF_Hero_Placeholder", "PF_Structure_Placeholder", "PF_Settlement_Placeholder" }));
             Assert.That(validation.IsValid, Is.True, string.Join("\n", validation.Issues));
             Assert.That(pack.Rules.SettlementArchetypeId, Is.EqualTo("fortified-city"));
             Assert.That(pack.Rules.DestructibleWalls, Is.False);
@@ -41,11 +41,15 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(pack.Rules.StrongholdRecruitmentEnabled, Is.True);
             Assert.That(pack.Rules.CaptureStrongholdInsteadOfDestroy, Is.True);
             Assert.That(pack.DefenseStructures.Any(value => value.Id.Value == "structure.stronghold-core"), Is.True);
+            Assert.That(pack.Units.Single(value => value.Id.Value == "unit.infantry").PrefabId,
+                Is.EqualTo(PrototypeUnitArtCatalog.InfantryPrefabId));
             using (PrototypeSystemComposition value = Create())
             {
                 Assert.That(value.ContentPackId, Is.EqualTo("prototype.neutral"));
                 Assert.That(value.ScenarioId, Is.EqualTo("scenario.prototype-conquest"));
                 Assert.That(value.Registry.Count, Is.EqualTo(8));
+                Assert.That(value.Registry.Snapshot().Where(record => record.DefinitionId == "unit.infantry")
+                    .All(record => record.PrefabId == PrototypeUnitArtCatalog.InfantryPrefabId), Is.True);
                 Assert.That(value.Factions.FactionCount, Is.EqualTo(2));
                 Assert.That(value.Settlements.SettlementCount, Is.EqualTo(3));
                 Assert.That(value.AI.AgentCount, Is.EqualTo(1));
@@ -252,6 +256,10 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(bootstrap.UsesUnityNavMesh, Is.True, "The playable scene must inject the Unity NavMesh product adapter.");
             Assert.That(bootstrap.Composition, Is.Not.Null);
             Assert.That(bootstrap.ViewCount, Is.EqualTo(bootstrap.Composition.Registry.Count));
+            PrototypeUnitArtView[] infantryArt = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude);
+            Assert.That(infantryArt, Has.Length.EqualTo(2), "Player and enemy infantry must use the imported art prefab.");
+            Assert.That(infantryArt.All(value => value.TeamColorRenderers.Length >= 2), Is.True);
+            Assert.That(infantryArt.All(value => value.HealthBarAnchor != null && value.SelectionAnchor != null), Is.True);
             Assert.That(bootstrap.HudQuery, Is.Not.Null);
             Assert.That(bootstrap.HudCommandSink, Is.Not.Null);
             Assert.That(bootstrap.Selection.RegisteredCount, Is.EqualTo(bootstrap.ViewCount + 4),
