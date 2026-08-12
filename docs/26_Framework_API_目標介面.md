@@ -165,6 +165,9 @@ selection.RecallControlGroup(1);
 - `ISelectionQuery`：讓 camera、UI 與其他 read-side adapter 查詢 selection，不暴露修改權限。
 - `SelectionChangedEvent`：selection 實際變更時才透過可選的 `EventBus` 發布 immutable snapshot。
 - `ContextCommandResolver`：Ground→Move、Enemy→Attack、Friendly→Follow、Settlement→Interact；neutral non-settlement 不產生未定義命令。
+- `SelectionService.Revision`：只有 selected ID set 實際改變時遞增，供 HUD 在 selection change 時更新而不覆蓋玩家後續手動頁籤選擇。
+- `SelectionCommandContextResolver`：將 descriptors 投影成 `Domestic`、`UnitSettings`、`Siege` 或 `None`；混合建築／兵種選取由 UnitSettings 優先。
+- `UnityRtsInputAdapter` 只把 Friendly Unit／Hero 當作 Move／Stop／Hold／context command actors；Structure／Settlement 保留可選取能力但不送入兵種指令。
 
 ### Camera / Unity adapters
 
@@ -229,6 +232,7 @@ var combat = new CombatSystem(events);
 combat.Register(entityId, combatantProfile, initialPosition);
 combat.RegisterAbility(abilityProfile);
 combat.IssueAttack(new AttackTargetCommand(actorIds, targetId));
+combat.SetEngagementMode(new SetUnitEngagementModeCommand(actorIds, UnitEngagementMode.Aggressive));
 combat.IssueAbility(new UseAbilityCommand(casterId, abilityId, targetId, targetPoint));
 combat.Tick(deltaSeconds);
 
@@ -245,6 +249,9 @@ if (combat.TryGetState(entityId, out CombatantSnapshot state))
 - `AttackProfile`：定義 damage type、range、cooldown、windup、projectile speed、splash radius 與 target tags。
 - `DefenseProfile`：定義 armor 與 physical／magical resistance；True damage 不套用 defense／resistance。
 - `CombatantProfile`：把 definition identity、faction、army、HP、attack、defense、tags、abilities 組成 runtime spawn configuration。
+- `UnitEngagementMode`：`HoldGround`=0.5、`Normal`=1.0、`Aggressive`=1.5 倍 attack range；`Retaliate` 不主動索敵，只在受擊後鎖定攻擊者。
+- `CombatantSnapshot` 額外公開 `EngagementMode`、`TargetReason`、`EngagementOrigin`、`DefenseRange` 與 `ShouldReturnToOrigin`。
+- `CombatMovementCoordinator` 只把 Combat 的追擊／返回 intent 投影成 Movement order，不保存第二份 authoritative state。
 
 ### Ability and status
 
@@ -392,6 +399,7 @@ sieges.RegisterStructure(siegeId, gateId,
 using var router = new SiegeCommandRouter(commandBus, sieges);
 commandBus.Dispatch(new StartSiegeCommand(siegeId));
 commandBus.Dispatch(new AttackDefenseStructureCommand(siegeId, attackerUnitId, gateId));
+commandBus.Dispatch(new RepairDefenseStructureCommand(siegeId, defenderEngineerId, gateId, amount: 45));
 commandBus.Dispatch(new EnterSiegeAreaCommand(siegeId, SiegeArea.InnerArea));
 commandBus.Dispatch(new EnterSiegeAreaCommand(siegeId, SiegeArea.CaptureObjective));
 commandBus.Dispatch(new CaptureSiegeCommand(siegeId));
@@ -402,8 +410,9 @@ commandBus.Dispatch(new CaptureSiegeCommand(siegeId));
 - `ISiegeNavigationSink`：Gate 開啟或 Wall／Gate 摧毀時通知 navigation backend 刷新通道與新路徑。
 - `ISiegeCaptureSink`／`SettlementSiegeCaptureSink`：將 capture objective 結果送入既有 Settlement owner transaction。
 - `ISiegeRule`：可替換 area entry 與 capture eligibility，不讓世界觀或 scenario 規則硬寫在 system。
-- Commands：Start、AttackDefenseStructure、SetGateState、EnterSiegeArea、ReportSiegeCondition、CompleteSiegeWave、CaptureSiege。
-- Events：SiegeStarted、DefenseStructureDamaged／Destroyed、GateStateChanged、BreachCreated、SiegeAreaEntered、SiegeCompleted。
+- `DefenseStructureProfile.Repairable`：由 Content tag `repairable` 建立；只有結構 owner／守方可修復。Gate 從 0 HP 修回正值時恢復 Closed 並發布 breach sealed event。
+- Commands：Start、AttackDefenseStructure、RepairDefenseStructure、SetGateState、EnterSiegeArea、ReportSiegeCondition、CompleteSiegeWave、CaptureSiege。
+- Events：SiegeStarted、DefenseStructureDamaged／Destroyed／Repaired、GateStateChanged、BreachCreated／Sealed、SiegeAreaEntered、SiegeCompleted。
 - `SiegeCombatEventBridge`：將 `UnitDiedEvent` 投影成 DefendersCleared／CommanderKilled capture conditions。
 
 ## Phase 10 Utility AI API

@@ -9,6 +9,16 @@ using AegisRTS.Gameplay.Technology;
 
 namespace AegisRTS.Gameplay.Recruitment
 {
+    public readonly struct RecruitmentQueueSnapshot
+    {
+        public RecruitmentQueueSnapshot(EntityId settlementId, EntityId factionId, DefinitionId unitId, double remainingSeconds)
+        { SettlementId = settlementId; FactionId = factionId; UnitId = unitId; RemainingSeconds = remainingSeconds; }
+        public EntityId SettlementId { get; }
+        public EntityId FactionId { get; }
+        public DefinitionId UnitId { get; }
+        public double RemainingSeconds { get; }
+    }
+
     /// <summary>Runs request, validation, cost, queue, timer, and spawn as a deterministic pipeline.</summary>
     public sealed class RecruitmentSystem
     {
@@ -63,20 +73,54 @@ namespace AegisRTS.Gameplay.Recruitment
             {
                 Job job = _jobs[index]; job.RemainingSeconds -= deltaSeconds;
                 if (job.RemainingSeconds > 0d) continue;
-                _sink?.SpawnUnit(job.SettlementId, job.FactionId, job.Definition.Id);
+                try
+                {
+                    _sink?.SpawnUnit(job.SettlementId, job.FactionId, job.Definition.Id);
+                }
+                catch (Exception exception)
+                {
+                    foreach (ResourceCost cost in job.Definition.Costs)
+                        _economy.AddResource(job.SettlementId, cost.ResourceId, cost.Amount);
+                    _economy.ReleasePopulation(job.SettlementId, job.Definition.PopulationCost);
+                    _jobs.RemoveAt(index);
+                    throw new InvalidOperationException($"Recruitment spawn for '{job.Definition.Id}' failed and was rolled back.", exception);
+                }
                 _events?.Publish(new UnitRecruitedEvent(job.SettlementId, job.FactionId, job.Definition.Id));
                 _jobs.RemoveAt(index);
             }
         }
 
         public string GetDebugSummary() => $"Units={_definitions.Count}, RecruitmentQueued={_jobs.Count}";
+
+        public IReadOnlyList<RecruitmentQueueSnapshot> SnapshotQueue()
+        {
+            var result = new List<RecruitmentQueueSnapshot>(_jobs.Count);
+            foreach (Job job in _jobs)
+                result.Add(new RecruitmentQueueSnapshot(job.SettlementId, job.FactionId, job.Definition.Id, Math.Max(0d, job.RemainingSeconds)));
+            return result.AsReadOnly();
+        }
+
+        /// <summary>Restores an already-paid and population-reserved recruitment job.</summary>
+        public void RestoreQueuedJob(EntityId settlementId, EntityId factionId, DefinitionId unitId, double remainingSeconds)
+        {
+            if (!_economy.ContainsAccount(settlementId)) throw new InvalidOperationException("Settlement economy account does not exist.");
+            if (!_definitions.TryGetValue(unitId, out UnitDefinition definition)) throw new InvalidOperationException("Unit definition does not exist.");
+            if (remainingSeconds <= 0d || remainingSeconds > definition.RecruitmentSeconds || double.IsNaN(remainingSeconds) || double.IsInfinity(remainingSeconds))
+                throw new ArgumentOutOfRangeException(nameof(remainingSeconds));
+            foreach (DefinitionId prerequisite in definition.PrerequisiteBuildingIds)
+                if (_buildings == null || !_buildings.IsBuilt(settlementId, prerequisite)) throw new InvalidOperationException($"Missing building prerequisite '{prerequisite}'.");
+            foreach (DefinitionId prerequisite in definition.PrerequisiteTechnologyIds)
+                if (_technologies == null || !_technologies.IsResearched(factionId, prerequisite)) throw new InvalidOperationException($"Missing technology prerequisite '{prerequisite}'.");
+            _jobs.Add(new Job(settlementId, factionId, definition, remainingSeconds));
+        }
+
         private static void ValidateDelta(double value)
         { if (double.IsNaN(value) || double.IsInfinity(value) || value < 0d) throw new ArgumentOutOfRangeException(nameof(value)); }
 
         private sealed class Job
         {
-            public Job(EntityId settlementId, EntityId factionId, UnitDefinition definition)
-            { SettlementId = settlementId; FactionId = factionId; Definition = definition; RemainingSeconds = definition.RecruitmentSeconds; }
+            public Job(EntityId settlementId, EntityId factionId, UnitDefinition definition, double? remainingSeconds = null)
+            { SettlementId = settlementId; FactionId = factionId; Definition = definition; RemainingSeconds = remainingSeconds ?? definition.RecruitmentSeconds; }
             public EntityId SettlementId { get; }
             public EntityId FactionId { get; }
             public UnitDefinition Definition { get; }

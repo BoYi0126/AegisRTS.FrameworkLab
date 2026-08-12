@@ -10,7 +10,11 @@ namespace AegisRTS.Gameplay.Content
             bool heroPermanentDeath,
             bool populationEnabled,
             bool fogOfWarEnabled,
-            bool destructibleWalls)
+            bool destructibleWalls,
+            string settlementArchetypeId = "constructed-base",
+            bool gateRepairEnabled = false,
+            bool strongholdRecruitmentEnabled = false,
+            bool captureStrongholdInsteadOfDestroy = false)
         {
             MoraleEnabled = moraleEnabled;
             SupplyEnabled = supplyEnabled;
@@ -19,6 +23,12 @@ namespace AegisRTS.Gameplay.Content
             PopulationEnabled = populationEnabled;
             FogOfWarEnabled = fogOfWarEnabled;
             DestructibleWalls = destructibleWalls;
+            SettlementArchetypeId = string.IsNullOrWhiteSpace(settlementArchetypeId)
+                ? "constructed-base"
+                : settlementArchetypeId.Trim();
+            GateRepairEnabled = gateRepairEnabled;
+            StrongholdRecruitmentEnabled = strongholdRecruitmentEnabled;
+            CaptureStrongholdInsteadOfDestroy = captureStrongholdInsteadOfDestroy;
         }
 
         public bool MoraleEnabled { get; }
@@ -34,5 +44,14 @@ namespace AegisRTS.Gameplay.Content
         public bool FogOfWarEnabled { get; }
 
         public bool DestructibleWalls { get; }
+
+        /// <summary>World-neutral rules profile such as constructed-base or fortified-city.</summary>
+        public string SettlementArchetypeId { get; }
+
+        public bool GateRepairEnabled { get; }
+
+        public bool StrongholdRecruitmentEnabled { get; }
+
+        public bool CaptureStrongholdInsteadOfDestroy { get; }
     }
 }

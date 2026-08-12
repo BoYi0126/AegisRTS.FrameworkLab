@@ -114,6 +114,26 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void ArmyRuntimeState_RestoresMoraleSupplyAndCurrentOrder()
+        {
+            var heroes = new HeroSystem();
+            var armies = new ArmySystem(heroes, new ArmyRuleOptions(true, true));
+            EntityId hero = new EntityId(1);
+            EntityId armyId = new EntityId(10);
+            heroes.Register(hero, new HeroProfile("hero.a", FactionA, 50));
+            armies.RegisterMember(hero, FactionA);
+            armies.Execute(new CreateArmyCommand(armyId, FactionA, new[] { hero }, hero));
+            var order = new ArmyOrder(ArmyOrderType.Retreat, Point(-8), EntityId.Invalid, FormationType.Line);
+
+            Assert.That(armies.RestoreRuntimeState(armyId, 45, 61, order), Is.True);
+            ArmySnapshot restored = State(armies, armyId);
+            Assert.That(restored.Morale, Is.EqualTo(45));
+            Assert.That(restored.Supply, Is.EqualTo(61));
+            Assert.That(restored.Order.Type, Is.EqualTo(ArmyOrderType.Retreat));
+            Assert.That(restored.Order.Destination, Is.EqualTo(Point(-8)));
+        }
+
+        [Test]
         public void SharedCommandBus_ValidatesAndRoutesAllArmyOrders()
         {
             var events = new EventBus();
@@ -179,6 +199,35 @@ namespace AegisRTS.Tests.EditMode
             Assert.That(armies.Execute(new CreateArmyCommand(armyId, FactionA, new[] { hero }, hero)).Succeeded, Is.True);
             Assert.That(combat.TryGetState(hero, out CombatantSnapshot combatant), Is.True);
             Assert.That(combatant.ArmyId, Is.EqualTo(armyId));
+        }
+
+        [Test]
+        public void UnregisterMember_RemovesAssignedUnitAndCommanderFromArmyAndCombat()
+        {
+            var heroes = new HeroSystem();
+            var combat = new CombatSystem();
+            EntityId hero = new EntityId(1);
+            EntityId unit = new EntityId(2);
+            EntityId armyId = new EntityId(10);
+            heroes.Register(hero, new HeroProfile("hero.a", FactionA, 50));
+            combat.Register(hero, new CombatantProfile("hero.a", FactionA, 100,
+                new AttackProfile(10, DamageType.Physical, 2, 1, 0)), Point(0));
+            combat.Register(unit, new CombatantProfile("unit.a", FactionA, 100,
+                new AttackProfile(10, DamageType.Physical, 2, 1, 0)), Point(0));
+            var armies = new ArmySystem(heroes, membershipSink: new CombatArmyMembershipSink(combat));
+            armies.RegisterMember(hero, FactionA);
+            armies.RegisterMember(unit, FactionA);
+            armies.Execute(new CreateArmyCommand(armyId, FactionA, new[] { hero, unit }, hero));
+
+            Assert.That(armies.UnregisterMember(unit), Is.True);
+            Assert.That(armies.TryGetArmyForUnit(unit, out _), Is.False);
+            CollectionAssert.DoesNotContain((System.Collections.ICollection)State(armies, armyId).UnitIds, unit);
+            Assert.That(combat.TryGetState(unit, out CombatantSnapshot unitCombat), Is.True);
+            Assert.That(unitCombat.ArmyId.IsValid, Is.False);
+            Assert.That(armies.UnregisterMember(hero), Is.True);
+            Assert.That(State(armies, armyId).CommanderId.IsValid, Is.False);
+            Assert.That(heroes.TryGetState(hero, out HeroSnapshot heroState), Is.True);
+            Assert.That(heroState.ArmyId.IsValid, Is.False);
         }
 
         private static ArmySnapshot State(ArmySystem armies, EntityId armyId)

@@ -2,6 +2,7 @@ using System;
 using AegisRTS.Core.Commands;
 using AegisRTS.Gameplay.Armies;
 using AegisRTS.Gameplay.Buildings;
+using AegisRTS.Gameplay.Combat;
 using AegisRTS.Gameplay.Economy;
 using AegisRTS.Gameplay.Factions;
 using AegisRTS.Gameplay.Objectives;
@@ -36,6 +37,9 @@ namespace AegisRTS.Package.Tests
             AssertCommand<StartSiegeCommand>();
             AssertCommand<CaptureSettlementCommand>();
             AssertCommand<StartScenarioCommand>();
+            AssertCommand<SetUnitEngagementModeCommand>();
+            AssertPublicInstanceMethod(typeof(CombatSystem), "SetEngagementMode");
+            Assert.That(typeof(CombatMovementCoordinator).IsPublic, Is.True);
         }
 
         [Test]

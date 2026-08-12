@@ -104,6 +104,48 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void ActiveProductionQueues_RestoreRemainingTimeWithoutChargingTwice()
+        {
+            BuildingDefinition building = Building("test.restore-building", 30, 4,
+                new[] { new ResourceProduction(Resource, 2d) }, 3d);
+            TechnologyDefinition technology = Technology("test.restore-technology", 20, 5);
+            UnitDefinition unit = Unit("test.restore-unit", 10, 6, 1);
+            var sourceEconomy = Economy(true, 100, 4);
+            sourceEconomy.RegisterAccount(Faction, new[] { new ResourceCost(Resource, 100) });
+            var sourceBuildings = new BuildingSystem(new[] { building }, sourceEconomy);
+            var sourceTechnologies = new TechnologySystem(new[] { technology }, sourceEconomy);
+            var sourceRecruitment = new RecruitmentSystem(new[] { unit }, sourceEconomy);
+            Assert.That(sourceBuildings.Request(new ConstructBuildingCommand(Settlement, Faction, building.Id)).Succeeded, Is.True);
+            Assert.That(sourceTechnologies.Request(new ResearchTechnologyCommand(Faction, technology.Id)).Succeeded, Is.True);
+            Assert.That(sourceRecruitment.Request(new RecruitUnitCommand(Settlement, Faction, unit.Id)).Succeeded, Is.True);
+            sourceBuildings.Tick(1.25); sourceTechnologies.Tick(1.25); sourceRecruitment.Tick(1.25);
+
+            BuildingQueueSnapshot buildingJob = sourceBuildings.SnapshotQueue()[0];
+            TechnologyQueueSnapshot technologyJob = sourceTechnologies.SnapshotQueue()[0];
+            RecruitmentQueueSnapshot recruitmentJob = sourceRecruitment.SnapshotQueue()[0];
+            var restoredEconomy = Economy(true, Balance(sourceEconomy, Settlement, Resource), 4);
+            restoredEconomy.TryReservePopulation(Settlement, State(sourceEconomy, Settlement).PopulationUsed);
+            restoredEconomy.RegisterAccount(Faction,
+                new[] { new ResourceCost(Resource, Balance(sourceEconomy, Faction, Resource)) });
+            double settlementBalance = Balance(restoredEconomy, Settlement, Resource);
+            double factionBalance = Balance(restoredEconomy, Faction, Resource);
+            var restoredBuildings = new BuildingSystem(new[] { building }, restoredEconomy);
+            var restoredTechnologies = new TechnologySystem(new[] { technology }, restoredEconomy);
+            var restoredRecruitment = new RecruitmentSystem(new[] { unit }, restoredEconomy);
+
+            restoredBuildings.RestoreQueuedJob(buildingJob.SettlementId, buildingJob.BuildingId, buildingJob.RemainingSeconds);
+            restoredTechnologies.RestoreQueuedJob(technologyJob.FactionId, technologyJob.TechnologyId, technologyJob.RemainingSeconds);
+            restoredRecruitment.RestoreQueuedJob(recruitmentJob.SettlementId, recruitmentJob.FactionId,
+                recruitmentJob.UnitId, recruitmentJob.RemainingSeconds);
+
+            Assert.That(Balance(restoredEconomy, Settlement, Resource), Is.EqualTo(settlementBalance));
+            Assert.That(Balance(restoredEconomy, Faction, Resource), Is.EqualTo(factionBalance));
+            Assert.That(restoredBuildings.SnapshotQueue()[0].RemainingSeconds, Is.EqualTo(2.75).Within(0.0001));
+            Assert.That(restoredTechnologies.SnapshotQueue()[0].RemainingSeconds, Is.EqualTo(3.75).Within(0.0001));
+            Assert.That(restoredRecruitment.SnapshotQueue()[0].RemainingSeconds, Is.EqualTo(4.75).Within(0.0001));
+        }
+
+        [Test]
         public void PopulationRule_CanBeDisabledWithoutChangingRecruitmentCode()
         {
             var economy = Economy(false, 100, 0);

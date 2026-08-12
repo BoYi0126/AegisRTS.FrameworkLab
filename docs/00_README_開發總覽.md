@@ -89,14 +89,17 @@ FrameworkLab 同時負責：
 30. `34_PlayablePrototype_01_總覽與範圍.md`
 31. `35_PlayablePrototype_01_分階段實作計畫.md`
 32. `36_PlayablePrototype_01_現況缺口與驗收矩陣.md`
+33. `37_PlayablePrototype_01_操作與驗收手冊.md`
+34. `38_PlayablePrototype_01_架構與維護.md`
+35. `39_GameMode_據點與武將分配規則.md`
 
 ### Agent / Art
-33. `40_Agent_總執行規則.md`
-34. `41_Agent_Phase執行Prompt.md`
-35. `42_Agent_CodeReview與驗收Prompt.md`
-36. `50_AI_Art_Pipeline.md`
-37. `51_Art_Bible_Template.md`
-38. `60_第一階段實際執行順序.md`
+36. `40_Agent_總執行規則.md`
+37. `41_Agent_Phase執行Prompt.md`
+38. `42_Agent_CodeReview與驗收Prompt.md`
+39. `50_AI_Art_Pipeline.md`
+40. `51_Art_Bible_Template.md`
+41. `60_第一階段實際執行順序.md`
 
 ## 最終驗證
 

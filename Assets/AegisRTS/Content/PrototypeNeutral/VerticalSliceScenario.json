@@ -1,0 +1,20 @@
+{
+  "id": "scenario.prototype.vertical-slice",
+  "contentPackId": "prototype.neutral",
+  "worldId": "prototype-neutral",
+  "resourceIds": ["resource.material", "resource.supply"],
+  "unitRoles": [
+    {"role":"infantry","unitId":"unit.infantry"},
+    {"role":"archer","unitId":"unit.archer"},
+    {"role":"cavalry","unitId":"unit.cavalry"},
+    {"role":"siege-unit","unitId":"unit.siege"}
+  ],
+  "heroIds": ["hero.commander", "hero.opponent"],
+  "economyBuildingId": "building.economy",
+  "recruitmentBuildingId": "building.recruitment",
+  "playerCityId": "settlement.player-city",
+  "villageId": "settlement.village",
+  "enemyFortressId": "settlement.enemy-fortress",
+  "gateId": "structure.gate",
+  "aiProfileId": "ai.prototype"
+}

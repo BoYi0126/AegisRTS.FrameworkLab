@@ -54,6 +54,15 @@ namespace AegisRTS.Presentation.Selection
             targetRenderer.SetPropertyBlock(_propertyBlock);
         }
 
+        public void SetAffiliation(SelectionAffiliation selectableAffiliation, Color baseColor)
+        {
+            if (_selection != null && EntityId.IsValid) _selection.Unregister(EntityId);
+            affiliation = selectableAffiliation;
+            _baseColor = baseColor;
+            _selection?.Register(Descriptor);
+            SetSelected(false);
+        }
+
         private void OnDestroy()
         {
             if (_selection != null && EntityId.IsValid) _selection.Unregister(EntityId);

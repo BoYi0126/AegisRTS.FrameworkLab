@@ -22,6 +22,7 @@ namespace AegisRTS.Tests.EditMode
         private static readonly EntityId DefenderFaction = new EntityId(4);
         private static readonly EntityId Attacker = new EntityId(5);
         private static readonly EntityId Gate = new EntityId(6);
+        private static readonly EntityId Repairer = new EntityId(7);
 
         [Test]
         public void DefenseStructureDefinition_LoadsWorldSpecificGateWithoutCoreBranch()
@@ -80,6 +81,33 @@ namespace AegisRTS.Tests.EditMode
             Assert.That(navigation.RefreshCount, Is.EqualTo(1));
             Assert.That(breaches, Is.EqualTo(1));
             Assert.That(destroyed, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void RepairableGate_DefenderCanRestoreDestroyedGateAndSealOuterBreach()
+        {
+            var events = new EventBus(); int repaired = 0, sealedBreaches = 0;
+            events.Subscribe<DefenseStructureRepairedEvent>(_ => repaired++);
+            events.Subscribe<BreachSealedEvent>(_ => sealedBreaches++);
+            var sieges = new SiegeSystem(new AttackAndRepairQuery(), eventBus: events);
+            sieges.Register(SiegeId, Profile());
+            sieges.RegisterStructure(SiegeId, Gate,
+                new DefenseStructureProfile("test.repairable-gate", DefenseStructureKind.Gate, SiegeArea.Gates,
+                    DefenderFaction, 100, repairable: true));
+            sieges.Execute(new StartSiegeCommand(SiegeId));
+            sieges.Execute(new AttackDefenseStructureCommand(SiegeId, Attacker, Gate));
+            Assert.That(State(sieges).Structures[0].IsDestroyed, Is.True);
+
+            Assert.That(sieges.Execute(new RepairDefenseStructureCommand(SiegeId, Attacker, Gate, 50)).Succeeded, Is.False,
+                "Attackers cannot repair an enemy gate.");
+            Assert.That(sieges.Execute(new RepairDefenseStructureCommand(SiegeId, Repairer, Gate, 50)).Succeeded, Is.True);
+
+            SiegeSnapshot state = State(sieges);
+            Assert.That(state.Structures[0].Health, Is.EqualTo(50));
+            Assert.That(state.Structures[0].GateState, Is.EqualTo(GateState.Closed));
+            Assert.That(state.State, Is.EqualTo(SiegeState.Active));
+            Assert.That(repaired, Is.EqualTo(1));
+            Assert.That(sealedBreaches, Is.EqualTo(1));
         }
 
         [Test]
@@ -192,6 +220,27 @@ namespace AegisRTS.Tests.EditMode
             public FakeAttackerQuery(EntityId faction, double damage) { _faction = faction; _attack = new AttackProfile(damage, DamageType.True, 2, 1, 0, targetTags: new[] { "structure" }); }
             public bool TryGetAttacker(EntityId entityId, out SiegeAttackerSnapshot attacker)
             { if (entityId != Attacker) { attacker = default; return false; } attacker = new SiegeAttackerSnapshot(_faction, _attack, new[] { "unit", "siege" }); return true; }
+        }
+        private sealed class AttackAndRepairQuery : ISiegeAttackerQuery
+        {
+            public bool TryGetAttacker(EntityId entityId, out SiegeAttackerSnapshot attacker)
+            {
+                if (entityId == Attacker)
+                {
+                    attacker = new SiegeAttackerSnapshot(AttackerFaction,
+                        new AttackProfile(120, DamageType.True, 2, 1, 0, targetTags: new[] { "structure" }),
+                        new[] { "unit", "siege" });
+                    return true;
+                }
+                if (entityId == Repairer)
+                {
+                    attacker = new SiegeAttackerSnapshot(DefenderFaction,
+                        new AttackProfile(1, DamageType.True, 1, 1, 0), new[] { "unit", "engineer" });
+                    return true;
+                }
+                attacker = default;
+                return false;
+            }
         }
         private sealed class FakeCaptureSink : ISiegeCaptureSink
         { public int Count { get; private set; } public SiegeActionResult Capture(EntityId settlementId, EntityId newOwnerId, CaptureCondition conditions, EntityId capturingArmyId) { Count++; return SiegeActionResult.Success(); } }

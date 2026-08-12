@@ -1,0 +1,18 @@
+{
+  "name": "AegisRTS.Editor",
+  "rootNamespace": "AegisRTS.Editor",
+  "references": [
+    "AegisRTS.Demo"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

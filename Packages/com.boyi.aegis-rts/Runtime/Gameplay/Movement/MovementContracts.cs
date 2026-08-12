@@ -114,6 +114,14 @@ namespace AegisRTS.Gameplay.Movement
         public double StuckSeconds { get; }
     }
 
+    public readonly struct MovementOrderSnapshot
+    {
+        public MovementOrderSnapshot(WorldPoint destination, int formationSlotIndex)
+        { Destination = destination; FormationSlotIndex = formationSlotIndex; }
+        public WorldPoint Destination { get; }
+        public int FormationSlotIndex { get; }
+    }
+
     public readonly struct MovementCommandResult
     {
         public MovementCommandResult(int acceptedActorCount, int rejectedActorCount)

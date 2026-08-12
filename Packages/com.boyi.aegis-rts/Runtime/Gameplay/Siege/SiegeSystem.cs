@@ -103,6 +103,44 @@ namespace AegisRTS.Gameplay.Siege
             return SiegeActionResult.Success();
         }
 
+        public SiegeActionResult Validate(RepairDefenseStructureCommand command)
+        {
+            if (command == null) return SiegeActionResult.Failure("Command is required.");
+            if (!TryActive(command.SiegeId, out SiegeRecord siege)) return SiegeActionResult.Failure("Siege is not active.");
+            if (!siege.Structures.TryGetValue(command.StructureId, out StructureRecord structure))
+                return SiegeActionResult.Failure("Defense structure does not exist.");
+            if (!structure.Profile.Repairable) return SiegeActionResult.Failure("Defense structure is not repairable.");
+            if (structure.Health >= structure.Profile.MaxHealth) return SiegeActionResult.Failure("Defense structure is already at full health.");
+            if (!_attackers.TryGetAttacker(command.RepairerId, out SiegeAttackerSnapshot repairer))
+                return SiegeActionResult.Failure("Repairer is unavailable.");
+            if (repairer.FactionId != siege.Profile.DefenderFactionId || repairer.FactionId != structure.Profile.FactionId)
+                return SiegeActionResult.Failure("Only the defending faction can repair this structure.");
+            return SiegeActionResult.Success();
+        }
+
+        public SiegeActionResult Execute(RepairDefenseStructureCommand command)
+        {
+            SiegeActionResult result = Validate(command); if (!result.Succeeded) return result;
+            SiegeRecord siege = _sieges[command.SiegeId]; StructureRecord structure = siege.Structures[command.StructureId];
+            bool sealedBreach = structure.IsDestroyed && structure.Profile.Kind == DefenseStructureKind.Gate;
+            double previous = structure.Health;
+            structure.Health = Math.Min(structure.Profile.MaxHealth, structure.Health + command.Amount);
+            if (structure.Profile.Kind == DefenseStructureKind.Gate && structure.Health > 0d)
+                structure.GateState = GateState.Closed;
+            _events?.Publish(new DefenseStructureRepairedEvent(siege.SiegeId, structure.StructureId,
+                structure.Health - previous, structure.Health));
+            if (sealedBreach)
+            {
+                if (siege.CurrentArea == SiegeArea.OuterArea || siege.CurrentArea == SiegeArea.Breach)
+                {
+                    siege.CurrentArea = SiegeArea.OuterArea;
+                    siege.State = SiegeState.Active;
+                }
+                _events?.Publish(new BreachSealedEvent(siege.SiegeId, structure.StructureId));
+            }
+            return SiegeActionResult.Success();
+        }
+
         public SiegeActionResult Validate(SetGateStateCommand command)
         {
             if (command == null) return SiegeActionResult.Failure("Command is required.");

@@ -11,6 +11,7 @@ namespace AegisRTS.Presentation.Selection
     public enum SelectableKind { Unit, Hero, Structure, Settlement }
     public enum SelectionAffiliation { Friendly, Enemy, Neutral }
     public enum SelectionModifier { Replace, Add, Toggle, Remove }
+    public enum SelectionCommandContext { None, Domestic, UnitSettings, Siege }
 
     public readonly struct SelectableDescriptor
     {
@@ -64,6 +65,7 @@ namespace AegisRTS.Presentation.Selection
         }
 
         public int RegisteredCount => _registry.Count;
+        public long Revision { get; private set; }
         public bool IsSelected(EntityId entityId) => _selected.Contains(entityId);
         public bool TryGetDescriptor(EntityId entityId, out SelectableDescriptor descriptor) => _registry.TryGetValue(entityId, out descriptor);
 
@@ -157,6 +159,7 @@ namespace AegisRTS.Presentation.Selection
 
         private void PublishChanged()
         {
+            Revision++;
             if (_eventBus == null) return;
             _eventBus.Publish(new SelectionChangedEvent(SelectedIds));
         }
@@ -164,6 +167,33 @@ namespace AegisRTS.Presentation.Selection
         private static void ValidateControlGroup(int index)
         {
             if (index < 0 || index > 9) throw new ArgumentOutOfRangeException(nameof(index), "Control group must be between 0 and 9.");
+        }
+    }
+
+    /// <summary>Maps a changed selection to a product command-panel family without knowing its concrete UI.</summary>
+    public static class SelectionCommandContextResolver
+    {
+        public static SelectionCommandContext Resolve(ISelectionQuery selection)
+        {
+            if (selection == null) throw new ArgumentNullException(nameof(selection));
+            bool hasUnit = false;
+            bool hasFriendlyBuilding = false;
+            bool hasHostileBuilding = false;
+            foreach (EntityId entityId in selection.SelectedIds)
+            {
+                if (!selection.TryGetDescriptor(entityId, out SelectableDescriptor descriptor)) continue;
+                if (descriptor.Kind == SelectableKind.Unit || descriptor.Kind == SelectableKind.Hero)
+                    hasUnit = true;
+                else if (descriptor.Affiliation == SelectionAffiliation.Friendly)
+                    hasFriendlyBuilding = true;
+                else if (descriptor.Affiliation == SelectionAffiliation.Enemy)
+                    hasHostileBuilding = true;
+            }
+
+            if (hasUnit) return SelectionCommandContext.UnitSettings;
+            if (hasFriendlyBuilding) return SelectionCommandContext.Domestic;
+            if (hasHostileBuilding) return SelectionCommandContext.Siege;
+            return SelectionCommandContext.None;
         }
     }
 

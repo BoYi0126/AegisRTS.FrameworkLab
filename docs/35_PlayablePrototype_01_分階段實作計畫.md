@@ -1,5 +1,7 @@
 # PlayablePrototype_01 — 分階段實作計畫
 
+> PP00～PP08 的程式與自動 gate 已實作；本文件保留原始執行需求。最新完成／未完成狀態、人工 playable gate 與操作步驟見 `37_PlayablePrototype_01_操作與驗收手冊.md`。
+
 ## 執行原則
 
 - 每次只執行一個 PP Phase，通過 acceptance 才進入下一個。
@@ -85,7 +87,7 @@ Input intent
 
 ### Goal
 
-讓玩家透過最小 HUD 取得資源、建造 prerequisite、研究必要科技並招募可立即操作的新單位。
+讓玩家透過最小 HUD 由主堡直接招募單位、選擇性建造經濟升級，並研究攻城科技後製造攻城兵器。
 
 ### Tasks
 
@@ -101,7 +103,7 @@ Input intent
 
 - 資源依 deterministic tick 增加。
 - 資源不足時 Recruit／Build／Research 被 validator 拒絕且 UI 顯示原因。
-- 完成 prerequisite 後可招募至少 Infantry、Archer、Siege Unit。
+- 不建兵營即可招募 Infantry／Archer；完成科技 prerequisite 後可招募 Siege Unit。
 - Cost 與 population reserve／consume 正確，不會重複扣除。
 - 新招募單位通過 PP01 的全部可操作條件。
 - EditMode 覆蓋成功、失敗、queue order 與 spawn rollback；PlayMode 覆蓋玩家點擊招募。
@@ -159,11 +161,11 @@ Input intent
 
 ### Tasks
 
-1. 將 Enemy Fortress、Gate、Inner Area、Capture Objective 接到 `SiegeSystem`。
+1. 將 Enemy Fortress、repairable Gate、Stronghold Core、Inner Area、Capture Objective 接到 `SiegeSystem`；固定城牆只屬 scene／navigation。
 2. 讓一般 Combat attacker 的 attack profile／tags 決定是否可傷害 defense structure。
-3. Gate destroyed／opened 後通知 `ISiegeNavigationSink` 更新路徑。
+3. Gate destroyed／opened 後更新路徑；守方修復 0 HP Gate 時重新封閉 breach 與 navigation。
 4. 玩家透過 commands 進入 siege areas，不由 trigger 直接改 authoritative state。
-5. Capture 使用既有 `SettlementSiegeCaptureSink`／Settlement owner transaction。
+5. Stronghold Core 被壓制後，Capture 使用既有 `SettlementSiegeCaptureSink`／Settlement owner transaction，保留主堡視圖。
 6. Scenario objectives 監看 authoritative events／facts，產生 Victory／Defeat。
 7. AI 可防守堡壘；Player City 被攻陷或 commander／objective 條件失敗時可 Defeat。
 
@@ -171,7 +173,7 @@ Input intent
 
 - 未滿足 capture conditions 時命令被拒絕並顯示原因。
 - 玩家可攻擊並摧毀 Gate，navigation refresh 至少發生一次。
-- 進入 Inner Area／Capture Objective 後可完成 capture。
+- 進入 Inner Area／Capture Objective 並壓制 Stronghold Core 後才可完成 capture。
 - Settlement／Territory owner 同步轉移。
 - Objective status 轉為 Completed，Session 進入 Victory。
 - Defeat path 至少有一個可重現 PlayMode test。

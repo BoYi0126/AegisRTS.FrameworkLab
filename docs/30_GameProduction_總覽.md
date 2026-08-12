@@ -15,5 +15,7 @@ Framework 名稱 `AegisRTS`；真正遊戲另命名，例如 `KingdomsOfHan`、`
 1. `34_PlayablePrototype_01_總覽與範圍.md`
 2. `35_PlayablePrototype_01_分階段實作計畫.md`
 3. `36_PlayablePrototype_01_現況缺口與驗收矩陣.md`
-4. Playable Prototype PASS 後進入 G01～G04。
-5. G02～G04 視覺需求確定後建立 Art Bible，再進入 G08 production art。
+4. `37_PlayablePrototype_01_操作與驗收手冊.md`
+5. `38_PlayablePrototype_01_架構與維護.md`
+6. Playable Prototype PASS 後進入 G01～G04。
+7. G02～G04 視覺需求確定後建立 Art Bible，再進入 G08 production art。

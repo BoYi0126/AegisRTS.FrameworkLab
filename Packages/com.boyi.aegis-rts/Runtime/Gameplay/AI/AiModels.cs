@@ -6,6 +6,28 @@ using AegisRTS.Gameplay.Content.Definitions;
 
 namespace AegisRTS.Gameplay.AI
 {
+    public readonly struct AiRuntimeStateSnapshot
+    {
+        public AiRuntimeStateSnapshot(double decisionRemaining, int decisionCount, int stalledDecisionCount,
+            AiStrategicGoal goal, AiDecisionLayer layer, AiActionType action, string lastError)
+        {
+            DecisionRemaining = decisionRemaining;
+            DecisionCount = decisionCount;
+            StalledDecisionCount = stalledDecisionCount;
+            Goal = goal;
+            Layer = layer;
+            Action = action;
+            LastError = lastError ?? string.Empty;
+        }
+        public double DecisionRemaining { get; }
+        public int DecisionCount { get; }
+        public int StalledDecisionCount { get; }
+        public AiStrategicGoal Goal { get; }
+        public AiDecisionLayer Layer { get; }
+        public AiActionType Action { get; }
+        public string LastError { get; }
+    }
+
     public enum AiDecisionLayer { Strategic, Operational, Tactical, Unit }
     public enum AiStrategicGoal { Economy, Expand, Attack, Defend, Recover }
     public enum AiActionType

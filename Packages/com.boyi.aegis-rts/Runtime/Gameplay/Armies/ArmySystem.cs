@@ -46,7 +46,15 @@ namespace AegisRTS.Gameplay.Armies
 
         public bool UnregisterMember(EntityId unitId)
         {
-            if (_armyByMember.ContainsKey(unitId)) return false;
+            if (_armyByMember.TryGetValue(unitId, out EntityId armyId))
+            {
+                ArmyRecord army = _armies[armyId];
+                army.UnitIds.Remove(unitId);
+                if (army.CommanderId == unitId) army.CommanderId = EntityId.Invalid;
+                _armyByMember.Remove(unitId);
+                if (_heroes.IsHero(unitId)) _heroes.AssignArmy(unitId, EntityId.Invalid);
+                _membershipSink.SetArmy(unitId, EntityId.Invalid);
+            }
             return _memberFactions.Remove(unitId);
         }
 
@@ -201,6 +209,21 @@ namespace AegisRTS.Gameplay.Armies
         {
             if (!_rules.SupplyEnabled || !_armies.TryGetValue(armyId, out ArmyRecord army) || !IsFinite(delta)) return false;
             army.Supply = Clamp(army.Supply + delta);
+            return true;
+        }
+
+        /// <summary>Restores non-membership army runtime state after the army and all members exist.</summary>
+        public bool RestoreRuntimeState(EntityId armyId, double morale, double supply, ArmyOrder order)
+        {
+            if (!_armies.TryGetValue(armyId, out ArmyRecord army)) return false;
+            if (morale < 0d || morale > 100d || supply < 0d || supply > 100d ||
+                double.IsNaN(morale) || double.IsNaN(supply) || double.IsInfinity(morale) || double.IsInfinity(supply))
+                throw new ArgumentOutOfRangeException(nameof(morale));
+            if (order.TargetId.IsValid && order.Type != ArmyOrderType.Attack && order.Type != ArmyOrderType.AttackSettlement)
+                throw new ArgumentException("Only attack orders can contain a target.", nameof(order));
+            army.Morale = morale;
+            army.Supply = supply;
+            army.Order = order;
             return true;
         }
 

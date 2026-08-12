@@ -1,0 +1,56 @@
+{
+  "id": "prototype.neutral",
+  "displayName": "Playable Prototype Neutral",
+  "declaredTags": ["resource", "unit", "infantry", "archer", "cavalry", "siege-unit", "hero", "ability", "structure", "economy", "recruitment", "settlement", "fortified-city", "repairable", "stronghold-core", "technology", "ai-profile"],
+  "resources": [
+    { "id": "resource.material", "displayName": "Material", "tags": ["resource"] },
+    { "id": "resource.supply", "displayName": "Supply", "tags": ["resource"] }
+  ],
+  "abilities": [
+    { "id": "ability.rally", "displayName": "Rally", "cooldownSeconds": 6, "range": 12, "tags": ["ability"] },
+    { "id": "ability.challenge", "displayName": "Challenge", "cooldownSeconds": 8, "range": 10, "tags": ["ability"] }
+  ],
+  "units": [
+    { "id": "unit.infantry", "displayName": "Infantry", "maxHealth": 130, "movementSpeed": 4.5, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.material","amount":20}], "recruitmentSeconds": 0.4, "populationCost": 1, "abilityIds": [], "tags": ["unit","infantry"] },
+    { "id": "unit.archer", "displayName": "Archer", "maxHealth": 90, "movementSpeed": 4.2, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.material","amount":15},{"resourceId":"resource.supply","amount":5}], "recruitmentSeconds": 0.4, "populationCost": 1, "abilityIds": [], "tags": ["unit","archer"] },
+    { "id": "unit.cavalry", "displayName": "Cavalry", "maxHealth": 160, "movementSpeed": 7, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.material","amount":25},{"resourceId":"resource.supply","amount":10}], "recruitmentSeconds": 0.5, "populationCost": 2, "abilityIds": [], "tags": ["unit","cavalry"] },
+    { "id": "unit.siege", "displayName": "Siege Unit", "maxHealth": 240, "movementSpeed": 2.8, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.supply","amount":30}], "recruitmentSeconds": 0.6, "populationCost": 2, "prerequisiteTechnologyIds": ["technology.siege"], "abilityIds": [], "tags": ["unit","siege-unit"] }
+  ],
+  "heroes": [
+    { "id": "hero.commander", "displayName": "Player Commander", "maxHealth": 360, "movementSpeed": 5, "leadership": 90, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["ability.rally"], "tags": ["hero"] },
+    { "id": "hero.lieutenant", "displayName": "Player Lieutenant", "maxHealth": 320, "movementSpeed": 5.5, "leadership": 76, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["ability.rally"], "tags": ["hero"] },
+    { "id": "hero.opponent", "displayName": "Opponent Commander", "maxHealth": 340, "movementSpeed": 5, "leadership": 84, "prefabId": "PF_Hero_Placeholder", "costs": [], "abilityIds": ["ability.challenge"], "tags": ["hero"] }
+  ],
+  "buildings": [
+    { "id": "building.economy", "displayName": "Economy Building", "maxHealth": 700, "prefabId": "PF_Structure_Placeholder", "costs": [{"resourceId":"resource.material","amount":10}], "buildSeconds": 0.5, "populationCapacity": 10, "production": [{"resourceId":"resource.material","amountPerSecond":6},{"resourceId":"resource.supply","amountPerSecond":4}], "tags": ["structure","economy"] },
+    { "id": "building.recruitment", "displayName": "Recruitment Building", "maxHealth": 900, "prefabId": "PF_Structure_Placeholder", "costs": [{"resourceId":"resource.material","amount":20}], "buildSeconds": 0.5, "prerequisiteBuildingIds": ["building.economy"], "populationCapacity": 10, "production": [], "tags": ["structure","recruitment"] }
+  ],
+  "technologies": [
+    { "id": "technology.siege", "displayName": "Siege Engineering", "costs": [{"resourceId":"resource.material","amount":15},{"resourceId":"resource.supply","amount":10}], "prerequisiteIds": [], "researchSeconds": 0.5, "modifiers": [], "tags": ["technology"] }
+  ],
+  "settlements": [
+    { "id": "settlement.player-city", "displayName": "Player City", "maxHealth": 2500, "initialPopulation": 800, "maxDefense": 120, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["resource.material","resource.supply"], "tags": ["settlement"] },
+    { "id": "settlement.village", "displayName": "Neutral Village", "maxHealth": 900, "initialPopulation": 200, "maxDefense": 40, "captureRule": "capture-zone", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["resource.material"], "tags": ["settlement"] },
+    { "id": "settlement.enemy-fortress", "displayName": "Enemy Fortress", "maxHealth": 3000, "initialPopulation": 900, "maxDefense": 170, "captureRule": "destroy-core", "prefabId": "PF_Settlement_Placeholder", "startingResourceIds": ["resource.material","resource.supply"], "tags": ["settlement","fortified-city"] }
+  ],
+  "defenseStructures": [
+    { "id": "structure.gate", "displayName": "Fortress Gate", "structureTypeId": "gate", "siegeAreaId": "gates", "maxHealth": 90, "armor": 5, "prefabId": "PF_Structure_Placeholder", "tags": ["structure","repairable"] },
+    { "id": "structure.stronghold-core", "displayName": "Stronghold Core", "structureTypeId": "core", "siegeAreaId": "capture-objective", "maxHealth": 45, "armor": 5, "prefabId": "PF_Structure_Placeholder", "tags": ["structure","stronghold-core"] }
+  ],
+  "aiProfiles": [
+    { "id": "ai.prototype", "displayName": "Prototype Opponent", "aggression": 0.85, "defenseBias": 0.45, "economyBias": 0.55, "riskTolerance": 0.7, "siegePreference": 0.7, "decisionIntervalSeconds": 0.5, "desiredArmySize": 5, "tags": ["ai-profile"] }
+  ],
+  "rules": {
+    "moraleEnabled": false,
+    "supplyEnabled": false,
+    "heroCaptureEnabled": false,
+    "heroPermanentDeath": false,
+    "populationEnabled": true,
+    "fogOfWarEnabled": false,
+    "destructibleWalls": false,
+    "settlementArchetypeId": "fortified-city",
+    "gateRepairEnabled": true,
+    "strongholdRecruitmentEnabled": true,
+    "captureStrongholdInsteadOfDestroy": true
+  }
+}

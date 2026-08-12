@@ -111,7 +111,8 @@ namespace AegisRTS.Gameplay.Economy
         public bool TryGetState(EntityId accountId, out EconomyAccountSnapshot snapshot)
         {
             if (!_accounts.TryGetValue(accountId, out Account account)) { snapshot = default; return false; }
-            snapshot = new EconomyAccountSnapshot(accountId, account.Wallet.Snapshot(), account.PopulationUsed, account.PopulationCapacity);
+            snapshot = new EconomyAccountSnapshot(accountId, account.Wallet.Snapshot(), account.PopulationUsed,
+                account.PopulationCapacity, new Dictionary<DefinitionId, double>(account.Production));
             return true;
         }
 

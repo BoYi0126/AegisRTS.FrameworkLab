@@ -36,13 +36,14 @@ New Game
 → 查看主城、資源與目標
 → 選取／框選單位
 → 移動與編隊
-→ 招募新單位
+→ 由主堡直接招募新單位
+→ 研究科技並製造攻城兵器
 → 建立 Hero-led Army
 → 擊敗野外敵軍
 → 應對 AI 反攻
 → 攻擊城門
-→ 進入攻城區域
-→ 佔領敵方據點
+→ 在守軍修復前進入內城
+→ 攻擊主堡並轉移據點所有權
 → Victory
 ```
 
@@ -62,8 +63,8 @@ New Game
 3. Unit 的 EntityId、Faction、Army、Position、Health、Selection 與 View 對應一致。
 4. Recruit 完成後的新單位可以被選取、移動、戰鬥、加入 Army 並被儲存。
 5. Combat death 會同步移除 Selection、Movement、Army、AI target 與 Unity View。
-6. Gate destroyed 會刷新 navigation，並允許進入 Inner Area／Capture Objective。
-7. Settlement owner change 由既有 Settlement／Siege transaction 完成。
+6. Gate destroyed 會刷新 navigation；守方修復至正值時重新封閉通路。固定城牆不可攻擊或摧毀。
+7. 主堡核心被壓制後，Settlement owner change 由既有 Settlement／Siege transaction 完成；主堡視圖保留。
 8. Objective 只根據 authoritative state 判定 Victory／Defeat。
 9. Save／Load 後核心 state fingerprint 與可見狀態一致。
 10. PlayMode 可由 New Game 跑到 Victory，Console 無未處理 Exception。
@@ -76,7 +77,7 @@ New Game
 - 一座玩家主城、一個中立據點、一座敵方堡壘。
 - Infantry、Archer、Cavalry、Siege Unit、Hero 等最小戰術角色。
 - 兩種通用資源。
-- 一條最小 Build／Recruit／Army／Siege progression。
+- 一條主堡直募／Tech／Army／Siege／Stronghold Capture progression；經濟建築是可選升級。
 - Primitive meshes、team colors、selection highlight、health bar、文字 UI。
 - Keyboard／mouse 操作。
 - 一個可完成的 Scenario 與明確 Victory／Defeat。
@@ -123,9 +124,13 @@ scenario.prototype-conquest
 | Hero Permanent Death | Disabled | 允許快速 Restart／重試。 |
 | Population | Enabled | 驗證 Economy、capacity reservation 與 Recruitment。 |
 | Fog of War | Disabled | 先確保所有狀態容易觀察與 debug。 |
-| Destructible Walls | Enabled | 攻城與破門是核心 acceptance。 |
+| Destructible Walls | Disabled | 城牆是固定地圖物件；攻城只能走城門通道。 |
+| Settlement Archetype | `fortified-city` | 主堡、固定城牆、可修城門與完整佔領交易。 |
+| Gate Repair | Enabled | 守方經共用 command 修復；0 HP 回復時封閉 breach。 |
+| Stronghold Recruitment | Enabled | 一般兵種不需要兵營；攻城兵器仍可要求科技。 |
+| Capture Stronghold | Enabled | 主堡核心歸零代表壓制並轉移 owner，不銷毀主堡。 |
 
-這些是 Prototype defaults，不是正式遊戲世界觀決策；G01 可在之後替換。
+完整模式與第二種 `constructed-base` 據點規則見 `39_GameMode_據點與武將分配規則.md`。世界觀名稱仍可在 G01 之後替換，但這組據點 gameplay 是目前優先實作。
 
 ## 產品層架構
 

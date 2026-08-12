@@ -21,7 +21,10 @@ namespace AegisRTS.Tests.EditMode
             EntityId attacker = new EntityId(1);
             EntityId target = new EntityId(2);
             DamageAppliedEvent damageEvent = null;
-            events.Subscribe<DamageAppliedEvent>(value => damageEvent = value);
+            events.Subscribe<DamageAppliedEvent>(value =>
+            {
+                if (value.TargetId == target) damageEvent = value;
+            });
             Register(combat, attacker, Blue, Point(0), Attack(50, range: 2, cooldown: 1, windup: 0.25),
                 abilities: null, defense: null, tags: new[] { "ground" });
             Register(combat, target, Red, Point(1), Attack(0), abilities: null,
@@ -93,6 +96,22 @@ namespace AegisRTS.Tests.EditMode
             Register(combat, airTarget, Red, Point(1), Attack(0), tags: new[] { "air" });
 
             Assert.That(combat.IssueAttack(new AttackTargetCommand(new[] { attacker }, airTarget)), Is.Zero);
+        }
+
+        [Test]
+        public void CombatRuntimeState_RestoresTargetAndCooldownAfterRegistration()
+        {
+            var combat = new CombatSystem();
+            EntityId attacker = new EntityId(1);
+            EntityId target = new EntityId(2);
+            Register(combat, attacker, Blue, Point(0), Attack(20));
+            Register(combat, target, Red, Point(1), Attack(0));
+
+            Assert.That(combat.RestoreRuntimeState(attacker, target, 0.75), Is.True);
+            CombatantSnapshot state = State(combat, attacker);
+            Assert.That(state.TargetId, Is.EqualTo(target));
+            Assert.That(state.AttackCooldownRemaining, Is.EqualTo(0.75));
+            Assert.That(state.State, Is.EqualTo(CombatantState.Targeting));
         }
 
         [Test]
@@ -187,6 +206,95 @@ namespace AegisRTS.Tests.EditMode
 
             Assert.That(State(combat, target).IsAlive, Is.False);
             Assert.That(deaths, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void EngagementModes_ExposeRequiredDefenseRangeMultipliers()
+        {
+            Assert.That(UnitEngagementRules.DefenseRangeMultiplier(UnitEngagementMode.HoldGround), Is.EqualTo(0.5d));
+            Assert.That(UnitEngagementRules.DefenseRangeMultiplier(UnitEngagementMode.Normal), Is.EqualTo(1d));
+            Assert.That(UnitEngagementRules.DefenseRangeMultiplier(UnitEngagementMode.Aggressive), Is.EqualTo(1.5d));
+            Assert.That(UnitEngagementRules.AllowsProactiveAttack(UnitEngagementMode.Retaliate), Is.False);
+        }
+
+        [TestCase(UnitEngagementMode.HoldGround, 4.9d, true)]
+        [TestCase(UnitEngagementMode.HoldGround, 5.1d, false)]
+        [TestCase(UnitEngagementMode.Normal, 9.9d, true)]
+        [TestCase(UnitEngagementMode.Normal, 10.1d, false)]
+        [TestCase(UnitEngagementMode.Aggressive, 14.9d, true)]
+        [TestCase(UnitEngagementMode.Aggressive, 15.1d, false)]
+        public void ProactiveModes_AcquireOnlyInsideTheirDefenseRange(
+            UnitEngagementMode mode,
+            double enemyDistance,
+            bool shouldAcquire)
+        {
+            var combat = new CombatSystem();
+            EntityId actor = new EntityId(1);
+            EntityId enemy = new EntityId(2);
+            Register(combat, actor, Blue, Point(0), Attack(10, range: 10));
+            Register(combat, enemy, Red, Point(enemyDistance), Attack(0, range: 0));
+            combat.SetEngagementMode(new SetUnitEngagementModeCommand(new[] { actor }, mode));
+
+            combat.Tick(0.01d);
+
+            Assert.That(State(combat, actor).TargetId.IsValid, Is.EqualTo(shouldAcquire));
+            Assert.That(State(combat, actor).TargetReason,
+                Is.EqualTo(shouldAcquire ? EngagementTargetReason.Proactive : EngagementTargetReason.None));
+        }
+
+        [Test]
+        public void RetaliateMode_DoesNotProactivelyAcquireButTargetsItsAttackerAfterDamage()
+        {
+            var combat = new CombatSystem();
+            EntityId attacker = new EntityId(1);
+            EntityId defender = new EntityId(2);
+            Register(combat, attacker, Blue, Point(0), Attack(10, range: 10));
+            Register(combat, defender, Red, Point(5), Attack(10, range: 10));
+            combat.SetEngagementMode(new SetUnitEngagementModeCommand(new[] { attacker }, UnitEngagementMode.Retaliate));
+            combat.SetEngagementMode(new SetUnitEngagementModeCommand(new[] { defender }, UnitEngagementMode.Retaliate));
+
+            combat.Tick(0.01d);
+            Assert.That(State(combat, defender).TargetId.IsValid, Is.False);
+            combat.IssueAttack(new AttackTargetCommand(new[] { attacker }, defender));
+            combat.Tick(0.01d);
+
+            Assert.That(State(combat, defender).TargetId, Is.EqualTo(attacker));
+            Assert.That(State(combat, defender).TargetReason, Is.EqualTo(EngagementTargetReason.Retaliation));
+        }
+
+        [Test]
+        public void ProactiveTarget_StopsAtLeashAndRequestsReturnToEngagementOrigin()
+        {
+            var combat = new CombatSystem();
+            EntityId actor = new EntityId(1);
+            EntityId enemy = new EntityId(2);
+            Register(combat, actor, Blue, Point(0), Attack(10, range: 10));
+            Register(combat, enemy, Red, Point(14), Attack(0, range: 0));
+            combat.SetEngagementMode(new SetUnitEngagementModeCommand(new[] { actor }, UnitEngagementMode.Aggressive));
+            combat.Tick(0.01d);
+            Assert.That(State(combat, actor).TargetId, Is.EqualTo(enemy));
+
+            combat.UpdatePosition(enemy, Point(16));
+            combat.Tick(0.01d);
+
+            CombatantSnapshot state = State(combat, actor);
+            Assert.That(state.TargetId.IsValid, Is.False);
+            Assert.That(state.ShouldReturnToOrigin, Is.True);
+            Assert.That(state.EngagementOrigin, Is.EqualTo(Point(0)));
+        }
+
+        [Test]
+        public void ExplicitAttackOrder_OverridesRetaliateModeWithoutEnablingProactiveSearch()
+        {
+            var combat = new CombatSystem();
+            EntityId actor = new EntityId(1);
+            EntityId enemy = new EntityId(2);
+            Register(combat, actor, Blue, Point(0), Attack(10, range: 10));
+            Register(combat, enemy, Red, Point(5), Attack(0, range: 0));
+            combat.SetEngagementMode(new SetUnitEngagementModeCommand(new[] { actor }, UnitEngagementMode.Retaliate));
+
+            Assert.That(combat.IssueAttack(new AttackTargetCommand(new[] { actor }, enemy)), Is.EqualTo(1));
+            Assert.That(State(combat, actor).TargetReason, Is.EqualTo(EngagementTargetReason.ManualOrder));
         }
 
         private static AttackProfile Attack(double damage, double range = 2, double cooldown = 1,

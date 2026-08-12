@@ -48,6 +48,31 @@ namespace AegisRTS.Gameplay.AI
         public string GetDebugSummary()
         { int decisions = 0, stalled = 0; foreach (Agent agent in _agents.Values) { decisions += agent.DecisionCount; stalled += agent.StalledDecisionCount; } return $"Agents={_agents.Count}, Decisions={decisions}, Stalled={stalled}"; }
 
+        public bool TryCaptureRuntimeState(EntityId factionId, out AiRuntimeStateSnapshot snapshot)
+        {
+            if (!_agents.TryGetValue(factionId, out Agent agent)) { snapshot = default; return false; }
+            snapshot = new AiRuntimeStateSnapshot(agent.DecisionRemaining, agent.DecisionCount,
+                agent.StalledDecisionCount, agent.Goal, agent.Layer, agent.Action, agent.LastError);
+            return true;
+        }
+
+        public bool RestoreRuntimeState(EntityId factionId, AiRuntimeStateSnapshot snapshot)
+        {
+            if (!_agents.TryGetValue(factionId, out Agent agent)) return false;
+            if (snapshot.DecisionRemaining < 0d || snapshot.DecisionRemaining > agent.Profile.DecisionIntervalSeconds ||
+                double.IsNaN(snapshot.DecisionRemaining) || double.IsInfinity(snapshot.DecisionRemaining) ||
+                snapshot.DecisionCount < 0 || snapshot.StalledDecisionCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(snapshot));
+            agent.DecisionRemaining = snapshot.DecisionRemaining;
+            agent.DecisionCount = snapshot.DecisionCount;
+            agent.StalledDecisionCount = snapshot.StalledDecisionCount;
+            agent.Goal = snapshot.Goal;
+            agent.Layer = snapshot.Layer;
+            agent.Action = snapshot.Action;
+            agent.LastError = snapshot.LastError;
+            return true;
+        }
+
         private void Decide(Agent agent)
         {
             AiWorldSnapshot world = agent.World.Observe(agent.FactionId);

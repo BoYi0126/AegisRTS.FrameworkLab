@@ -120,6 +120,28 @@ namespace AegisRTS.Tests.EditMode
             Assert.That(stopped.Status, Is.EqualTo(MovementStatus.Idle));
         }
 
+        [Test]
+        public void MovementOrders_RestoreCurrentAndQueuedDestinationsInOrder()
+        {
+            var sourceNavigation = new FakeNavigationAdapter();
+            var source = new MovementSystem(sourceNavigation);
+            EntityId actor = RegisterUnits(source, sourceNavigation, 1)[0];
+            source.IssueMove(new MoveUnitsCommand(new[] { actor }, new WorldPoint(5, 0, 1)));
+            source.IssueMove(new MoveUnitsCommand(new[] { actor }, new WorldPoint(9, 0, 2), queue: true));
+            IReadOnlyList<MovementOrderSnapshot> orders = source.SnapshotOrders(actor);
+
+            var restoredNavigation = new FakeNavigationAdapter();
+            var restored = new MovementSystem(restoredNavigation);
+            RegisterUnits(restored, restoredNavigation, 1);
+            Assert.That(restored.RestoreOrders(actor, orders, MovementStatus.Moving), Is.True);
+
+            Assert.That(restored.SnapshotOrders(actor).Count, Is.EqualTo(2));
+            Assert.That(restoredNavigation.Destinations[actor], Is.EqualTo(new WorldPoint(5, 0, 1)));
+            restoredNavigation.SetArrived(actor, new WorldPoint(5, 0, 1));
+            restored.Tick(0.1);
+            Assert.That(restoredNavigation.Destinations[actor], Is.EqualTo(new WorldPoint(9, 0, 2)));
+        }
+
         private static EntityId[] RegisterUnits(MovementSystem movement, FakeNavigationAdapter navigation, int count)
         {
             var result = new EntityId[count];

@@ -3,10 +3,74 @@ using System.Collections.Generic;
 using AegisRTS.Core.Entities;
 using AegisRTS.Core.Events;
 using AegisRTS.Gameplay.Abilities;
+using AegisRTS.Gameplay.Movement;
 using AegisRTS.Gameplay.Units;
 
 namespace AegisRTS.Gameplay.Combat
 {
+    /// <summary>
+    /// Bridges authoritative combat intent to movement orders. It owns no unit state and can be replaced by
+    /// another product-level navigation coordinator.
+    /// </summary>
+    public sealed class CombatMovementCoordinator
+    {
+        private const double ArrivalDistance = 0.35d;
+        private const double DestinationRefreshDistance = 0.5d;
+        private readonly CombatSystem _combat;
+        private readonly MovementSystem _movement;
+
+        public CombatMovementCoordinator(CombatSystem combat, MovementSystem movement)
+        {
+            _combat = combat ?? throw new ArgumentNullException(nameof(combat));
+            _movement = movement ?? throw new ArgumentNullException(nameof(movement));
+        }
+
+        public void Tick()
+        {
+            foreach (CombatantSnapshot actor in _combat.Snapshot())
+            {
+                if (!actor.IsAlive || !_movement.TryGetState(actor.EntityId, out MovementStateSnapshot movement)) continue;
+                if (actor.TargetId.IsValid && _combat.TryGetState(actor.TargetId, out CombatantSnapshot target) && target.IsAlive)
+                {
+                    if (!_combat.TryGetProfile(actor.EntityId, out CombatantProfile profile)) continue;
+                    if (Distance(actor.Position, target.Position) <= profile.Attack.Range)
+                    {
+                        if (movement.Status == MovementStatus.Moving)
+                            _movement.IssueStop(new StopUnitsCommand(new[] { actor.EntityId }));
+                    }
+                    else if (ShouldRefreshDestination(movement, target.Position))
+                    {
+                        _movement.IssueMove(new MoveUnitsCommand(new[] { actor.EntityId }, target.Position));
+                    }
+                    continue;
+                }
+
+                if (!actor.ShouldReturnToOrigin) continue;
+                if (Distance(actor.Position, actor.EngagementOrigin) <= ArrivalDistance)
+                {
+                    if (movement.Status == MovementStatus.Moving)
+                        _movement.IssueStop(new StopUnitsCommand(new[] { actor.EntityId }));
+                    _combat.CompleteReturnToOrigin(actor.EntityId);
+                }
+                else if (ShouldRefreshDestination(movement, actor.EngagementOrigin))
+                {
+                    _movement.IssueMove(new MoveUnitsCommand(new[] { actor.EntityId }, actor.EngagementOrigin));
+                }
+            }
+        }
+
+        private static bool ShouldRefreshDestination(MovementStateSnapshot movement, WorldPoint destination) =>
+            movement.Status != MovementStatus.Moving || Distance(movement.Destination, destination) > DestinationRefreshDistance;
+
+        private static double Distance(WorldPoint left, WorldPoint right)
+        {
+            double x = right.X - left.X;
+            double y = right.Y - left.Y;
+            double z = right.Z - left.Z;
+            return Math.Sqrt(x * x + y * y + z * z);
+        }
+    }
+
     /// <summary>Pure C# unit combat, projectile, damage, status, ability, and death simulation.</summary>
     public sealed class CombatSystem : ICombatQuery
     {
@@ -51,6 +115,41 @@ namespace AegisRTS.Gameplay.Combat
             return true;
         }
 
+        /// <summary>Restores transient target and attack cooldown after all referenced combatants exist.</summary>
+        public bool RestoreRuntimeState(
+            EntityId entityId,
+            EntityId targetId,
+            double attackCooldownRemaining,
+            UnitEngagementMode engagementMode = UnitEngagementMode.Normal,
+            WorldPoint? engagementOrigin = null,
+            EngagementTargetReason targetReason = EngagementTargetReason.ManualOrder)
+        {
+            if (!_combatants.TryGetValue(entityId, out Combatant combatant) || !combatant.IsAlive) return false;
+            if (attackCooldownRemaining < 0d || double.IsNaN(attackCooldownRemaining) || double.IsInfinity(attackCooldownRemaining))
+                throw new ArgumentOutOfRangeException(nameof(attackCooldownRemaining));
+            combatant.AttackCooldownRemaining = attackCooldownRemaining;
+            combatant.WindupRemaining = 0d;
+            combatant.EngagementMode = engagementMode;
+            combatant.EngagementOrigin = engagementOrigin ?? combatant.Position;
+            combatant.ShouldReturnToOrigin = false;
+            if (targetId.IsValid && _combatants.TryGetValue(targetId, out Combatant target) && target.IsAlive &&
+                target.Profile.FactionId != combatant.Profile.FactionId && CanTarget(combatant.Profile.Attack, target.Profile.Tags))
+            {
+                combatant.TargetId = targetId;
+                combatant.TargetReason = targetReason == EngagementTargetReason.None
+                    ? EngagementTargetReason.ManualOrder
+                    : targetReason;
+                combatant.State = CombatantState.Targeting;
+            }
+            else
+            {
+                combatant.TargetId = EntityId.Invalid;
+                combatant.TargetReason = EngagementTargetReason.None;
+                combatant.State = CombatantState.Idle;
+            }
+            return true;
+        }
+
         /// <summary>Exposes immutable authored combat configuration to cross-system adapters.</summary>
         public bool TryGetProfile(EntityId entityId, out CombatantProfile profile)
         {
@@ -69,10 +168,68 @@ namespace AegisRTS.Gameplay.Combat
                     actor.Profile.FactionId == target.Profile.FactionId || !CanTarget(actor.Profile.Attack, target.Profile.Tags))
                     continue;
                 actor.TargetId = target.EntityId;
+                actor.TargetReason = EngagementTargetReason.ManualOrder;
+                actor.ShouldReturnToOrigin = false;
                 actor.State = CombatantState.Targeting;
                 accepted++;
             }
             return accepted;
+        }
+
+        public int SetEngagementMode(SetUnitEngagementModeCommand command)
+        {
+            if (command == null) throw new ArgumentNullException(nameof(command));
+            int accepted = 0;
+            foreach (EntityId actorId in command.ActorIds)
+            {
+                if (!_combatants.TryGetValue(actorId, out Combatant actor) || !actor.IsAlive) continue;
+                actor.EngagementMode = command.Mode;
+                actor.EngagementOrigin = actor.Position;
+                actor.ShouldReturnToOrigin = false;
+                if (actor.TargetReason == EngagementTargetReason.Proactive)
+                    ClearTarget(actor, false);
+                _events?.Publish(new UnitEngagementModeChangedEvent(actorId, command.Mode, actor.EngagementOrigin));
+                accepted++;
+            }
+            return accepted;
+        }
+
+        /// <summary>Transfers movement intent into the engagement anchor and cancels the current attack.</summary>
+        public int NotifyMoveOrder(IReadOnlyList<EntityId> actorIds, WorldPoint destination)
+        {
+            if (actorIds == null) throw new ArgumentNullException(nameof(actorIds));
+            int accepted = 0;
+            foreach (EntityId actorId in actorIds)
+            {
+                if (!_combatants.TryGetValue(actorId, out Combatant actor) || !actor.IsAlive) continue;
+                actor.EngagementOrigin = destination;
+                actor.ShouldReturnToOrigin = false;
+                ClearTarget(actor, false);
+                accepted++;
+            }
+            return accepted;
+        }
+
+        public int NotifyHoldOrder(IReadOnlyList<EntityId> actorIds)
+        {
+            if (actorIds == null) throw new ArgumentNullException(nameof(actorIds));
+            int accepted = 0;
+            foreach (EntityId actorId in actorIds)
+            {
+                if (!_combatants.TryGetValue(actorId, out Combatant actor) || !actor.IsAlive) continue;
+                actor.EngagementOrigin = actor.Position;
+                actor.ShouldReturnToOrigin = false;
+                ClearTarget(actor, false);
+                accepted++;
+            }
+            return accepted;
+        }
+
+        public bool CompleteReturnToOrigin(EntityId entityId)
+        {
+            if (!_combatants.TryGetValue(entityId, out Combatant actor)) return false;
+            actor.ShouldReturnToOrigin = false;
+            return true;
         }
 
         public bool IssueAbility(UseAbilityCommand command)
@@ -152,6 +309,10 @@ namespace AegisRTS.Gameplay.Combat
             TickProjectiles(deltaSeconds);
             foreach (Combatant combatant in _combatants.Values)
             {
+                if (combatant.IsAlive) TickEngagement(combatant);
+            }
+            foreach (Combatant combatant in _combatants.Values)
+            {
                 if (combatant.IsAlive) TickAttack(combatant, deltaSeconds);
             }
         }
@@ -204,6 +365,7 @@ namespace AegisRTS.Gameplay.Combat
             if (!actor.TargetId.IsValid || !_combatants.TryGetValue(actor.TargetId, out Combatant target) || !target.IsAlive)
             {
                 actor.TargetId = EntityId.Invalid;
+                actor.TargetReason = EngagementTargetReason.None;
                 actor.State = CombatantState.Idle;
                 return;
             }
@@ -308,9 +470,17 @@ namespace AegisRTS.Gameplay.Combat
 
             target.Health = Math.Max(0d, target.Health - finalDamage);
             _events?.Publish(new DamageAppliedEvent(source.EntityId, target.EntityId, damageType, finalDamage, target.Health));
+            if (target.Health > 0d && source.EntityId != target.EntityId && source.IsAlive &&
+                target.EngagementMode == UnitEngagementMode.Retaliate &&
+                source.Profile.FactionId != target.Profile.FactionId &&
+                CanTarget(target.Profile.Attack, source.Profile.Tags))
+            {
+                SetTarget(target, source.EntityId, EngagementTargetReason.Retaliation);
+            }
             if (target.Health > 0d) return;
             target.State = CombatantState.Dead;
             target.TargetId = EntityId.Invalid;
+            target.TargetReason = EngagementTargetReason.None;
             target.WindupRemaining = 0d;
             _events?.Publish(new UnitDiedEvent(target.EntityId, source.EntityId));
         }
@@ -376,7 +546,83 @@ namespace AegisRTS.Gameplay.Combat
                 combatant.AttackCooldownRemaining,
                 MovementMultiplier(combatant),
                 cooldowns,
-                statuses.AsReadOnly());
+                statuses.AsReadOnly(),
+                combatant.EngagementMode,
+                combatant.TargetReason,
+                combatant.EngagementOrigin,
+                combatant.Profile.Attack.Range * UnitEngagementRules.DefenseRangeMultiplier(combatant.EngagementMode),
+                combatant.ShouldReturnToOrigin);
+        }
+
+        private void TickEngagement(Combatant actor)
+        {
+            if (actor.TargetId.IsValid)
+            {
+                if (!_combatants.TryGetValue(actor.TargetId, out Combatant target) || !target.IsAlive ||
+                    target.Profile.FactionId == actor.Profile.FactionId ||
+                    !CanTarget(actor.Profile.Attack, target.Profile.Tags))
+                {
+                    ClearTarget(actor, actor.TargetReason != EngagementTargetReason.ManualOrder);
+                    return;
+                }
+
+                if (actor.TargetReason == EngagementTargetReason.Proactive)
+                {
+                    double defenseRange = actor.Profile.Attack.Range *
+                        UnitEngagementRules.DefenseRangeMultiplier(actor.EngagementMode);
+                    if (!UnitEngagementRules.AllowsProactiveAttack(actor.EngagementMode) ||
+                        Distance(actor.EngagementOrigin, target.Position) > defenseRange)
+                        ClearTarget(actor, true);
+                }
+                return;
+            }
+
+            if (!UnitEngagementRules.AllowsProactiveAttack(actor.EngagementMode)) return;
+            double radius = actor.Profile.Attack.Range * UnitEngagementRules.DefenseRangeMultiplier(actor.EngagementMode);
+            if (radius <= 0d) return;
+            Combatant nearest = null;
+            double nearestDistance = double.MaxValue;
+            foreach (Combatant candidate in _combatants.Values)
+            {
+                if (!candidate.IsAlive || candidate.EntityId == actor.EntityId ||
+                    candidate.Profile.FactionId == actor.Profile.FactionId ||
+                    !CanTarget(actor.Profile.Attack, candidate.Profile.Tags)) continue;
+                double actorDistance = Distance(actor.Position, candidate.Position);
+                if (actorDistance > radius || Distance(actor.EngagementOrigin, candidate.Position) > radius) continue;
+                if (actorDistance < nearestDistance ||
+                    (Math.Abs(actorDistance - nearestDistance) < 0.000001d &&
+                     (nearest == null || candidate.EntityId.CompareTo(nearest.EntityId) < 0)))
+                {
+                    nearest = candidate;
+                    nearestDistance = actorDistance;
+                }
+            }
+            if (nearest != null) SetTarget(actor, nearest.EntityId, EngagementTargetReason.Proactive);
+        }
+
+        private void SetTarget(Combatant actor, EntityId targetId, EngagementTargetReason reason)
+        {
+            if (actor.TargetId == targetId && actor.TargetReason == reason) return;
+            actor.TargetId = targetId;
+            actor.TargetReason = reason;
+            actor.ShouldReturnToOrigin = false;
+            actor.State = CombatantState.Targeting;
+            _events?.Publish(new EngagementTargetChangedEvent(actor.EntityId, targetId, reason));
+        }
+
+        private void ClearTarget(Combatant actor, bool returnToOrigin)
+        {
+            if (!actor.TargetId.IsValid && actor.TargetReason == EngagementTargetReason.None)
+            {
+                actor.ShouldReturnToOrigin |= returnToOrigin;
+                return;
+            }
+            actor.TargetId = EntityId.Invalid;
+            actor.TargetReason = EngagementTargetReason.None;
+            actor.WindupRemaining = 0d;
+            actor.ShouldReturnToOrigin |= returnToOrigin;
+            if (actor.IsAlive) actor.State = CombatantState.Idle;
+            _events?.Publish(new EngagementTargetChangedEvent(actor.EntityId, EntityId.Invalid, EngagementTargetReason.None));
         }
 
         private static double MovementMultiplier(Combatant combatant)
@@ -423,7 +669,16 @@ namespace AegisRTS.Gameplay.Combat
         private sealed class Combatant
         {
             public Combatant(EntityId entityId, CombatantProfile profile, WorldPoint position)
-            { EntityId = entityId; Profile = profile; ArmyId = profile.ArmyId; Position = position; Health = profile.MaxHealth; State = CombatantState.Idle; }
+            {
+                EntityId = entityId;
+                Profile = profile;
+                ArmyId = profile.ArmyId;
+                Position = position;
+                EngagementOrigin = position;
+                EngagementMode = UnitEngagementMode.Retaliate;
+                Health = profile.MaxHealth;
+                State = CombatantState.Idle;
+            }
             public EntityId EntityId { get; }
             public CombatantProfile Profile { get; }
             public EntityId ArmyId { get; set; }
@@ -433,6 +688,10 @@ namespace AegisRTS.Gameplay.Combat
             public EntityId TargetId { get; set; }
             public double AttackCooldownRemaining { get; set; }
             public double WindupRemaining { get; set; }
+            public UnitEngagementMode EngagementMode { get; set; }
+            public EngagementTargetReason TargetReason { get; set; }
+            public WorldPoint EngagementOrigin { get; set; }
+            public bool ShouldReturnToOrigin { get; set; }
             public List<ActiveStatus> Statuses { get; } = new List<ActiveStatus>();
             public Dictionary<string, double> AbilityCooldowns { get; } = new Dictionary<string, double>(StringComparer.Ordinal);
             public bool IsAlive => State != CombatantState.Dead;

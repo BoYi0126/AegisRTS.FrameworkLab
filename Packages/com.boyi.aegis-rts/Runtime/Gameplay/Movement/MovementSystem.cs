@@ -199,6 +199,41 @@ namespace AegisRTS.Gameplay.Movement
             return result.AsReadOnly();
         }
 
+        public IReadOnlyList<MovementOrderSnapshot> SnapshotOrders(EntityId entityId)
+        {
+            if (!_units.TryGetValue(entityId, out UnitRecord actor)) return Array.Empty<MovementOrderSnapshot>();
+            var result = new List<MovementOrderSnapshot>(actor.Orders.Count + (actor.CurrentOrder == null ? 0 : 1));
+            if (actor.CurrentOrder != null)
+                result.Add(new MovementOrderSnapshot(actor.CurrentOrder.Destination, actor.CurrentOrder.FormationSlotIndex));
+            foreach (MovementOrder order in actor.Orders)
+                result.Add(new MovementOrderSnapshot(order.Destination, order.FormationSlotIndex));
+            return result.AsReadOnly();
+        }
+
+        /// <summary>Restores exact already-validated destinations without recalculating formation slots.</summary>
+        public bool RestoreOrders(EntityId entityId, IReadOnlyList<MovementOrderSnapshot> orders, MovementStatus emptyStatus = MovementStatus.Idle)
+        {
+            if (!_units.TryGetValue(entityId, out UnitRecord actor)) return false;
+            if (orders == null) throw new ArgumentNullException(nameof(orders));
+            actor.Orders.Clear();
+            actor.CurrentOrder = null;
+            actor.Velocity = default;
+            actor.RepathCount = 0;
+            actor.StuckSeconds = 0d;
+            _navigation.Stop(entityId);
+            if (orders.Count == 0)
+            {
+                actor.Status = emptyStatus == MovementStatus.Holding ? MovementStatus.Holding : MovementStatus.Idle;
+                return true;
+            }
+
+            var first = new MovementOrder(orders[0].Destination, orders[0].FormationSlotIndex);
+            if (!StartOrder(actor, first)) return false;
+            for (int index = 1; index < orders.Count; index++)
+                actor.Orders.Enqueue(new MovementOrder(orders[index].Destination, orders[index].FormationSlotIndex));
+            return true;
+        }
+
         public string GetDebugSummary()
         {
             int moving = 0;

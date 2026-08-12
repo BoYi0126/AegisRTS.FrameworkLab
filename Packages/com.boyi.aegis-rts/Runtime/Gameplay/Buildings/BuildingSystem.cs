@@ -8,6 +8,15 @@ using AegisRTS.Gameplay.Technology;
 
 namespace AegisRTS.Gameplay.Buildings
 {
+    public readonly struct BuildingQueueSnapshot
+    {
+        public BuildingQueueSnapshot(EntityId settlementId, DefinitionId buildingId, double remainingSeconds)
+        { SettlementId = settlementId; BuildingId = buildingId; RemainingSeconds = remainingSeconds; }
+        public EntityId SettlementId { get; }
+        public DefinitionId BuildingId { get; }
+        public double RemainingSeconds { get; }
+    }
+
     /// <summary>Runs the cost, prerequisite, timed construction, and completion-effect pipeline.</summary>
     public sealed class BuildingSystem : IBuildingStatusQuery
     {
@@ -71,6 +80,27 @@ namespace AegisRTS.Gameplay.Buildings
         public bool IsBuilt(EntityId settlementId, DefinitionId buildingId) =>
             _built.TryGetValue(settlementId, out HashSet<DefinitionId> values) && values.Contains(buildingId);
 
+        public IReadOnlyList<BuildingQueueSnapshot> SnapshotQueue()
+        {
+            var result = new List<BuildingQueueSnapshot>(_jobs.Count);
+            foreach (Job job in _jobs)
+                result.Add(new BuildingQueueSnapshot(job.SettlementId, job.Definition.Id, Math.Max(0d, job.RemainingSeconds)));
+            return result.AsReadOnly();
+        }
+
+        /// <summary>Restores an already-paid construction job without spending its cost a second time.</summary>
+        public void RestoreQueuedJob(EntityId settlementId, DefinitionId buildingId, double remainingSeconds)
+        {
+            if (!_economy.ContainsAccount(settlementId)) throw new InvalidOperationException("Settlement economy account does not exist.");
+            if (!_definitions.TryGetValue(buildingId, out BuildingDefinition definition)) throw new InvalidOperationException("Building definition does not exist.");
+            if (IsBuilt(settlementId, buildingId) || IsQueued(settlementId, buildingId)) throw new InvalidOperationException("Building is already built or queued.");
+            if (remainingSeconds <= 0d || remainingSeconds > definition.BuildSeconds || double.IsNaN(remainingSeconds) || double.IsInfinity(remainingSeconds))
+                throw new ArgumentOutOfRangeException(nameof(remainingSeconds));
+            foreach (DefinitionId prerequisite in definition.PrerequisiteBuildingIds)
+                if (!IsBuilt(settlementId, prerequisite)) throw new InvalidOperationException($"Missing building prerequisite '{prerequisite}'.");
+            _jobs.Add(new Job(settlementId, definition, remainingSeconds));
+        }
+
         public string GetDebugSummary() => $"Buildings={_definitions.Count}, ConstructionQueued={_jobs.Count}";
 
         private bool IsQueued(EntityId settlementId, DefinitionId buildingId) =>
@@ -82,8 +112,8 @@ namespace AegisRTS.Gameplay.Buildings
 
         private sealed class Job
         {
-            public Job(EntityId settlementId, BuildingDefinition definition)
-            { SettlementId = settlementId; Definition = definition; RemainingSeconds = definition.BuildSeconds; }
+            public Job(EntityId settlementId, BuildingDefinition definition, double? remainingSeconds = null)
+            { SettlementId = settlementId; Definition = definition; RemainingSeconds = remainingSeconds ?? definition.BuildSeconds; }
             public EntityId SettlementId { get; }
             public BuildingDefinition Definition { get; }
             public double RemainingSeconds { get; set; }

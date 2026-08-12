@@ -61,6 +61,29 @@ namespace AegisRTS.Tests.EditMode
             service.Select(descriptor.EntityId);
             service.Select(descriptor.EntityId);
             Assert.That(publishCount, Is.EqualTo(1));
+            Assert.That(service.Revision, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SelectionCommandContext_ChoosesDomesticUnitsAndSiegeDeterministically()
+        {
+            var selection = new SelectionService();
+            var city = new SelectableDescriptor(new EntityId(10), "settlement.city", SelectableKind.Settlement, SelectionAffiliation.Friendly);
+            var infantry = new SelectableDescriptor(new EntityId(11), "unit.infantry", SelectableKind.Unit, SelectionAffiliation.Friendly);
+            var enemyGate = new SelectableDescriptor(new EntityId(12), "structure.gate", SelectableKind.Structure, SelectionAffiliation.Enemy);
+            selection.Register(city);
+            selection.Register(infantry);
+            selection.Register(enemyGate);
+
+            selection.Select(city.EntityId);
+            Assert.That(SelectionCommandContextResolver.Resolve(selection), Is.EqualTo(SelectionCommandContext.Domestic));
+            selection.Select(enemyGate.EntityId);
+            Assert.That(SelectionCommandContextResolver.Resolve(selection), Is.EqualTo(SelectionCommandContext.Siege));
+            selection.SelectMany(new[] { city.EntityId, infantry.EntityId });
+            Assert.That(SelectionCommandContextResolver.Resolve(selection), Is.EqualTo(SelectionCommandContext.UnitSettings),
+                "A mixed box selection must prioritize controllable units over buildings.");
+            selection.Clear();
+            Assert.That(SelectionCommandContextResolver.Resolve(selection), Is.EqualTo(SelectionCommandContext.None));
         }
 
         [TestCase(SelectionAffiliation.Enemy, SelectableKind.Unit, typeof(AttackTargetCommand))]

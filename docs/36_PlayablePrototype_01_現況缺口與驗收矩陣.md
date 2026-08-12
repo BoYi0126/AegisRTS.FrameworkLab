@@ -1,5 +1,7 @@
 # PlayablePrototype_01 — 現況、缺口與驗收矩陣
 
+> 本文件保留 PP00 開始前的 baseline／目標驗收矩陣，不代表目前實作狀態。PP00～PP08 實作後的完成、未完成、操作方式與建議順序見 `37_PlayablePrototype_01_操作與驗收手冊.md`；逐次證據以 Repository Root 的 `DevelopmentProgress.md` 為準。
+
 ## 狀態定義
 
 - `Completed`：功能已有 runtime、tests，且在現有 Sandbox／Vertical Slice 可驗證。

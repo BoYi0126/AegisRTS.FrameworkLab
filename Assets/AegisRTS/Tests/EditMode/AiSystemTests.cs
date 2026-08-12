@@ -85,6 +85,26 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void AiRuntimeState_RestoresCadenceCountersAndLastDecision()
+        {
+            var pipeline = new PipelineWorld();
+            var ai = new AiSystem();
+            ai.Register(Faction, Profile(interval: 2), pipeline, pipeline);
+            var runtime = new AiRuntimeStateSnapshot(1.25, 7, 2, AiStrategicGoal.Attack,
+                AiDecisionLayer.Tactical, AiActionType.Breach, "saved error");
+
+            Assert.That(ai.RestoreRuntimeState(Faction, runtime), Is.True);
+            Assert.That(ai.TryCaptureRuntimeState(Faction, out AiRuntimeStateSnapshot restored), Is.True);
+            Assert.That(restored.DecisionRemaining, Is.EqualTo(1.25));
+            Assert.That(restored.DecisionCount, Is.EqualTo(7));
+            Assert.That(restored.StalledDecisionCount, Is.EqualTo(2));
+            Assert.That(restored.Goal, Is.EqualTo(AiStrategicGoal.Attack));
+            Assert.That(restored.Layer, Is.EqualTo(AiDecisionLayer.Tactical));
+            Assert.That(restored.Action, Is.EqualTo(AiActionType.Breach));
+            Assert.That(restored.LastError, Is.EqualTo("saved error"));
+        }
+
+        [Test]
         public void Snapshot_ContainsGoalScoresTargetStrengthThreatAndRoute()
         {
             var pipeline = new PipelineWorld { Strength = 8, Threat = 3 };

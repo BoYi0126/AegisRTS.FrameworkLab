@@ -129,7 +129,11 @@ namespace AegisRTS.Gameplay.Content.Serialization
                     document.Rules.HeroPermanentDeath,
                     document.Rules.PopulationEnabled,
                     document.Rules.FogOfWarEnabled,
-                    document.Rules.DestructibleWalls);
+                    document.Rules.DestructibleWalls,
+                    document.Rules.SettlementArchetypeId,
+                    document.Rules.GateRepairEnabled,
+                    document.Rules.StrongholdRecruitmentEnabled,
+                    document.Rules.CaptureStrongholdInsteadOfDestroy);
 
             return new ContentPack(
                 Id(document.Id),
@@ -313,5 +317,9 @@ namespace AegisRTS.Gameplay.Content.Serialization
         public bool PopulationEnabled { get; set; }
         public bool FogOfWarEnabled { get; set; }
         public bool DestructibleWalls { get; set; }
+        public string SettlementArchetypeId { get; set; }
+        public bool GateRepairEnabled { get; set; }
+        public bool StrongholdRecruitmentEnabled { get; set; }
+        public bool CaptureStrongholdInsteadOfDestroy { get; set; }
     }
 }

@@ -33,3 +33,7 @@
 - Passive／Aura／Triggered 已保留 activation type；自動觸發條件與 aura refresh policy 由後續 Hero／Army／AI 系統注入，不在手動 `UseAbilityCommand` 中猜測規則。
 - Direction target 已保留方向資料；cone／line shape query 可在新增 spatial query 後擴充。
 - 追擊至 attack range 仍需由 Movement 與 Combat 的上層 coordinator 串接。
+
+## 後續擴充：兵種交戰模式
+
+已新增 `HoldGround`／`Normal`／`Aggressive`／`Retaliate` 四種模式、`SetUnitEngagementModeCommand`、自主索敵、追擊 leash、受擊反擊與 `CombatMovementCoordinator`。原本「追擊仍待 coordinator」的缺口已完成；完整規則與存檔語意見 [`43_Unit_Engagement_兵種交戰模式.md`](43_Unit_Engagement_兵種交戰模式.md)。

@@ -9,12 +9,14 @@ namespace AegisRTS.Gameplay.Economy
     public readonly struct EconomyAccountSnapshot
     {
         public EconomyAccountSnapshot(EntityId accountId, IReadOnlyDictionary<DefinitionId, double> resources,
-            double populationUsed, double populationCapacity)
-        { AccountId = accountId; Resources = resources; PopulationUsed = populationUsed; PopulationCapacity = populationCapacity; }
+            double populationUsed, double populationCapacity, IReadOnlyDictionary<DefinitionId, double> production = null)
+        { AccountId = accountId; Resources = resources; PopulationUsed = populationUsed; PopulationCapacity = populationCapacity;
+            Production = production ?? new Dictionary<DefinitionId, double>(); }
         public EntityId AccountId { get; }
         public IReadOnlyDictionary<DefinitionId, double> Resources { get; }
         public double PopulationUsed { get; }
         public double PopulationCapacity { get; }
+        public IReadOnlyDictionary<DefinitionId, double> Production { get; }
     }
 
     public sealed class ResourceProducedEvent : IEvent

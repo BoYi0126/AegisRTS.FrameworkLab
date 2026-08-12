@@ -10,6 +10,48 @@ namespace AegisRTS.Gameplay.Combat
     public enum CombatantState { Idle, Targeting, Windup, Attacking, Stunned, Dead }
     public enum StatusEffectKind { Buff, Debuff, Stun, Slow, Root, Shield, DamageOverTime }
 
+    /// <summary>Controls autonomous target acquisition and pursuit without overriding explicit attack orders.</summary>
+    public enum UnitEngagementMode
+    {
+        HoldGround,
+        Normal,
+        Aggressive,
+        Retaliate,
+    }
+
+    public enum EngagementTargetReason
+    {
+        None,
+        ManualOrder,
+        Proactive,
+        Retaliation,
+    }
+
+    public static class UnitEngagementRules
+    {
+        public static bool AllowsProactiveAttack(UnitEngagementMode mode) => mode != UnitEngagementMode.Retaliate;
+
+        public static double DefenseRangeMultiplier(UnitEngagementMode mode)
+        {
+            switch (mode)
+            {
+                case UnitEngagementMode.HoldGround: return 0.5d;
+                case UnitEngagementMode.Normal: return 1d;
+                case UnitEngagementMode.Aggressive: return 1.5d;
+                case UnitEngagementMode.Retaliate: return 0d;
+                default: throw new ArgumentOutOfRangeException(nameof(mode));
+            }
+        }
+    }
+
+    public sealed class SetUnitEngagementModeCommand : UnitCommand
+    {
+        public SetUnitEngagementModeCommand(IEnumerable<EntityId> actorIds, UnitEngagementMode mode)
+            : base(actorIds, false) => Mode = mode;
+
+        public UnitEngagementMode Mode { get; }
+    }
+
     /// <summary>Read-only combat state exposed to presentation, UI, AI, and tests.</summary>
     public interface ICombatQuery
     {
@@ -165,7 +207,12 @@ namespace AegisRTS.Gameplay.Combat
             double attackCooldownRemaining,
             double movementSpeedMultiplier,
             IReadOnlyDictionary<string, double> abilityCooldowns,
-            IReadOnlyList<StatusEffectSnapshot> statuses)
+            IReadOnlyList<StatusEffectSnapshot> statuses,
+            UnitEngagementMode engagementMode,
+            EngagementTargetReason targetReason,
+            WorldPoint engagementOrigin,
+            double defenseRange,
+            bool shouldReturnToOrigin)
         {
             EntityId = entityId;
             FactionId = factionId;
@@ -179,6 +226,11 @@ namespace AegisRTS.Gameplay.Combat
             MovementSpeedMultiplier = movementSpeedMultiplier;
             AbilityCooldowns = abilityCooldowns ?? throw new ArgumentNullException(nameof(abilityCooldowns));
             Statuses = statuses ?? throw new ArgumentNullException(nameof(statuses));
+            EngagementMode = engagementMode;
+            TargetReason = targetReason;
+            EngagementOrigin = engagementOrigin;
+            DefenseRange = defenseRange;
+            ShouldReturnToOrigin = shouldReturnToOrigin;
         }
 
         public EntityId EntityId { get; }
@@ -193,6 +245,12 @@ namespace AegisRTS.Gameplay.Combat
         public double MovementSpeedMultiplier { get; }
         public IReadOnlyDictionary<string, double> AbilityCooldowns { get; }
         public IReadOnlyList<StatusEffectSnapshot> Statuses { get; }
+        public UnitEngagementMode EngagementMode { get; }
+        public EngagementTargetReason TargetReason { get; }
+        public WorldPoint EngagementOrigin { get; }
+        public double DefenseRange { get; }
+        public bool ShouldReturnToOrigin { get; }
+        public bool AllowsProactiveAttack => UnitEngagementRules.AllowsProactiveAttack(EngagementMode);
         public int StatusCount => Statuses.Count;
         public bool IsAlive => State != CombatantState.Dead;
     }
@@ -244,5 +302,23 @@ namespace AegisRTS.Gameplay.Combat
         public UnitDiedEvent(EntityId entityId, EntityId killerId) { EntityId = entityId; KillerId = killerId; }
         public EntityId EntityId { get; }
         public EntityId KillerId { get; }
+    }
+
+    public sealed class UnitEngagementModeChangedEvent : IEvent
+    {
+        public UnitEngagementModeChangedEvent(EntityId entityId, UnitEngagementMode mode, WorldPoint origin)
+        { EntityId = entityId; Mode = mode; Origin = origin; }
+        public EntityId EntityId { get; }
+        public UnitEngagementMode Mode { get; }
+        public WorldPoint Origin { get; }
+    }
+
+    public sealed class EngagementTargetChangedEvent : IEvent
+    {
+        public EngagementTargetChangedEvent(EntityId entityId, EntityId targetId, EngagementTargetReason reason)
+        { EntityId = entityId; TargetId = targetId; Reason = reason; }
+        public EntityId EntityId { get; }
+        public EntityId TargetId { get; }
+        public EngagementTargetReason Reason { get; }
     }
 }

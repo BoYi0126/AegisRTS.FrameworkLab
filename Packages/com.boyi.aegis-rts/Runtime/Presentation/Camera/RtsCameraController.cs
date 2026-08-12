@@ -20,6 +20,7 @@ namespace AegisRTS.Presentation.Camera
 
         private RtsCameraRigModel _model;
         private UnityEngine.Camera _camera;
+        private int _ignoreInputFrames;
 
         public RtsCameraRigModel Model => _model;
 
@@ -27,12 +28,19 @@ namespace AegisRTS.Presentation.Camera
         {
             _model = model;
             _camera = GetComponent<UnityEngine.Camera>();
+            _ignoreInputFrames = 2;
             ApplyTransform();
         }
 
         public void ProcessInput(Vector2 movement, Vector2 pointer, Vector2 pointerDelta, bool middleDragging, float scroll, float deltaTime)
         {
             if (_model == null) return;
+            if (_ignoreInputFrames > 0)
+            {
+                _ignoreInputFrames--;
+                ApplyTransform();
+                return;
+            }
             Vector2 edge = Vector2.zero;
             if (pointer.x >= 0f && pointer.y >= 0f && pointer.x <= Screen.width && pointer.y <= Screen.height)
             {

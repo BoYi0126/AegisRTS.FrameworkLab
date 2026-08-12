@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AegisRTS.Core.Commands;
 using AegisRTS.Core.Entities;
 using AegisRTS.Gameplay.Formation;
@@ -35,9 +36,13 @@ namespace AegisRTS.Presentation.Input
         private bool _dragging;
         private EntityId _lastClicked;
         private float _lastClickTime = float.NegativeInfinity;
+        private Func<Vector2, bool> _pointerBlocker;
 
         public SelectionService Selection => _selection;
         public FormationType ActiveFormation { get; private set; } = FormationType.Box;
+
+        /// <summary>Lets the product UI reserve pointer regions without coupling this adapter to a HUD framework.</summary>
+        public void SetPointerBlocker(Func<Vector2, bool> pointerBlocker) => _pointerBlocker = pointerBlocker;
 
         public void Initialize(SelectionService selection, CommandBus commands, RtsCameraController cameraController)
         {
@@ -50,17 +55,25 @@ namespace AegisRTS.Presentation.Input
 
         private void Update()
         {
-            if (_map == null) return;
+            if (_map == null || !Application.isFocused) return;
             Vector2 pointer = _point.ReadValue<Vector2>();
             Vector2 pointerDelta = Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
             bool middleDragging = Mouse.current != null && Mouse.current.middleButton.isPressed;
+            bool pointerBlocked = _pointerBlocker != null && _pointerBlocker(pointer);
             _cameraController.ProcessInput(
                 _cameraMove.ReadValue<Vector2>(), pointer, pointerDelta, middleDragging,
                 _cameraZoom.ReadValue<Vector2>().y, Time.unscaledDeltaTime);
 
-            if (_select.WasPressedThisFrame()) { _selectionStart = pointer; _dragging = true; }
-            if (_select.WasReleasedThisFrame() && _dragging) { CompleteSelection(pointer); _dragging = false; }
-            if (_command.WasPressedThisFrame()) IssueContextCommand(pointer);
+            if (pointerBlocked)
+            {
+                if (_select.WasReleasedThisFrame()) _dragging = false;
+            }
+            else
+            {
+                if (_select.WasPressedThisFrame()) { _selectionStart = pointer; _dragging = true; }
+                if (_select.WasReleasedThisFrame() && _dragging) { CompleteSelection(pointer); _dragging = false; }
+                if (_command.WasPressedThisFrame()) IssueContextCommand(pointer);
+            }
             if (_stop.WasPressedThisFrame()) DispatchStop();
             if (_hold.WasPressedThisFrame()) DispatchHold();
             if (_focus.WasPressedThisFrame()) _cameraController.FocusSelection(_selection, FindViews());
@@ -112,7 +125,8 @@ namespace AegisRTS.Presentation.Input
 
         private void IssueContextCommand(Vector2 pointer)
         {
-            if (_selection.SelectedIds.Count == 0) return;
+            IReadOnlyList<EntityId> actors = CommandableSelectedIds();
+            if (actors.Count == 0) return;
             UnitySelectableView view = RaycastSelectable(pointer, out RaycastHit hit);
             ContextTarget target = view != null
                 ? ContextTarget.Entity(ToWorldPoint(hit.point), view.Descriptor)
@@ -120,7 +134,7 @@ namespace AegisRTS.Presentation.Input
                     ? ContextTarget.Ground(ToWorldPoint(hit.point))
                     : ContextTarget.Ground(ToWorldPoint(ScreenToGround(pointer)));
             ICommand command = ContextCommandResolver.Resolve(
-                _selection.SelectedIds,
+                actors,
                 target,
                 _queueCommand.IsPressed(),
                 ActiveFormation);
@@ -129,12 +143,27 @@ namespace AegisRTS.Presentation.Input
 
         private void DispatchStop()
         {
-            if (_selection.SelectedIds.Count > 0) _commands.Dispatch(new StopUnitsCommand(_selection.SelectedIds));
+            IReadOnlyList<EntityId> actors = CommandableSelectedIds();
+            if (actors.Count > 0) _commands.Dispatch(new StopUnitsCommand(actors));
         }
 
         private void DispatchHold()
         {
-            if (_selection.SelectedIds.Count > 0) _commands.Dispatch(new HoldUnitsCommand(_selection.SelectedIds, _queueCommand.IsPressed()));
+            IReadOnlyList<EntityId> actors = CommandableSelectedIds();
+            if (actors.Count > 0) _commands.Dispatch(new HoldUnitsCommand(actors, _queueCommand.IsPressed()));
+        }
+
+        private IReadOnlyList<EntityId> CommandableSelectedIds()
+        {
+            var result = new List<EntityId>();
+            foreach (EntityId entityId in _selection.SelectedIds)
+            {
+                if (!_selection.TryGetDescriptor(entityId, out SelectableDescriptor descriptor)) continue;
+                if (descriptor.Affiliation == SelectionAffiliation.Friendly &&
+                    (descriptor.Kind == SelectableKind.Unit || descriptor.Kind == SelectableKind.Hero))
+                    result.Add(entityId);
+            }
+            return result.AsReadOnly();
         }
 
         private void Dispatch(ICommand command)

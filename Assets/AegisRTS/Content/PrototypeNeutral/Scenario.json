@@ -1,0 +1,26 @@
+{
+  "id": "scenario.prototype-conquest",
+  "displayName": "Prototype Conquest",
+  "gameMode": {
+    "id": "mode.prototype-conquest",
+    "displayName": "Prototype Conquest",
+    "type": "Conquest",
+    "allowedSystems": ["economy", "building", "technology", "recruitment", "army", "combat", "territory", "settlement", "siege", "ai"],
+    "rules": { "fog-of-war": false, "population": true, "destructible-walls": true }
+  },
+  "startSetup": [
+    { "type": "SetFact", "targetId": "fortress.captured", "value": 0 },
+    { "type": "SetFact", "targetId": "player.city.lost", "value": 0 }
+  ],
+  "objectives": [
+    {
+      "id": "capture-fortress",
+      "displayName": "Breach and capture the enemy fortress",
+      "type": "Capture",
+      "factId": "fortress.captured",
+      "targetValue": 1,
+      "failureFactId": "player.city.lost",
+      "failureThreshold": 1
+    }
+  ]
+}

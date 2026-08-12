@@ -40,7 +40,7 @@ namespace AegisRTS.Gameplay.Siege
     {
         public DefenseStructureProfile(string definitionId, DefenseStructureKind kind, SiegeArea area,
             EntityId factionId, double maxHealth, double armor = 0d, string extensionTypeId = null,
-            IEnumerable<string> tags = null)
+            IEnumerable<string> tags = null, bool repairable = false)
         {
             if (string.IsNullOrWhiteSpace(definitionId)) throw new ArgumentException("Definition ID is required.", nameof(definitionId));
             if (!factionId.IsValid) throw new ArgumentException("Faction ID must be valid.", nameof(factionId));
@@ -50,6 +50,7 @@ namespace AegisRTS.Gameplay.Siege
             var values = new List<string> { "structure", KindTag(kind) };
             foreach (string tag in tags ?? Array.Empty<string>()) if (!string.IsNullOrWhiteSpace(tag) && !values.Contains(tag.Trim())) values.Add(tag.Trim());
             Tags = values.AsReadOnly();
+            Repairable = repairable;
         }
         public string DefinitionId { get; }
         public DefenseStructureKind Kind { get; }
@@ -59,13 +60,15 @@ namespace AegisRTS.Gameplay.Siege
         public double Armor { get; }
         public string ExtensionTypeId { get; }
         public IReadOnlyList<string> Tags { get; }
+        public bool Repairable { get; }
 
         public static DefenseStructureProfile FromDefinition(DefenseStructureDefinition definition, EntityId factionId)
         {
             if (definition == null) throw new ArgumentNullException(nameof(definition));
             DefenseStructureKind kind = ParseKind(definition.StructureTypeId);
             return new DefenseStructureProfile(definition.Id.Value, kind, ParseArea(definition.SiegeAreaId), factionId,
-                definition.MaxHealth, definition.Armor, kind == DefenseStructureKind.Extension ? definition.StructureTypeId : null);
+                definition.MaxHealth, definition.Armor, kind == DefenseStructureKind.Extension ? definition.StructureTypeId : null,
+                TagValues(definition.Tags), HasTag(definition.Tags, "repairable"));
         }
 
         private static DefenseStructureKind ParseKind(string value) => value == "wall" ? DefenseStructureKind.Wall
@@ -77,6 +80,19 @@ namespace AegisRTS.Gameplay.Siege
             : value == "breach" ? SiegeArea.Breach : value == "inner-area" ? SiegeArea.InnerArea
             : value == "capture-objective" ? SiegeArea.CaptureObjective : SiegeArea.OuterArea;
         private static string KindTag(DefenseStructureKind value) => value.ToString().ToLowerInvariant();
+        private static IReadOnlyList<string> TagValues(IReadOnlyList<ContentTag> tags)
+        {
+            var values = new List<string>();
+            if (tags != null) foreach (ContentTag tag in tags) values.Add(tag.Value);
+            return values.AsReadOnly();
+        }
+        private static bool HasTag(IReadOnlyList<ContentTag> tags, string expected)
+        {
+            if (tags == null) return false;
+            foreach (ContentTag tag in tags)
+                if (string.Equals(tag.Value, expected, StringComparison.Ordinal)) return true;
+            return false;
+        }
         private static bool IsFinite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);
     }
 
@@ -143,6 +159,21 @@ namespace AegisRTS.Gameplay.Siege
     { public StartSiegeCommand(EntityId siegeId) { if (!siegeId.IsValid) throw new ArgumentException("Siege ID must be valid."); SiegeId = siegeId; } public EntityId SiegeId { get; } }
     public sealed class AttackDefenseStructureCommand : ICommand
     { public AttackDefenseStructureCommand(EntityId siegeId, EntityId attackerId, EntityId structureId) { if (!siegeId.IsValid || !attackerId.IsValid || !structureId.IsValid) throw new ArgumentException("Siege, attacker, and structure IDs must be valid."); SiegeId = siegeId; AttackerId = attackerId; StructureId = structureId; } public EntityId SiegeId { get; } public EntityId AttackerId { get; } public EntityId StructureId { get; } }
+    public sealed class RepairDefenseStructureCommand : ICommand
+    {
+        public RepairDefenseStructureCommand(EntityId siegeId, EntityId repairerId, EntityId structureId, double amount)
+        {
+            if (!siegeId.IsValid || !repairerId.IsValid || !structureId.IsValid)
+                throw new ArgumentException("Siege, repairer, and structure IDs must be valid.");
+            if (amount <= 0d || double.IsNaN(amount) || double.IsInfinity(amount))
+                throw new ArgumentOutOfRangeException(nameof(amount));
+            SiegeId = siegeId; RepairerId = repairerId; StructureId = structureId; Amount = amount;
+        }
+        public EntityId SiegeId { get; }
+        public EntityId RepairerId { get; }
+        public EntityId StructureId { get; }
+        public double Amount { get; }
+    }
     public sealed class SetGateStateCommand : ICommand
     { public SetGateStateCommand(EntityId siegeId, EntityId gateId, GateState state) { if (!siegeId.IsValid || !gateId.IsValid) throw new ArgumentException("Siege and gate IDs must be valid."); SiegeId = siegeId; GateId = gateId; State = state; } public EntityId SiegeId { get; } public EntityId GateId { get; } public GateState State { get; } }
     public sealed class EnterSiegeAreaCommand : ICommand
@@ -160,6 +191,17 @@ namespace AegisRTS.Gameplay.Siege
     { public DefenseStructureDamagedEvent(EntityId siegeId, EntityId structureId, double damage, double health) { SiegeId = siegeId; StructureId = structureId; Damage = damage; RemainingHealth = health; } public EntityId SiegeId { get; } public EntityId StructureId { get; } public double Damage { get; } public double RemainingHealth { get; } }
     public sealed class DefenseStructureDestroyedEvent : IEvent
     { public DefenseStructureDestroyedEvent(EntityId siegeId, EntityId structureId, DefenseStructureKind kind) { SiegeId = siegeId; StructureId = structureId; Kind = kind; } public EntityId SiegeId { get; } public EntityId StructureId { get; } public DefenseStructureKind Kind { get; } }
+    public sealed class DefenseStructureRepairedEvent : IEvent
+    {
+        public DefenseStructureRepairedEvent(EntityId siegeId, EntityId structureId, double amount, double health)
+        { SiegeId = siegeId; StructureId = structureId; Amount = amount; Health = health; }
+        public EntityId SiegeId { get; }
+        public EntityId StructureId { get; }
+        public double Amount { get; }
+        public double Health { get; }
+    }
+    public sealed class BreachSealedEvent : IEvent
+    { public BreachSealedEvent(EntityId siegeId, EntityId structureId) { SiegeId = siegeId; StructureId = structureId; } public EntityId SiegeId { get; } public EntityId StructureId { get; } }
     public sealed class GateStateChangedEvent : IEvent
     { public GateStateChangedEvent(EntityId siegeId, EntityId gateId, GateState state) { SiegeId = siegeId; GateId = gateId; State = state; } public EntityId SiegeId { get; } public EntityId GateId { get; } public GateState State { get; } }
     public sealed class BreachCreatedEvent : IEvent

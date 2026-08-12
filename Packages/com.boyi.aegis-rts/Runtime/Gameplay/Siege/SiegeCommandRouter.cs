@@ -17,6 +17,8 @@ namespace AegisRTS.Gameplay.Siege
                 commands.RegisterHandler<StartSiegeCommand>(value => LastResult = sieges.Execute(value)),
                 commands.RegisterValidator<AttackDefenseStructureCommand>(value => Result(sieges.Validate(value))),
                 commands.RegisterHandler<AttackDefenseStructureCommand>(value => LastResult = sieges.Execute(value)),
+                commands.RegisterValidator<RepairDefenseStructureCommand>(value => Result(sieges.Validate(value))),
+                commands.RegisterHandler<RepairDefenseStructureCommand>(value => LastResult = sieges.Execute(value)),
                 commands.RegisterValidator<SetGateStateCommand>(value => Result(sieges.Validate(value))),
                 commands.RegisterHandler<SetGateStateCommand>(value => LastResult = sieges.Execute(value)),
                 commands.RegisterValidator<EnterSiegeAreaCommand>(value => Result(sieges.Validate(value))),

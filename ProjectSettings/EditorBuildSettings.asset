@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/AegisRTS/Demo/PlayablePrototype/PlayablePrototype_01.unity
+    guid: a26b2b8553b90d442ad43ee8d82fab92
+  - enabled: 1
     path: Assets/AegisRTS/Demo/Scenes/Bootstrap.unity
     guid: 5cd0d0d7dc614eb781124111e76113e0
   - enabled: 1

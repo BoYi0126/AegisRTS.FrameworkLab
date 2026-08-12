@@ -4,11 +4,193 @@
 
 ## Current Status
 
-- Current Phase：PlayablePrototype_01 規劃完成；PP00 尚未開始，最高優先級為中立 Content、graybox scene、composition skeleton、entity registry、tick order 與 boot tests。
+- Current Phase：PlayablePrototype_01 已切換為 `fortified-city` 要塞城市規則；第一個玩家攻城垂直切片（主堡直募、固定城牆、可修城門、主堡壓制後佔領）為 `Completed`，玩家守城與隨機武將模式尚未完成。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：Framework DoD（本次文件工作未重跑）— 原專案 EditMode 159/159、PlayMode 19/19；乾淨安裝專案 EditMode 6/6、PlayMode 3/3。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 31/31；Windows Development Build PASS（173,603,484 bytes）；960×540 executable 實際點選我方主堡、我方英雄、敵方主堡後，指揮面板依序自動切為內政、兵種設定、攻城行動，Player log 0 error hits。
 - Unity Project Version：`6000.5.7f1`
-- Specification Baseline：專案使用 Unity `6000.5.7f1`；文件標示的 Unity 6.3 LTS 與實際版本命名對應仍待確認。
+- Highest Priority：下一輪先補玩家守城／AI 正式攻城與維修資源成本，再建立 deterministic Match Setup／Random Commander Roster 分發；世界觀與 production art 仍延後。
+- Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam，不是產品功能缺口。
+
+## 2026-08-12 — 選取內容自動切換指揮面板
+
+- Status：Completed
+- Goal：框選／點選不同類型物件後，指揮面板自動顯示對應操作；我方建築→內政、兵種／英雄→兵種設定、敵方建築→攻城行動。
+- Baseline：`_commandTab` 只能由 HUD toggle 手動修改；Player City、Neutral Village、Fortress Gate、Fortress Stronghold 只是有 Collider 的 graybox marker，未註冊 `UnitySelectableView`，所以建築實際上不能進入 Selection model。
+- Scope In：Selection revision、descriptor context resolver、建築／據點 selectable、selection-driven tab、混合框選優先、建築 selection projection、world command actor filtering、佔領後 affiliation 更新、測試、操作文件與實機 UI 驗證。Scope Out：正式建築 UI、各建築不同生產面板、多選群組詳細 inspector。
+- Changed：新增 `SelectionCommandContext` 與 pure `SelectionCommandContextResolver`；`SelectionService.Revision` 僅在 selected set 實際改變時遞增；新增 `PrototypeCommandTab`，Bootstrap 在 `LateUpdate` 偵測 revision 後切頁，因此 selection 不變時玩家仍能手動看其他頁籤。
+- Selection Rules：任一 Unit／Hero → UnitSettings；否則 Friendly Structure／Settlement → Domestic；否則 Enemy Structure／Settlement → Siege；Neutral-only／empty 保持目前頁；建築＋兵種混合框選由 UnitSettings 優先。
+- World Integration：Player City、Neutral Village、Fortress Gate、Fortress Stronghold 都註冊正式 `UnitySelectableView`；敵方主堡佔領後透過 `SetAffiliation` 更新為 Friendly。Command dock 與 `PrototypeHudAdapter` 現在能顯示建築 definition、owner、defense 或 descriptor。
+- Command Safety：`UnityRtsInputAdapter` 從 selection 建立 actor list 時只接受 Friendly Unit／Hero；建築仍可選取，但不會收到 Move／Stop／Hold／context Attack 等兵種指令。
+- Architecture：Selection truth 與 revision 仍由 pure Presentation `SelectionService` 擁有；resolver 只讀 `ISelectionQuery` descriptor，不用 GameObject name 或 gameplay hardcode；Bootstrap 只做產品 tab enum 映射，未修改 Gameplay authoritative state 或 Save format。
+- Tests：`RtsInputSelectionCameraTests` 新增 revision 與 Domestic／UnitSettings／Siege／mixed priority cases；PP06 PlayMode 驗證 4 個建築 selectable、三類自動切頁、混合框選優先、姿態 HUD click 保留 selection。
+- Validation：`dotnet build AegisRTS.FrameworkLab.slnx` PASS（0 warning／0 error）；targeted EditMode PASS 11/11；targeted PP06 PlayMode PASS 1/1；完整 EditMode PASS 177/177；完整 PlayMode PASS 31/31；Windows Development Build PASS（173,603,484 bytes）；960×540 executable 實際點選 Player City 顯示「我方主堡」並切到內政，點選 Player Hero 顯示「指揮官」並切到兵種設定，點選 Enemy Stronghold 顯示「敵方主堡」並切到攻城行動；證據 `selection_context_city.png`、`selection_context_unit2.png`、`selection_context_enemy_building.png`；Player log 0 error hits；`git diff --check` PASS。
+- Known Issues：Neutral-only 選取刻意保持目前頁籤；混合框選目前只選一個主要 command context，尚未提供 split inspector；敵方一般 Unit 會進入兵種設定作為資訊情境，但我方專用按鈕不會接受它。
+- Files：`SelectionService.cs`、`UnitySelectableView.cs`、`UnityRtsInputAdapter.cs`、`PlayablePrototypeBootstrap.cs`、`PrototypeHudAdapter.cs`、Selection EditMode／Prototype PlayMode tests、docs 37／38／44、`DevelopmentProgress.md`。
+- Git：未 commit、未 push；保留所有既有未提交工作與 `AGENTS.md`。
+- Next：下一步可將 Domestic 再依主堡／資源建築／訓練建築分成各自 action set；正式 UI 應改用同一 `SelectionCommandContextResolver`，不要在 Canvas／UI Toolkit 另寫分類規則。
+
+## 2026-08-12 — 兵種四種交戰模式與自主追擊
+
+- Status：Completed
+- Goal：依需求加入堅守陣地、普通、攻擊、反擊四種兵種防守模式；前三種主動攻擊與追擊，反擊模式只有受擊後才鎖定攻擊者。
+- Baseline：`CombatSystem` 只接受既有 `AttackTargetCommand`，沒有自主索敵、追擊 leash、返回防守點、受擊反擊或可見 UI；Phase 05 文件也將 attack-range approach 列為未完成 coordinator 缺口。
+- Scope In：四種 mode、0.5／1.0／1.5 倍範圍、反擊受擊鎖定、deterministic 目標選擇、Movement 追擊與返回、防守原點更新、CommandBus、HUD、snapshot、event、Save／Load、API 文件與測試。Scope Out：完整外交 hostile query、spatial partition、combat order queue、正式動畫／VFX。
+- Changed：新增 `UnitEngagementMode`、`EngagementTargetReason`、`UnitEngagementRules`、`SetUnitEngagementModeCommand`、mode／target events 與 snapshot 欄位；`CombatSystem` 現在管理 mode、origin、目標來源、自主索敵、leash 與 retaliation；`CombatMovementCoordinator` 把 chase／return intent 轉成 Movement orders，明確攻擊仍有優先權。
+- Product Integration：Prototype 生成單位時明確設為 `Normal`；非 queue Move、Stop／Hold 會更新防守原點並取消現有目標；HUD 新增「單位姿態」頁籤與四個中文按鈕，Selection panel 顯示 mode；`PrototypeEntitySaveData` round-trip mode、target reason、origin。舊 v3 欄位缺失時以 `Normal` 和存檔位置補值。
+- Input Fix：960×540 實機檢查發現 HUD click 同時穿透到 RTS world selection；新增 `UnityRtsInputAdapter.SetPointerBlocker` 可注入區域，Prototype 保留上方 cards 與 command dock，姿態命令套用後 selection 不再被清除。
+- Behavior：HoldGround／Normal／Aggressive 只會在 engagement origin 的 0.5／1.0／1.5 倍 attack range 內取得最近合法敵人並追擊；目標越界時清除並返回 origin。Retaliate 不主動索敵，受到敵方傷害後鎖定來源；目標死亡／失效後返回 origin。Player／AI 明確 `AttackTargetCommand` 不受模式阻擋。
+- Architecture：authoritative mode／origin／target 只存在 `CombatSystem`；coordinator 無 state，只讀 Combat／Movement snapshots；HUD 經 `IHudCommandSink` → CommandBus；Player／AI／Scenario／Test 共用相同 command 與倍率規則，未新增 God Manager 或 Bootstrap gameplay truth。
+- API / Data：新增 `CombatSystem.SetEngagementMode`、`NotifyMoveOrder`、`NotifyHoldOrder`、`CompleteReturnToOrigin`；`CombatantSnapshot` 新增 `EngagementMode`、`TargetReason`、`EngagementOrigin`、`DefenseRange`、`ShouldReturnToOrigin`；新增 `UnitEngagementModeChangedEvent` 與 `EngagementTargetChangedEvent`。
+- Tests：`CombatAbilityTests` 新增倍率邊界、主動索敵、反擊受擊、leash 返回、明確攻擊優先；Prototype PlayMode 新增 Combat／Movement 整合 pursuit test，PP06 補 HUD stance command／selection preservation，PP07 Save／Load 補 engagement round-trip；package API contract 鎖定 command、system method 與 coordinator public surface。
+- Validation：`dotnet build AegisRTS.FrameworkLab.slnx` PASS（0 warning／0 error）；Unity EditMode PASS 176/176；Unity PlayMode PASS 31/31；Windows Development Build PASS（173,599,720 bytes）；960×540 executable 實際關閉 modal、點選我方指揮官、開啟姿態頁籤、點 Aggressive，畫面顯示 `1/1 unit(s)` 且 selection 保留；證據 `engagement_hud_release.png`；Player log 0 error hits；`git diff --check` PASS。
+- Known Issues：自主 hostile 暫以 faction 不同判斷，尚未接 Faction diplomacy；索敵目前 O(n²) 全量掃描；queue Move 不立刻改寫 engagement origin；IMGUI 文字與 event notification 尚未全面中文化。
+- Files：`CombatModels.cs`、`CombatSystem.cs`、`UnityRtsInputAdapter.cs`、Prototype composition／HUD／save／bootstrap、Combat EditMode／Prototype PlayMode／package contract tests、docs 14／26／37／38／43、package FrameworkApi／CHANGELOG。
+- Git：未 commit、未 push；保留既有未提交工作，不處理 `AGENTS.md` 與無關修改。
+- Next：若下一輪先強化戰鬥可讀性，建議加入 placeholder projectile／melee hit feedback；若先擴展規則，優先注入外交 hostility query，再以 spatial index 支援超大地圖多勢力。
+
+## 2026-08-12 — 新手說明 modal 點擊穿透修正
+
+- Status：Completed
+- Goal：修正 Windows Player 按「我了解了，開始遊戲」後說明不消失、底層 HUD 反而收到點擊而造成卡住的問題。
+- Baseline：說明視窗最後繪製，但底層 GUILayout controls 先取得 MouseDown hot control；可重現為 overlay 留在畫面、玩家材料由 200 變 190 並錯誤排入 Economy construction。
+- Changed：`PlayablePrototypeBootstrap.OnGUI` 在 modal 顯示時停用底層 HUD；更重要的是，在繪製任何 HUD 前以 `WelcomeDismissHitRect` 攔截說明按鈕區 MouseDown、立即關閉說明並 `Event.Use()`，避免 MouseUp 再穿透。另加入 Enter／KeypadEnter／Esc 關閉備援；操作手冊同步更新。
+- Behavior：Before 為可見按鈕無反應且觸發底層命令；After 為單次點擊立即關閉 overlay、材料維持 200、無 construction queue，simulation 與 RTS input 正常開始。
+- Architecture：修正只在 Bootstrap presentation／input arbitration；不修改 gameplay state、CommandBus 或 domain rules。
+- Tests / Validation：`dotnet build AegisRTS.Demo.csproj` PASS（0 warning／0 error）；PP06 scene／HUD PlayMode targeted test PASS 1/1；Windows Development Build PASS（173,574,388 bytes）；960×540 executable 以實際滑鼠 MouseDown／MouseUp 點擊驗證，證據 `aegis_modal_clicked_r2.png`；Player log 0 error hits；`git diff --check` PASS。
+- Known Issues：IMGUI 仍是 Prototype UI；正式 UI 建議改用 UI Toolkit 或 Canvas EventSystem，以標準 modal input blocker 取代手動 hit rect。
+- Git：未 commit／push；本次沒有收到相關指令。
+- Next：加入 placeholder combat feedback：遠程投射物色塊、近戰突進／閃光、受擊閃色與死亡縮放，保持 CombatSystem 為 authoritative state。
+
+## 2026-08-12 — GameMode 與 `fortified-city` 要塞城市第一個可玩切片
+
+- Status：Completed（玩家進攻要塞的第一個完整垂直切片）；玩家守城、隨機武將分配與 `constructed-base` 仍為 Deferred。
+- Goal：重新定義兩種對局模式與兩種主堡規則，先把類《三國霸業》的主堡＋固定城牆＋可修城門＋佔領主堡玩法落到 Prototype，而非只留在聊天或文件。
+- Baseline：Prototype 使用 `destructibleWalls=true`，攻城只破 Gate 後直接 Capture；攻城兵器要求先建兵營；沒有 Stronghold Core、Gate Repair API、模式／據點正式規格，Save v2 也不保存修復倒數與主堡狀態。
+- Scope：
+  - In：正式規格、`fortified-city` rule metadata、主堡直募、固定不可破壞城牆、可破壞／修復 Gate、Stronghold Core 壓制與 owner transfer、HUD／onboarding、Save v3、tests、package docs、Windows build／畫面 smoke。
+  - Out：超大劇情地圖內容、隨機指揮官選擇與武將分發、玩家守城操作、AI 對玩家城門的完整攻城、維修資源成本、工程單位、`constructed-base` 建築放置／全建築摧毀、正式世界觀與美術。
+- Changed：
+  - `docs/39_GameMode_據點與武將分配規則.md`：新增 `story-grand-war`／`random-commander-war` 與 `constructed-base`／`fortified-city` 正式規格、資料邊界、流程、未完成項目、順序與驗收條件。
+  - `PrototypeNeutral/ContentPack.json`：切換為 `fortified-city`；`destructibleWalls=false`，啟用 Gate repair、Stronghold recruitment、capture-instead-of-destroy；新增 repairable Gate 與 Stronghold Core；Siege Unit 移除兵營 prerequisite，保留 Siege Technology。
+  - package `GameRuleSet`／JSON loader：新增世界中立的 settlement archetype、Gate Repair、Stronghold Recruitment、Capture Stronghold switches，舊 constructor 透過 optional defaults 維持相容。
+  - package `SiegeSystem`／models／router：新增 defender-only `RepairDefenseStructureCommand`、`Repairable` profile、Repaired／BreachSealed events；Gate 從 0 HP 修回正值時 Closed，外圈狀態回到 Active。
+  - `PrototypeSystemComposition`：註冊 repair command router、Fortified City capture rule、Stronghold Core；守軍 8 秒 repair cadence，每次 45 HP；進入內城後停止修門；攻擊 Core 至 0 才執行 Settlement／Territory owner transaction。另修正 AI 主堡直募增援的 Army membership restore 對帳。
+  - `PlayablePrototypeBootstrap`：主堡生產 HUD、修門倒數／固定城牆提示、Attack Stronghold 流程、可見 Stronghold primitive 與 capture 後 team color；onboarding 改為主堡直募與接管主堡。
+  - `PrototypeGameStateAdapter`：升級 schema／extension 至 v3，保存 Gate HP、Stronghold HP 與 repair countdown；舊 v2 明確不相容，不 silent migrate。
+  - `SiegeSystemTests`／`PlayablePrototypePlayModeTests`：新增守方修復與 breach seal、rule metadata、無兵營直募、Stronghold Core capture、AI 增援 restore regression；同步移除舊兵營 queue 假設。
+  - `docs/00`、`26`、`34`、`35`、`37`、`38`、package API／CHANGELOG：同步規格、API、操作、保存與維護契約。
+- Behavior：
+  - Before：Build Economy → Build Barracks → Research Siege → Recruit Siege → break Gate → enter → manual Capture；牆規則資料標成可摧毀，Gate 一旦摧毀不可修。
+  - After：一般兵種直接由主堡招募；研究科技後由主堡製造攻城兵器；固定城牆沒有可受擊 runtime structure；Gate 可破壞且守方可修復封回通路；玩家必須在修門前進內城並攻擊 Stronghold Core，核心歸零後主堡保留、城市與領土 owner 一致轉移並 Victory。
+- Architecture：Definitions／Content 宣告規則；Siege／Settlement／Territory 擁有 authoritative HP、capture condition 與 owner；Bootstrap 只投影 Gate blocker／Stronghold team color；Player／AI defender／tests 都經 CommandBus／SiegeSystem，沒有 HUD 直接改 HP 或 owner。故事名稱與產品規則沒有進 package Runtime。
+- API / Data：
+  - `GameRuleSet` 新增 `SettlementArchetypeId`、`GateRepairEnabled`、`StrongholdRecruitmentEnabled`、`CaptureStrongholdInsteadOfDestroy`。
+  - `DefenseStructureProfile` 新增 `Repairable`；Content tag `repairable` 會映射此能力。
+  - 新增 `RepairDefenseStructureCommand`、`DefenseStructureRepairedEvent`、`BreachSealedEvent`。
+  - Prototype save v3 新增 `strongholdHealth`／`gateRepairRemainingSeconds`；v2 save 需重新建立。
+- Tests / Validation：
+  - `dotnet build AegisRTS.Tests.EditMode.csproj`／`AegisRTS.Tests.PlayMode.csproj`：PASS，0 warning／0 error。
+  - FrameworkLab Unity EditMode：PASS，166/166，`aegis_fortified_editmode.xml`。
+  - FrameworkLab Unity PlayMode：PASS，30/30，`aegis_fortified_playmode_final.xml`；涵蓋 Unity NavMesh、要塞攻城、Save／Load、AI 與 E2E。
+  - Clean package validation：EditMode PASS 6/6、PlayMode PASS 3/3，`aegis_fortified_package_editmode.xml`／`aegis_fortified_package_playmode.xml`。
+  - Windows Development Build：PASS，`C:\projects\Unity\AegisRTS.BuildValidation\PlayablePrototype_01.exe`，Unity build report 173,573,595 bytes；`AegisRTS.Demo.dll`／Gameplay assemblies 於 13:17 更新。
+  - Executable smoke：960×540 實際啟動並檢查 onboarding 與 gameplay；最終畫面 `aegis_fortified_player_final.png`／`aegis_fortified_gameplay_final2.png`，Player log 0 個 NullReference／MissingReference／Argument／InvalidOperation／Assertion／Crash／Unhandled／Error hits。
+  - `git diff --check`：PASS；Content JSON parse PASS；Unity build 自動改寫的 URP／ProjectSettings 雜訊已還原，只保留既有 intentional `EditorBuildSettings.asset`。
+- Acceptance：玩家進攻 `fortified-city` 的 first playable slice 為 PASS：主堡直募、科技攻城兵器、固定牆、可修 Gate、breach navigation、Core-gated capture、owner transaction、Save／Load 與 Windows build 均有自動或實機證據。不可宣稱玩家守城、隨機模式或建造型基地完成。
+- Known Issues / Deferred：目前修 Gate 由守軍 AI timer 使用 Enemy Hero 作 repairer，尚無資源成本、工程單位、施工動畫或玩家守城 UI；玩家左側主城尚未建立對稱的 Gate／Wall defense siege；Core 0 HP 是「防禦被壓制」的 domain condition，視圖不銷毀。
+- Git：Branch `main`；本次未收到 commit／push 指令，因此 NOT DONE。工作樹包含先前尚未提交的 Prototype／package 變更；`AGENTS.md` 是既有未追蹤環境檔，不屬於本成果。
+- Next：先實作玩家守城＋AI 攻門＋付費維修，再做 `MatchSetupDefinition`、seeded hero allocation 與 `random-commander-war` 最小選角／分發畫面；`story-grand-war` 等 G01 世界觀確定後再填正式勢力。
+
+## 2026-08-12 — PlayablePrototype_01 實機可用性修正與完整通關
+
+- Status：Completed
+- Goal：直接啟動 Windows Development Build、以實際畫面與玩家操作檢查「打開後看不懂」問題，修正阻擋理解與完整遊玩的 P0 缺陷，並完成一局勝利與正常戰敗／重開驗收。
+- Baseline：自動測試與 process smoke 已通過，但初始 executable 是除錯儀表板式 HUD；大量內部 ID／訊息遮住戰場、敵軍會在玩家理解介面前擊殺指揮官，且 runtime 動態 Shader 在 Windows build 被剝除後呈現紫色材質。先前沒有真實畫面與完整按鈕流程證據。
+- Changed：
+  - `PlayablePrototypeBootstrap.cs`：重做玩家向 IMGUI；加入中文資源列、目前任務、戰況、世界標籤、底部三分頁指令台、disabled prerequisite、設定／說明、勝敗 modal、F1 說明與 F3 debug 分離。
+  - 新遊戲顯示三步 onboarding 並暫停模擬與 RTS input；關閉說明後才開始操作。AI 增加 90 秒進攻保護期，頂端顯示倒數。
+  - Restart 從 Victory／Defeat 正確經 `GameSessionController.Restart()` 回到 Playing，不再保留戰敗遮罩。
+  - Save／Load 改為排程 scene reload；新場景先建立乾淨世界，下一個 Update 才套用權威存檔，避免在 IMGUI／Awake 期間重建 NavMesh、camera 與 renderer。實機確認載入後戰場、單位、資源與 HUD 都保留。
+  - `RtsCameraController` 初始化後忽略前兩幀輸入；`UnityRtsInputAdapter` 在視窗失焦時不處理輸入；說明頁顯示時停用 RTS input，避免背景 edge-scroll 把鏡頭捲走。
+  - 建立並序列化 `PrototypeUnlit.mat`，Windows build 不再依賴可能被 shader stripping 移除的 runtime `Shader.Find`。
+  - 960×540 時隱藏與 HUD 重疊的世界標籤，將主要建設、研究、招募、Save／Load 與勝利事件訊息中文化。
+  - PP06 PlayMode regression 新增 onboarding pause、Defeat → Restart state、Save → scene reload → world／views／camera 可見性的驗證。
+- Tests / Validation：
+  - FrameworkLab EditMode：PASS，165/165，`aegis_ux_final_editmode.xml`。
+  - FrameworkLab PlayMode：PASS，30/30，`aegis_ux_final_playmode.xml`。
+  - Clean package validation：EditMode PASS 6/6、PlayMode PASS 3/3，`aegis_ux_final_package_editmode.xml`／`aegis_ux_final_package_playmode.xml`。
+  - Windows Development Build：PASS，`C:\projects\Unity\AegisRTS.BuildValidation\PlayablePrototype_01.exe`，173,558,063 bytes。
+  - Visual QA：1280×720 與 960×540 均實際啟動檢查；主要證據為 `aegis_ux_1280_game_final.png`、`aegis_ux_verified_started.png`、`aegis_ux_twostage_actual.png`、`aegis_ux_rapid_victory.png`。
+  - Executable flow：PASS。實際按 UI 完成 onboarding → Economy → Recruitment → Siege Tech → Siege Unit → Hero Army → Start Siege → Breach → Enter → Capture → Victory；另實際等待敵軍反攻產生 Defeat，再從 modal Restart 並完成下一局。
+  - Save／Load：PASS。實際按 Save／Load 後 scene reload，世界、單位、資源、人口、HUD 與倒數恢復；最新相關 Player logs 0 個 NullReference／MissingReference／Assertion／Crash／Unhandled Error hits。
+- Acceptance：PP00～PP08 為 PASS；系統優先 Prototype 可理解、可操作、可存取、可勝利、可戰敗並可重新開始。Unity Editor 以 PlayMode 30/30 驗證，Windows executable 以實際 UI 完整通關驗證。
+- Known Issues / Deferred：仍是 primitive graybox 與 IMGUI prototype；selection／camera／戰鬥手感、正式 UI Toolkit、accessibility、production profiling、世界觀、美術與音訊仍屬後續，不再是「能否啟動與完成一局」的 blocker。
+- Git：尚未 commit／push；`AGENTS.md` 為既有未追蹤環境檔，不屬於本成果。
+- Next：先建立本次 Prototype checkpoint commit，再做一輪針對操作手感與 UI 架構的 polish；G01 世界觀與 production art 可繼續延後。
+
+## 2026-08-11～2026-08-12 — PlayablePrototype_01 PP00～PP08
+
+- Status：Partial（程式、自動 gate、build 與 process smoke 完成；人工 playable gate NOT RUN）
+- Goal：建立一個由玩家 input 驅動、使用中立 placeholder content 的完整 Prototype，補齊 PP00 前置並依 PP01～PP08 完成 selection／movement／combat、economy／production／recruitment、Hero／Army、AI、siege／capture／victory、HUD／session、Save／Load、tests／performance／Windows build。
+- Baseline：
+  - Branch／Git：`main`；開始時 `HEAD`／`origin/main` 同為 `fd94ccf Add PlayablePrototype`，工作樹乾淨。
+  - Existing Evidence：Framework DoD 已通過；`Sandbox_RTS` 有玩家 selection／movement，但 Attack 只記錄 command；各 domain sandbox 與自動 Vertical Slice 通過，沒有單一玩家 full loop。
+- Scope：
+  - In：PP01～PP08 全部 requirements；因 PP00 assets／composition 不存在，補齊它們作為不可省略的依賴。
+  - Out／Deferred：正式世界觀、production art、完整 Campaign、multiplayer、商城與 G01～G12。
+- Changed：
+  - `Assets/AegisRTS/Content/PrototypeNeutral/`：新增 valid neutral Content Pack、Vertical Slice binding、Scenario 與 UI Theme；提供兩種資源、Infantry／Archer／Cavalry／Siege、三名 Hero、Economy／Recruitment buildings、Siege technology、三個 settlements、Gate、AI 與 scenario rules。
+  - `Assets/AegisRTS/Demo/PlayablePrototype/PrototypeSystemComposition.cs`：組合 Economy、Building、Technology、Recruitment、Movement、Combat、Faction、Territory、Settlement、Hero、Army、AI、Siege、Scenario、CommandBus 與 EventBus；建立固定 IDs、tick order、共用 Player／AI commands、spawn／death lifecycle、siege validation、capture、read side 與 restore。
+  - `PrototypeEntityRegistry.cs`、`PrototypeNavigationAdapter.cs`：建立單一 EntityId registry 與 deterministic navigation／position adapter。
+  - `PrototypeUnityNavigationAdapter.cs`：新增 Unity `NavMeshSurface`／`NavMeshAgent` product adapter；封閉 Gate 使內院不可達，破門後 rebuild NavMesh 並重新派送目的地。
+  - `PrototypeGameStateAdapter.cs`：改以 `GameStateCoordinator` 建立 checksum／version／content／scenario envelope；單一 PlayerPrefs slot 可保存 active production queues、movement／combat／Army／AI／random transient state與 SHA-256 fingerprint。
+  - `PlayablePrototypeBootstrap.cs`、`PrototypeHudAdapter.cs`、`PlayablePrototype_01.unity`：建立封閉城堡 graybox、Unity RTS input／selection／camera、primitive units／health bars、`IHudQuery`／`IHudCommandSink` HUD、theme/settings、notifications、menu、pause／resume／restart／save／load 與 Debug Defeat control。
+  - `Assets/AegisRTS/Editor/`、`ProjectSettings/EditorBuildSettings.asset`：新增 scene rebuild／Windows Development Build method，並把 Prototype scene 加為第一個 build scene。
+  - `PlayablePrototypePlayModeTests.cs`：新增 11 個 PP00～PP08 tests；涵蓋 boot、player combat、economy rollback、Hero／Army 全命令、AI 真實生產／招募、Unity NavMesh gate、siege／victory／正常 defeat、HUD interfaces／session、完整 Save／Load、E2E／long-run 與 300-unit smoke。
+  - package `BuildingSystem`、`TechnologySystem`、`RecruitmentSystem`、`MovementSystem`、`CombatSystem`、`ArmySystem`、`AiSystem`、`EconomySystem`：新增通用 runtime snapshot／restore API；Recruitment spawn 失敗會原子回滾成本與人口。新增 5 項 EditMode regression。
+  - `HeroArmyCommandTests.cs`、package `ArmySystem.cs`：新增已分配 member 移除 regression；修正 `UnregisterMember` 未同步 Army snapshot／commander／Hero／Combat ArmyId 的通用 lifecycle defect。
+  - `docs/37_PlayablePrototype_01_操作與驗收手冊.md`、`38_PlayablePrototype_01_架構與維護.md`：新增完整啟動、操作、manual gate、現況、限制、建議順序、ownership、tick、entity、position、save／restore 與維護規則；總覽索引同步更新。
+- Behavior：
+  - Before：沒有 `PlayablePrototype_01` scene／Content／runtime／tests；Vertical Slice 由自動 stage executor 完成。
+  - After：單一 scene／build 可 New Game，透過 input 或 HUD 完成戰鬥、經濟、招募、Army、AI 反攻、攻城、佔領與勝負；Gate 會實際阻擋 NavMesh，破門後才可進入；Pause 停止 simulation，Restart 清理並重建 session，Save／Load 可在 active queues／orders 中途精確還原 gameplay fingerprint 與 views。人工操作完整一局尚未由專案擁有者執行。
+- Architecture / API / Data：
+  - Architecture：產品層留在 `Assets/AegisRTS/Demo/PlayablePrototype`，Bootstrap 只做 Unity composition／presentation；domain truth 由 package systems 擁有。Player、HUD、AI、tests 共用 CommandBus；query／snapshot／event 驅動 UI。Entity spawn、death、restart、load 與 dispose 都有固定 lifecycle。
+  - API：新增 Demo composition、navigation runtime、HUD query／sink 與 save surface；package 新增 production queue snapshots／restore、movement orders、combat／Army／AI runtime restore。`ArmySystem.UnregisterMember(EntityId)` 真正移除已分配成員並同步 commander／Hero／Combat state。
+  - Data：新增 `prototype.neutral` Content、`scenario.prototype-conquest` 與 Prototype save schema v2。Save 僅含純資料，不含 Unity references；使用 `GameStateCoordinator` checksum 與 content／scenario metadata 拒絕 corrupt／incompatible data。
+- Tests / Validation：
+  - Prototype-only Unity PlayMode：PASS，11/11，結果 `aegis_pp_audit8.xml`。
+  - FrameworkLab Unity EditMode：PASS，165/165，結果 `aegis_editmode_pp_final.xml`；新增 queue／movement／combat／Army／AI restore regression。
+  - FrameworkLab Unity PlayMode：PASS，30/30，0 failed／0 skipped，最終結果 `C:\projects\Unity\AegisRTS.ValidationResults\aegis_playmode_pp_final2.xml`；包含載入後 AI economy 繼續模擬仍 deterministic 的驗證。
+  - Clean package project `C:\projects\Unity\AegisRTS.PackageValidation`：EditMode 6/6、PlayMode 3/3 PASS；包含 package Army lifecycle fix。
+  - 最終 Windows Development Build：PASS，輸出 `C:\projects\Unity\AegisRTS.BuildValidation\PlayablePrototype_01.exe`，Unity build report 173,516,501 bytes；executable 在 1280×720 與 960×540 各啟動 8 秒持續運行，`aegis_pp_player_final2_1280x720.log`／`aegis_pp_player_final2_960x540.log` 未發現 NullReference、MissingReference、Argument／InvalidOperation、assertion 或 crash，之後由驗證程序停止。
+  - Deterministic E2E：New Game → Recruit → Army → Battle → Siege → Capture → Victory PASS；1800 simulation seconds long-run PASS；300 active units／120 ticks 在 5 秒 ceiling 內 PASS。
+  - Manual Editor／executable A～E：NOT RUN；不可用自動測試或 process boot 冒充。
+- Acceptance：
+  - PP00～PP07 自動 acceptance：PASS。
+  - PP08 automated regression／performance smoke／build／process boot：PASS。
+  - PP08 executable 完整人工通關與 1920×1080＋較小解析度：NOT RUN，因此 PP08 整體 `PARTIAL`。
+  - PA-01、PA-03～PA-15 automated evidence：PASS；PA-02 的自動 movement 與 input wiring PASS，manual 操作部分 NOT RUN。
+  - Package Runtime world-specific hardcode boundary：維持 package tests／static architecture規則；本次新增世界中立資料只在 Lab Content／Demo。
+- Completed：
+  - 完成 PP00～PP08 所需 Content、scene、composition、input／HUD、Unity NavMesh gate、所有 domain integration、mid-action Save／Load、tests、performance smoke 與 Development Build。
+  - 修正死亡 member 留在 Army／Hero／Combat state 的通用 package defect並加入 regression。
+  - 建立足以重現操作、驗收、架構與後續維護的詳細文件。
+- Not Completed / Deferred：
+  - P0：專案擁有者尚未完成一次 Editor 與 executable A～E 人工通關；完成前 Prototype 整體維持 `Partial`。
+  - P2：目前 HUD 為功能完整的 IMGUI prototype，尚未進行正式 UX、accessibility 或 production UI Toolkit 視覺整理。
+  - Deferred：G01～G12、正式世界觀、production art／audio、tutorial、localization、accessibility、target hardware production profiling。
+- Known Issues / Risks：
+  - Unity NavMesh 是 runtime bake；若未來加入大型動態障礙或多層地圖，需重新評估 rebuild cost、agent carving 與 path reissue policy。
+  - Save schema v2 對舊的 prototype schema v1 採明確不相容，不做 silent migration；舊測試存檔需重建。
+  - 300-unit test 是 simulation regression ceiling，不代表 production hardware 的 frame／render／NavMesh budget。
+- Git：
+  - Branch：`main`。
+  - Working Tree：本工作包含新增 Prototype Content／Demo／Editor／tests／docs 與 package bug fix，全部尚未提交；`AGENTS.md` 是既有未追蹤檔，不屬於本成果。
+  - Commit／Push：NOT DONE；本次沒有收到 commit／push 指令。
+- Next：
+  1. 依 `docs/37_PlayablePrototype_01_操作與驗收手冊.md` 在 Editor 與最新 Windows build 完成 A～E 人工通關及兩種解析度驗收，將實際結果補回本紀錄。
+  2. 修正人工 gate 發現的 P0 blocker，優先處理 selection／camera／command feedback、NavMesh path feedback 與 mid-action Save usability。
+  3. 人工 gate PASS 後才建立 Prototype checkpoint commit／tag，再開始 G01／G02；production art 繼續延後。
 
 ## 2026-08-11 — PlayablePrototype_01 詳細規劃與紀錄規範
 

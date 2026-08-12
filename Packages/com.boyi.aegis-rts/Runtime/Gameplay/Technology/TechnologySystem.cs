@@ -7,6 +7,15 @@ using AegisRTS.Gameplay.Economy;
 
 namespace AegisRTS.Gameplay.Technology
 {
+    public readonly struct TechnologyQueueSnapshot
+    {
+        public TechnologyQueueSnapshot(EntityId factionId, DefinitionId technologyId, double remainingSeconds)
+        { FactionId = factionId; TechnologyId = technologyId; RemainingSeconds = remainingSeconds; }
+        public EntityId FactionId { get; }
+        public DefinitionId TechnologyId { get; }
+        public double RemainingSeconds { get; }
+    }
+
     /// <summary>Validates technology DAG prerequisites, pays costs, advances research, and applies modifiers.</summary>
     public sealed class TechnologySystem : ITechnologyStatusQuery
     {
@@ -67,6 +76,26 @@ namespace AegisRTS.Gameplay.Technology
         public bool IsResearched(EntityId factionId, DefinitionId technologyId) =>
             _researched.TryGetValue(factionId, out HashSet<DefinitionId> values) && values.Contains(technologyId);
 
+        public IReadOnlyList<TechnologyQueueSnapshot> SnapshotQueue()
+        {
+            var result = new List<TechnologyQueueSnapshot>(_jobs.Count);
+            foreach (Job job in _jobs)
+                result.Add(new TechnologyQueueSnapshot(job.FactionId, job.Definition.Id, Math.Max(0d, job.RemainingSeconds)));
+            return result.AsReadOnly();
+        }
+
+        /// <summary>Restores an already-paid research job without spending its cost a second time.</summary>
+        public void RestoreQueuedJob(EntityId factionId, DefinitionId technologyId, double remainingSeconds)
+        {
+            if (!_definitions.TryGetValue(technologyId, out TechnologyDefinition definition)) throw new InvalidOperationException("Technology definition does not exist.");
+            if (IsResearched(factionId, technologyId) || IsQueued(factionId, technologyId)) throw new InvalidOperationException("Technology is already researched or queued.");
+            if (remainingSeconds <= 0d || remainingSeconds > definition.ResearchSeconds || double.IsNaN(remainingSeconds) || double.IsInfinity(remainingSeconds))
+                throw new ArgumentOutOfRangeException(nameof(remainingSeconds));
+            foreach (DefinitionId prerequisite in definition.PrerequisiteIds)
+                if (!IsResearched(factionId, prerequisite)) throw new InvalidOperationException($"Missing technology prerequisite '{prerequisite}'.");
+            _jobs.Add(new Job(factionId, definition, remainingSeconds));
+        }
+
         public string GetDebugSummary() => $"Technologies={_definitions.Count}, ResearchQueued={_jobs.Count}";
 
         private bool IsQueued(EntityId factionId, DefinitionId technologyId) =>
@@ -78,8 +107,8 @@ namespace AegisRTS.Gameplay.Technology
 
         private sealed class Job
         {
-            public Job(EntityId factionId, TechnologyDefinition definition)
-            { FactionId = factionId; Definition = definition; RemainingSeconds = definition.ResearchSeconds; }
+            public Job(EntityId factionId, TechnologyDefinition definition, double? remainingSeconds = null)
+            { FactionId = factionId; Definition = definition; RemainingSeconds = remainingSeconds ?? definition.ResearchSeconds; }
             public EntityId FactionId { get; }
             public TechnologyDefinition Definition { get; }
             public double RemainingSeconds { get; set; }
