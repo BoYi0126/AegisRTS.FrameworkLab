@@ -5,6 +5,7 @@ using AegisRTS.Core.Entities;
 using AegisRTS.Gameplay.Combat;
 using AegisRTS.Gameplay.Content.Definitions;
 using AegisRTS.Gameplay.Economy;
+using AegisRTS.Gameplay.Movement;
 using AegisRTS.Gameplay.Siege;
 using AegisRTS.Gameplay.Units;
 using AegisRTS.Gameplay.VerticalSlice;
@@ -15,6 +16,7 @@ using AegisRTS.Presentation.UI;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using EntityId = AegisRTS.Core.Entities.EntityId;
 
@@ -73,6 +75,8 @@ namespace AegisRTS.Demo.PlayablePrototype
         private PrototypeSaveData _startupRestore;
         private PrototypeSaveData _pendingStartupApply;
         private static PrototypeSaveData s_sceneReloadRestore;
+        private static readonly Color FriendlyTeamColor = new Color32(0x4A, 0xA3, 0xD8, 0xFF);
+        private static readonly Color EnemyTeamColor = new Color32(0xD9, 0x4A, 0x45, 0xFF);
 
         public GameSessionController Session { get; private set; }
         public PrototypeSystemComposition Composition { get; private set; }
@@ -91,6 +95,7 @@ namespace AegisRTS.Demo.PlayablePrototype
         private void Awake()
         {
             ConfigureCamera();
+            ConfigureLighting();
             _startupRestore = s_sceneReloadRestore;
             s_sceneReloadRestore = null;
             Session = new GameSessionController(this);
@@ -326,8 +331,8 @@ namespace AegisRTS.Demo.PlayablePrototype
             root.transform.SetParent(_unitRoot);
             root.transform.position = ToVector(record.SpawnPosition);
             Color color = record.FactionId == PrototypeSystemComposition.PlayerFactionId
-                ? new Color(0.12f, 0.52f, 0.95f)
-                : new Color(0.92f, 0.18f, 0.15f);
+                ? FriendlyTeamColor
+                : EnemyTeamColor;
             GameObject visual;
             PrototypeUnitArtView artView;
             if (!PrototypeUnitArtCatalog.TryInstantiate(record.PrefabId, root.transform, color, out visual, out artView))
@@ -360,7 +365,8 @@ namespace AegisRTS.Demo.PlayablePrototype
             healthFill.transform.localPosition = new Vector3(0f, healthBarY, -0.08f);
             healthFill.transform.localScale = new Vector3(1.2f, 0.08f, 0.08f);
             SetColor(healthFill, new Color(0.2f, 0.9f, 0.25f));
-            _views.Add(record.EntityId, new UnitView(root, healthFill.transform, healthBarY));
+            _views.Add(record.EntityId, new UnitView(root, healthFill.transform, healthBarY,
+                artView != null ? artView.AnimatorView : null));
         }
 
         private void RemoveUnitView(EntityId entityId)
@@ -368,7 +374,13 @@ namespace AegisRTS.Demo.PlayablePrototype
             if (!_views.TryGetValue(entityId, out UnitView view)) return;
             _views.Remove(entityId);
             _selection?.Unregister(entityId);
-            if (view.Root != null) Destroy(view.Root);
+            if (view.Root == null) return;
+            if (view.AnimatorView != null)
+            {
+                view.AnimatorView.PlayDeath();
+                Destroy(view.Root, view.AnimatorView.DeathDurationSeconds + 0.15f);
+            }
+            else Destroy(view.Root);
         }
 
         private void RefreshViews()
@@ -383,6 +395,11 @@ namespace AegisRTS.Demo.PlayablePrototype
                 if (direction.sqrMagnitude > 0.000001f)
                     item.Value.Root.transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
                 item.Value.Root.transform.position = nextPosition;
+                double worldSpeed = Math.Sqrt(
+                    movement.Velocity.X * movement.Velocity.X +
+                    movement.Velocity.Y * movement.Velocity.Y +
+                    movement.Velocity.Z * movement.Velocity.Z);
+                item.Value.AnimatorView?.Refresh(movement.Status == MovementStatus.Moving, worldSpeed, combat);
                 float ratio = (float)Math.Max(0d, Math.Min(1d, combat.Health / combat.MaxHealth));
                 item.Value.HealthFill.localScale = new Vector3(1.2f * ratio, 0.08f, 0.08f);
                 item.Value.HealthFill.localPosition = new Vector3(-0.6f * (1f - ratio), item.Value.HealthBarY, -0.08f);
@@ -394,7 +411,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             Camera mainCamera = Camera.main;
             var controller = mainCamera.GetComponent<RtsCameraController>();
             if (controller == null) controller = mainCamera.gameObject.AddComponent<RtsCameraController>();
-            controller.Initialize(new RtsCameraRigModel(0d, 0d, 31d));
+            controller.Initialize(new RtsCameraRigModel(0d, 0d, 31d, minimumZoom: 2.5d, maximumZoom: 40d));
             _inputObject = new GameObject("Prototype_RTS_Input");
             _inputObject.transform.SetParent(transform);
             _input = _inputObject.AddComponent<UnityRtsInputAdapter>();
@@ -423,6 +440,30 @@ namespace AegisRTS.Demo.PlayablePrototype
             camera.transform.position = new Vector3(0f, 27f, -25f);
             camera.transform.rotation = Quaternion.Euler(48f, 0f, 0f);
             camera.backgroundColor = new Color(0.055f, 0.075f, 0.105f);
+        }
+
+        private static void ConfigureLighting()
+        {
+            Light keyLight = UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude)
+                .FirstOrDefault(value => value.type == LightType.Directional);
+            if (keyLight == null)
+            {
+                GameObject value = new GameObject("Prototype_KeyLight");
+                keyLight = value.AddComponent<Light>();
+            }
+
+            keyLight.type = LightType.Directional;
+            keyLight.color = new Color(1f, 0.94f, 0.84f);
+            keyLight.intensity = 1.15f;
+            keyLight.shadows = LightShadows.Soft;
+            keyLight.shadowStrength = 0.55f;
+            keyLight.transform.rotation = Quaternion.Euler(48f, -35f, 0f);
+
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.36f, 0.42f, 0.50f);
+            RenderSettings.ambientEquatorColor = new Color(0.24f, 0.27f, 0.30f);
+            RenderSettings.ambientGroundColor = new Color(0.12f, 0.13f, 0.14f);
+            RenderSettings.ambientIntensity = 0.85f;
         }
 
         private GameObject CreateMarker(string name, PrimitiveType primitive, Vector3 position, Vector3 scale, Color color)
@@ -918,7 +959,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             GUILayout.Label("3　切換到「攻城行動」：破壞可修復城門、進入內院、攻擊主堡並接管城市。", _bodyStyle);
             GUILayout.Space(14f);
             GUILayout.Label("敵軍會先發展經濟，90 秒後才主動進攻。說明開啟期間遊戲完全暫停。", _statusStyle);
-            GUILayout.Label("快捷鍵：WASD 相機｜X 停止｜H 原地防守｜Shift 命令排隊｜F1 說明｜F3 Debug", _mutedStyle);
+            GUILayout.Label("快捷鍵：WASD 相機｜滾輪縮放 2.5–40m｜F 聚焦選取｜X 停止｜H 原地防守｜F1 說明｜F3 Debug", _mutedStyle);
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("我了解了，開始遊戲", _primaryButtonStyle, GUILayout.Height(48f))) DismissTutorialNow();
             GUILayout.EndArea();
@@ -1178,15 +1219,17 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         private sealed class UnitView
         {
-            public UnitView(GameObject root, Transform healthFill, float healthBarY)
+            public UnitView(GameObject root, Transform healthFill, float healthBarY, PrototypeUnitAnimatorView animatorView)
             {
                 Root = root;
                 HealthFill = healthFill;
                 HealthBarY = healthBarY;
+                AnimatorView = animatorView;
             }
             public GameObject Root { get; }
             public Transform HealthFill { get; }
             public float HealthBarY { get; }
+            public PrototypeUnitAnimatorView AnimatorView { get; }
         }
     }
 }

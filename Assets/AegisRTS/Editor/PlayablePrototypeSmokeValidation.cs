@@ -21,6 +21,7 @@ namespace AegisRTS.Editor
         private const string PreviousScenePathKey = "AegisRTS.PlayableSmoke.PreviousScenePath";
         private static int _framesRemaining;
         private static bool _captureRequested;
+        private static bool _failed;
 
         static PlayablePrototypeSmokeValidation()
         {
@@ -54,6 +55,7 @@ namespace AegisRTS.Editor
 
             SessionState.SetBool(OpenedSceneKey, openedScene);
             SessionState.SetBool(RunningKey, true);
+            _failed = false;
             SceneManager.SetActiveScene(prototype);
             Debug.Log("[PlayablePrototype Smoke] Starting Play Mode validation.");
             EditorApplication.EnterPlaymode();
@@ -96,6 +98,7 @@ namespace AegisRTS.Editor
                 }
                 catch (Exception exception)
                 {
+                    _failed = true;
                     Debug.LogError($"[PlayablePrototype Smoke] FAIL: {exception}");
                 }
             }
@@ -113,11 +116,17 @@ namespace AegisRTS.Editor
 
             PrototypeUnitArtView[] infantry = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude);
             Require(infantry.Length == 2, $"Expected 2 infantry art instances, found {infantry.Length}.");
-            Require(infantry.All(value => value.TeamColorRenderers.Length == 2), "Each infantry must expose both LOD team-color renderers.");
+            Require(infantry.All(value => value.TeamColorRenderers.Length >= 3), "Each infantry must expose team-color renderers across all LOD levels.");
             Require(infantry.All(value => value.GetComponent<LODGroup>() == null && value.GetComponentInChildren<LODGroup>() != null),
                 "Each infantry must contain an LODGroup below its gameplay root.");
             Require(infantry.All(value => value.SelectionAnchor != null && value.HealthBarAnchor != null),
                 "Selection and health-bar anchors are required.");
+            Require(infantry.All(value => value.AnimatorView != null && value.AnimatorView.Animator != null),
+                "Each infantry must expose an L3 Animator bridge.");
+            Require(infantry.All(value => value.AnimatorView.Animator.avatar != null &&
+                                          value.AnimatorView.Animator.avatar.isHuman &&
+                                          value.AnimatorView.Animator.avatar.isValid),
+                "Each infantry must use a valid Humanoid Avatar.");
 
             string outputDirectory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "AegisRTS.BuildValidation"));
             Directory.CreateDirectory(outputDirectory);
@@ -142,6 +151,7 @@ namespace AegisRTS.Editor
             SessionState.EraseBool(OpenedSceneKey);
             SessionState.EraseString(PreviousScenePathKey);
             Debug.Log("[PlayablePrototype Smoke] Editor scene restored.");
+            if (Application.isBatchMode) EditorApplication.Exit(_failed ? 1 : 0);
         }
 
         private static Scene FindLoadedSceneOtherThan(Scene excluded)

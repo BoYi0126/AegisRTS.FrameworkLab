@@ -66,6 +66,8 @@ Rebuild 會重新建立 scene、綁定 PrototypeNeutral Content／Scenario／The
 | 停止 | `X` | 派送 Stop。 |
 | 原地防守 | `H` | 派送 Hold。 |
 | 移動相機 | `WASD` | 平移 RTS camera。 |
+| 放大／縮小 | 滑鼠滾輪 | 相機距離可在 2.5–40 m 間縮放；2.5–4 m 會自動降低俯角並聚焦身體，用於查看臉、甲片、盾牌、武器與動畫。 |
+| 聚焦選取 | `F` | 將相機中心移到目前選取單位，再用滾輪拉近。 |
 
 Prototype 的 HUD 按鈕是完整系統流程的可重現入口，不會直接寫 resources、HP、owner 或 objective。所有 mutation 都必須經 CommandBus、domain validator 或 authoritative event／fact。
 

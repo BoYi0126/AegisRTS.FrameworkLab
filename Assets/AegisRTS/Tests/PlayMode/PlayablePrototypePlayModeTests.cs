@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,8 +16,10 @@ using AegisRTS.Gameplay.Content.Validation;
 using AegisRTS.Gameplay.Economy;
 using AegisRTS.Gameplay.Objectives;
 using AegisRTS.Gameplay.Siege;
+using AegisRTS.Gameplay.Units;
 using AegisRTS.Gameplay.VerticalSlice;
 using AegisRTS.Presentation.Camera;
+using AegisRTS.Presentation.Selection;
 using AegisRTS.Presentation.UI;
 using NUnit.Framework;
 using UnityEngine;
@@ -260,6 +263,8 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(infantryArt, Has.Length.EqualTo(2), "Player and enemy infantry must use the imported art prefab.");
             Assert.That(infantryArt.All(value => value.TeamColorRenderers.Length >= 2), Is.True);
             Assert.That(infantryArt.All(value => value.HealthBarAnchor != null && value.SelectionAnchor != null), Is.True);
+            Assert.That(infantryArt.All(value => value.AnimatorView != null && value.AnimatorView.Animator != null), Is.True,
+                "L3 infantry must expose a configured Animator presentation bridge.");
             Assert.That(bootstrap.HudQuery, Is.Not.Null);
             Assert.That(bootstrap.HudCommandSink, Is.Not.Null);
             Assert.That(bootstrap.Selection.RegisteredCount, Is.EqualTo(bootstrap.ViewCount + 4),
@@ -353,6 +358,237 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(rebuiltCamera.Model.PivotX, Is.EqualTo(0d).Within(0.001d));
             Assert.That(rebuiltCamera.Model.PivotZ, Is.EqualTo(0d).Within(0.001d),
                 "A load must reset stale edge-scroll movement before accepting new pointer input.");
+        }
+
+        [UnityTest]
+        public IEnumerator InfantryL3_PrefabAvatarClipsEventsAndRootMotionAreValid()
+        {
+            GameObject prefab = PrototypeUnitArtCatalog.Load(PrototypeUnitArtCatalog.InfantryPrefabId);
+            Assert.That(prefab, Is.Not.Null);
+            GameObject instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                PrototypeUnitArtView art = instance.GetComponent<PrototypeUnitArtView>();
+                Assert.That(art, Is.Not.Null);
+                Assert.That(art.AnimatorView, Is.Not.Null);
+                Animator animator = art.AnimatorView.Animator;
+                Assert.That(animator, Is.Not.Null);
+                Assert.That(animator.avatar, Is.Not.Null);
+                Assert.That(animator.avatar.isHuman && animator.avatar.isValid, Is.True);
+                Assert.That(animator.applyRootMotion, Is.False);
+                Assert.That(instance.GetComponentInChildren<LODGroup>(), Is.Not.Null);
+
+                Vector3 rootPosition = instance.transform.position;
+                yield return null;
+                animator.SetFloat("MoveRate", 1.8f);
+                animator.SetFloat("Speed", 1f);
+                yield return new WaitForSeconds(0.8f);
+                Assert.That(art.AnimatorView.FootstepCount, Is.GreaterThan(0));
+                Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
+
+                animator.SetFloat("Speed", 0f);
+                animator.SetTrigger("Attack");
+                yield return new WaitForSeconds(0.55f);
+                Assert.That(art.AnimatorView.AttackImpactCount, Is.GreaterThan(0));
+                Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
+
+                art.AnimatorView.PlayDeath();
+                yield return new WaitForSeconds(1.25f);
+                Assert.That(art.AnimatorView.DeathSettledCount, Is.GreaterThan(0));
+                Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
+            }
+            finally
+            {
+                UnityEngine.Object.Destroy(instance);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator InfantryL3_ActualMovementFacesTravelDirectionAndSupportsCloseZoom()
+        {
+            SceneManager.LoadScene("PlayablePrototype_01", LoadSceneMode.Single);
+            yield return null;
+            yield return null;
+
+            PlayablePrototypeBootstrap bootstrap = UnityEngine.Object.FindAnyObjectByType<PlayablePrototypeBootstrap>();
+            Assert.That(bootstrap, Is.Not.Null);
+            bootstrap.DismissTutorialNow();
+
+            PrototypeUnitArtView art = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude)
+                .First(value => value.GetComponentInParent<UnitySelectableView>().transform.position.x < 0f);
+            UnitySelectableView selectable = art.GetComponentInParent<UnitySelectableView>();
+            Transform root = selectable.transform;
+            Vector3 start = root.position;
+
+            RtsCameraController cameraController = Camera.main.GetComponent<RtsCameraController>();
+            cameraController.Model.Focus(start.x, start.z);
+            cameraController.Model.ZoomBy(-100d);
+            cameraController.ProcessInput(Vector2.zero, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f),
+                Vector2.zero, false, 0f, 0f);
+            cameraController.ProcessInput(Vector2.zero, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f),
+                Vector2.zero, false, 0f, 0f);
+            Assert.That(cameraController.Model.Zoom, Is.EqualTo(2.5d));
+
+            Assert.That(bootstrap.Composition.Move(new[] { selectable.EntityId },
+                new WorldPoint(start.x, start.y, start.z + 8f)).WasHandled, Is.True);
+
+            string captureDirectory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..",
+                "AegisRTS.BuildValidation", "InfantryMovementReview"));
+            bool capture = string.Equals(Environment.GetEnvironmentVariable("AEGIS_CAPTURE_MOVEMENT_REVIEW"), "1",
+                StringComparison.Ordinal);
+            if (capture)
+            {
+                Directory.CreateDirectory(captureDirectory);
+                foreach (UnitySelectableView other in UnityEngine.Object.FindObjectsByType<UnitySelectableView>(FindObjectsInactive.Exclude))
+                {
+                    if (other == selectable) continue;
+                    foreach (Renderer renderer in other.GetComponentsInChildren<Renderer>()) renderer.enabled = false;
+                }
+            }
+
+            for (int frame = 0; frame < 8; frame++)
+            {
+                yield return new WaitForSeconds(0.13f);
+                cameraController.Model.Focus(root.position.x, root.position.z);
+                cameraController.ProcessInput(Vector2.zero, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f),
+                    Vector2.zero, false, 0f, 0f);
+                if (capture)
+                {
+                    CaptureCamera(Camera.main, Path.Combine(captureDirectory, $"Move_{frame:00}.png"));
+                }
+            }
+
+            Vector3 displacement = root.position - start;
+            Assert.That(displacement.magnitude, Is.GreaterThan(1f));
+            Assert.That(Vector3.Dot(root.forward, displacement.normalized), Is.GreaterThan(0.98f),
+                "The infantry gameplay root must face its actual travel direction.");
+            Assert.That(art.AnimatorView.Animator.GetFloat("Speed"), Is.GreaterThan(0.5f));
+        }
+
+        [UnityTest]
+        public IEnumerator InfantryL3_CloseInspectionPreservesBaseDetailAndOnlyTintsTeamMaterialSlots()
+        {
+            SceneManager.LoadScene("PlayablePrototype_01", LoadSceneMode.Single);
+            yield return null;
+            yield return null;
+
+            PlayablePrototypeBootstrap bootstrap = UnityEngine.Object.FindAnyObjectByType<PlayablePrototypeBootstrap>();
+            Assert.That(bootstrap, Is.Not.Null);
+            bootstrap.DismissTutorialNow();
+
+            PrototypeUnitArtView art = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude)
+                .First(value => value.GetComponentInParent<UnitySelectableView>().Affiliation == SelectionAffiliation.Friendly);
+            UnitySelectableView selectable = art.GetComponentInParent<UnitySelectableView>();
+            Transform root = selectable.transform;
+            root.rotation = Quaternion.LookRotation(Vector3.back, Vector3.up);
+
+            Bounds visualBounds = art.GetComponentsInChildren<Renderer>(true)[0].bounds;
+            foreach (Renderer renderer in art.GetComponentsInChildren<Renderer>(true).Skip(1))
+                visualBounds.Encapsulate(renderer.bounds);
+            Assert.That(visualBounds.size.y, Is.GreaterThan(1.65f), "The character must stand on Unity Y.");
+            Assert.That(visualBounds.size.y, Is.GreaterThan(visualBounds.size.z),
+                "A valid Humanoid Avatar is insufficient if the imported visual is lying on the ground.");
+
+            Animator detailAnimator = art.AnimatorView.Animator;
+            detailAnimator.speed = 0f;
+            detailAnimator.Play("Idle", 0, 0.25f);
+            detailAnimator.Update(0f);
+            yield return null;
+            Bounds idleBounds = CalculateBounds(art.GetComponentsInChildren<Renderer>(true));
+            float[] poseSamples = { 0f, 0.25f, 0.5f, 0.75f };
+            foreach (float poseSample in poseSamples)
+            {
+                detailAnimator.Play("Move", 0, poseSample);
+                detailAnimator.Update(0f);
+                yield return null;
+                Bounds moveBounds = CalculateBounds(art.GetComponentsInChildren<Renderer>(true));
+                Assert.That(moveBounds.size.y, Is.GreaterThan(1.5f),
+                    $"Move {poseSample:P0} collapsed the standing silhouette: {moveBounds}.");
+                Assert.That(moveBounds.min.y, Is.GreaterThan(root.position.y - 0.12f),
+                    $"Move {poseSample:P0} penetrated the ground: {moveBounds}.");
+                Assert.That(moveBounds.max.y, Is.LessThan(root.position.y + 2.05f),
+                    $"Move {poseSample:P0} exceeded the vertical envelope: {moveBounds}.");
+                Vector2 planarOffset = new Vector2(moveBounds.center.x - idleBounds.center.x,
+                    moveBounds.center.z - idleBounds.center.z);
+                Assert.That(planarOffset.magnitude, Is.LessThan(0.2f),
+                    $"Move {poseSample:P0} drifted inside VisualRoot by {planarOffset.magnitude:F3} m.");
+            }
+            detailAnimator.Play("Idle", 0, 0.25f);
+            detailAnimator.Update(0f);
+            yield return null;
+
+            Renderer shield = art.GetComponentsInChildren<Renderer>(true)
+                .First(value => value.name == "SM_Infantry_Shield_LOD0");
+            Material[] shieldMaterials = shield.sharedMaterials;
+            int baseIndex = Array.FindIndex(shieldMaterials,
+                value => value != null && value.name.IndexOf("MAT_Infantry_Base", StringComparison.OrdinalIgnoreCase) >= 0);
+            int teamIndex = Array.FindIndex(shieldMaterials,
+                value => value != null && value.name.IndexOf("TeamColor", StringComparison.OrdinalIgnoreCase) >= 0);
+            Assert.That(baseIndex, Is.GreaterThanOrEqualTo(0), "The L2 wood/metal shield material must remain on L3.");
+            Assert.That(teamIndex, Is.GreaterThanOrEqualTo(0), "Only the shield emblem/panel may receive team tint.");
+
+            int baseColorId = Shader.PropertyToID("_BaseColor");
+            var block = new MaterialPropertyBlock();
+            shield.GetPropertyBlock(block, baseIndex);
+            Assert.That(block.isEmpty, Is.True, "Team tint must not overwrite the shield base material slot.");
+            block.Clear();
+            shield.GetPropertyBlock(block, teamIndex);
+            Color actualTeamColor = block.GetColor(baseColorId);
+            Color expectedTeamColor = new Color32(0x4A, 0xA3, 0xD8, 0xFF);
+            Assert.That(actualTeamColor.r, Is.EqualTo(expectedTeamColor.r).Within(0.005f));
+            Assert.That(actualTeamColor.g, Is.EqualTo(expectedTeamColor.g).Within(0.005f));
+            Assert.That(actualTeamColor.b, Is.EqualTo(expectedTeamColor.b).Within(0.005f));
+
+            Light keyLight = UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude)
+                .FirstOrDefault(value => value.type == LightType.Directional);
+            Assert.That(keyLight, Is.Not.Null);
+            Assert.That(keyLight.intensity, Is.GreaterThanOrEqualTo(1f));
+
+            RtsCameraController cameraController = Camera.main.GetComponent<RtsCameraController>();
+            cameraController.Model.Focus(root.position.x, root.position.z);
+            cameraController.Model.ZoomBy(-100d);
+            cameraController.ProcessInput(Vector2.zero, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f),
+                Vector2.zero, false, 0f, 0f);
+            Assert.That(cameraController.Model.Zoom, Is.EqualTo(2.5d));
+            Assert.That(Camera.main.transform.eulerAngles.x, Is.EqualTo(38f).Within(0.5f));
+
+            bool capture = string.Equals(Environment.GetEnvironmentVariable("AEGIS_CAPTURE_INFANTRY_DETAIL"), "1",
+                StringComparison.Ordinal);
+            if (capture)
+            {
+                foreach (UnitySelectableView other in UnityEngine.Object.FindObjectsByType<UnitySelectableView>(FindObjectsInactive.Exclude))
+                {
+                    if (other == selectable) continue;
+                    foreach (Renderer renderer in other.GetComponentsInChildren<Renderer>()) renderer.enabled = false;
+                }
+                foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>())
+                {
+                    if (renderer.name.StartsWith("Health_", StringComparison.Ordinal)) renderer.enabled = false;
+                }
+
+                string directory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..",
+                    "AegisRTS.BuildValidation", "InfantryDetailReview"));
+                Directory.CreateDirectory(directory);
+                Vector3[] directions = { Vector3.back, Vector3.right, Vector3.forward };
+                string[] names = { "Front", "Side", "Back" };
+                for (int index = 0; index < directions.Length; index++)
+                {
+                    root.rotation = Quaternion.LookRotation(directions[index], Vector3.up);
+                    yield return null;
+                    CaptureCamera(Camera.main, Path.Combine(directory, $"InfantryDetail_{names[index]}.png"));
+                }
+
+                root.rotation = Quaternion.LookRotation(Vector3.back, Vector3.up);
+                Animator animator = art.AnimatorView.Animator;
+                float[] normalizedTimes = { 0f, 0.25f, 0.5f, 0.75f };
+                for (int index = 0; index < normalizedTimes.Length; index++)
+                {
+                    animator.Play("Move", 0, normalizedTimes[index]);
+                    animator.Update(0f);
+                    yield return null;
+                    CaptureCamera(Camera.main, Path.Combine(directory, $"InfantryMovePose_{index:00}.png"));
+                }
+            }
         }
 
         [UnityTest]
@@ -560,6 +796,38 @@ namespace AegisRTS.Tests.PlayMode
 
         private static PrototypeSystemComposition Create() => new PrototypeSystemComposition(Read("ContentPack.json"), Read("Scenario.json"));
         private static string Read(string file) => File.ReadAllText(Path.Combine("Assets", "AegisRTS", "Content", "PrototypeNeutral", file));
+
+        private static void CaptureCamera(Camera camera, string path)
+        {
+            var target = new RenderTexture(960, 540, 24, RenderTextureFormat.ARGB32);
+            var image = new Texture2D(960, 540, TextureFormat.RGB24, false);
+            RenderTexture previousActive = RenderTexture.active;
+            RenderTexture previousTarget = camera.targetTexture;
+            try
+            {
+                camera.targetTexture = target;
+                RenderTexture.active = target;
+                camera.Render();
+                image.ReadPixels(new Rect(0f, 0f, 960f, 540f), 0, 0);
+                image.Apply();
+                File.WriteAllBytes(path, image.EncodeToPNG());
+            }
+            finally
+            {
+                camera.targetTexture = previousTarget;
+                RenderTexture.active = previousActive;
+                UnityEngine.Object.DestroyImmediate(image);
+                target.Release();
+                UnityEngine.Object.DestroyImmediate(target);
+            }
+        }
+
+        private static Bounds CalculateBounds(IReadOnlyList<Renderer> renderers)
+        {
+            Bounds bounds = renderers[0].bounds;
+            for (int index = 1; index < renderers.Count; index++) bounds.Encapsulate(renderers[index].bounds);
+            return bounds;
+        }
 
         private static void Tick(PrototypeSystemComposition value, double seconds)
         {

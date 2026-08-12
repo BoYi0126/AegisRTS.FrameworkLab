@@ -13,17 +13,21 @@ namespace AegisRTS.Demo.PlayablePrototype
         [SerializeField] private Transform selectionAnchor;
         [SerializeField] private Transform healthBarAnchor;
         [SerializeField] private Renderer[] teamColorRenderers = Array.Empty<Renderer>();
+        [SerializeField] private PrototypeUnitAnimatorView animatorView;
 
         public Transform SelectionAnchor => selectionAnchor;
         public Transform HealthBarAnchor => healthBarAnchor;
         public Renderer[] TeamColorRenderers => teamColorRenderers ?? Array.Empty<Renderer>();
         public Renderer PrimaryTeamColorRenderer => TeamColorRenderers.Length > 0 ? TeamColorRenderers[0] : null;
+        public PrototypeUnitAnimatorView AnimatorView => animatorView;
 
-        public void Configure(Transform selection, Transform healthBar, Renderer[] renderers)
+        public void Configure(Transform selection, Transform healthBar, Renderer[] renderers,
+            PrototypeUnitAnimatorView animation = null)
         {
             selectionAnchor = selection;
             healthBarAnchor = healthBar;
             teamColorRenderers = renderers ?? Array.Empty<Renderer>();
+            animatorView = animation;
         }
 
         public void ApplyTeamColor(Color color)
@@ -31,11 +35,29 @@ namespace AegisRTS.Demo.PlayablePrototype
             foreach (Renderer target in TeamColorRenderers)
             {
                 if (target == null) continue;
-                var block = new MaterialPropertyBlock();
-                target.GetPropertyBlock(block);
-                block.SetColor(BaseColor, color);
-                block.SetColor(ColorProperty, color);
-                target.SetPropertyBlock(block);
+                Material[] materials = target.sharedMaterials;
+                bool appliedToTeamSlot = false;
+                for (int materialIndex = 0; materialIndex < materials.Length; materialIndex++)
+                {
+                    Material material = materials[materialIndex];
+                    if (material == null || material.name.IndexOf("TeamColor", StringComparison.OrdinalIgnoreCase) < 0)
+                        continue;
+
+                    var block = new MaterialPropertyBlock();
+                    target.GetPropertyBlock(block, materialIndex);
+                    block.SetColor(BaseColor, color);
+                    block.SetColor(ColorProperty, color);
+                    target.SetPropertyBlock(block, materialIndex);
+                    appliedToTeamSlot = true;
+                }
+
+                // Legacy art may expose a dedicated team renderer whose material has not yet adopted the naming contract.
+                if (appliedToTeamSlot) continue;
+                var fallback = new MaterialPropertyBlock();
+                target.GetPropertyBlock(fallback);
+                fallback.SetColor(BaseColor, color);
+                fallback.SetColor(ColorProperty, color);
+                target.SetPropertyBlock(fallback);
             }
         }
 

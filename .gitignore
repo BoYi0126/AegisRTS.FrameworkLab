@@ -31,6 +31,12 @@
 *.mdb
 *.mdb.meta
 
+# Python/Blender build-script caches
+__pycache__/
+*.py[cod]
+*.blend1
+*.fbm/
+
 # Operating system files
 .DS_Store
 Thumbs.db

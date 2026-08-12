@@ -64,8 +64,27 @@ namespace AegisRTS.Presentation.Selection
             foreach (Renderer renderer in targetRenderers ?? Array.Empty<Renderer>())
             {
                 if (renderer == null) continue;
+                Color color = selected ? Color.Lerp(_baseColor, Color.white, 0.65f) : _baseColor;
+                Material[] materials = renderer.sharedMaterials;
+                bool appliedToTeamSlot = false;
+                for (int materialIndex = 0; materialIndex < materials.Length; materialIndex++)
+                {
+                    Material material = materials[materialIndex];
+                    if (material == null || material.name.IndexOf("TeamColor", StringComparison.OrdinalIgnoreCase) < 0)
+                        continue;
+
+                    _propertyBlock.Clear();
+                    renderer.GetPropertyBlock(_propertyBlock, materialIndex);
+                    _propertyBlock.SetColor(BaseColor, color);
+                    renderer.SetPropertyBlock(_propertyBlock, materialIndex);
+                    appliedToTeamSlot = true;
+                }
+
+                // Generic selectable placeholders may not use the art material naming convention.
+                if (appliedToTeamSlot) continue;
+                _propertyBlock.Clear();
                 renderer.GetPropertyBlock(_propertyBlock);
-                _propertyBlock.SetColor(BaseColor, selected ? Color.Lerp(_baseColor, Color.white, 0.65f) : _baseColor);
+                _propertyBlock.SetColor(BaseColor, color);
                 renderer.SetPropertyBlock(_propertyBlock);
             }
         }

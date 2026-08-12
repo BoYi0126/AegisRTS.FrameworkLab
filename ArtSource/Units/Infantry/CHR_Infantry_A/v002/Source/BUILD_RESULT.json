@@ -1,0 +1,42 @@
+{
+  "tool": "Blender",
+  "blender_version": "5.2.0 LTS",
+  "fps": 30,
+  "source_lod0": "CHR_Infantry_A_v001_LOD0_Blue.glb",
+  "source_lod1": "CHR_Infantry_A_v001_LOD1_Blue.glb",
+  "lod_triangles": {
+    "LOD0": 4376,
+    "LOD1": 1512,
+    "LOD2": 542
+  },
+  "lod2_pre_join_triangles": 542,
+  "rest_pose": "A-Pose",
+  "root_motion": "Off / Root bone never keyed",
+  "locomotion": {
+    "clip": "AN_Infantry_Move",
+    "frame_range": [
+      0,
+      24
+    ],
+    "duration_seconds": 0.8,
+    "poses": [
+      "left_contact",
+      "right_passing",
+      "right_contact",
+      "left_passing",
+      "left_contact"
+    ],
+    "footstep_frames": [
+      1,
+      13
+    ],
+    "reference_world_speed_mps": 4.5,
+    "reference_animator_rate": 1.8
+  },
+  "attack_impact": {
+    "frame": 13,
+    "time_seconds": 0.43333333333333335
+  },
+  "seed_job_id": "N/A - deterministic procedural rig/animation build",
+  "prompt": "請基於 `CHR_Infantry_A_v001` 補交 L3。\n需要可編輯 `.blend` 原始檔及 Unity Humanoid 相容 FBX。角色必須為 A-Pose 或 T-Pose，盾牌與短劍分離並可掛到左右手骨骼。\n動畫包含 Idle、Move、Attack_A、Hit、Death，全部 In Place、Root Motion 關閉。\nAttack_A 需要 `AttackImpact` 事件時間。\n另提供單一灰階 Team Color Mask，不要再輸出藍紅兩套重複網格。\n請附生成工具、版本、完整 Prompt、Seed／Job ID、人工修改、第三方素材及商用授權紀錄。"
+}

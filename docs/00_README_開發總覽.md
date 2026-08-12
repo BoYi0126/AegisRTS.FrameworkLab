@@ -103,7 +103,8 @@ FrameworkLab 同時負責：
 42. `51_Art_Bible_Template.md`
 43. `ArtSpecs/00_美術製作總覽與AI任務索引.md`
 44. `ArtSpecs/07_製作批次與目前整合缺口.md`
-45. `60_第一階段實際執行順序.md`
+45. `ArtSpecs/Unit_03_步兵_L3骨架動畫交付規格.md`
+46. `60_第一階段實際執行順序.md`
 
 ## 最終驗證
 

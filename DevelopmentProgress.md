@@ -6,10 +6,172 @@
 
 - Current Phase：PlayablePrototype_01 已切換為 `fortified-city` 要塞城市規則；第一個玩家攻城垂直切片（主堡直募、固定城牆、可修城門、主堡壓制後佔領）為 `Completed`，玩家守城與隨機武將模式尚未完成。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 31/31；Windows Development Build PASS（173,603,484 bytes）；2026-08-12 互動式 Unity Editor 步兵整合 smoke PASS，實際 Game View 顯示雙方步兵 Prefab、LOD／Team Color renderers、anchors 與血條，編譯 0 errors。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 34/34；Windows Development Build PASS（BuildReport 186,823,929 bytes；輸出 331 files／187,176,482 bytes），`.exe` 實際啟動 5 秒並維持正常執行；2026-08-12 Infantry L3 站立軸向、四個 Move 姿勢、材質槽 Team Color、2.5 m／38° close inspection 與 Game View smoke PASS；solution build 0 warnings／0 errors。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：系統面仍先補玩家守城／AI 正式攻城與維修資源成本；美術下一步先取得步兵 L3 rig／Idle、Move、Attack、Hit、Death 動畫，再依序接弓兵、指揮官、城門、城牆與要塞主堡，不先大量製作世界觀資產。
+- Highest Priority：先由專案擁有者在 Unity Game View 檢查直立、材質與 Move；若「L1 精細度」是正式目標，下一個美術工作應是 Infantry L2.1 正式雕模／重拓樸／手繪貼圖，而不是繼續在目前 4,376-triangle 程式化 blockout 上調 Animator。若目前 L2 blockout 可接受，系統面續補玩家守城／AI 正式攻城與維修資源成本。
 - Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam，不是產品功能缺口。
+
+## 2026-08-12 — Infantry L3 人物細節、材質與 Unity 軸向修正
+
+- Status：Completed（現有 L2 外觀的 L3 保真修正；L1 概念圖等級的正式角色製作為 Deferred）
+- Goal：處理「L1／L2 看起來不錯，但加入動畫後人物細節和動作出現大量問題」的回報；先確認問題來自模型資料、Rig、Unity 匯入、材質、燈光或鏡頭，再讓 L3 在不重新設計角色的前提下忠實呈現 L2。
+- Baseline：
+  - Branch／HEAD：`main`／`7ab232d Add the infantry L2`；工作樹包含前一輪尚未提交的 L3 Blender／FBX／Animator／相機修正，均保留。
+  - L1 是精修概念圖；L2 報告明載其為程式化 `production-blockout / low-poly L2`，LOD0 為 4,376 triangles、Flat Normal、簡單 atlas，不是 L1 等級的人工雕模。L3 沒有降 LOD0 triangle count，但 Unity 呈現仍明顯比 L2 差。
+  - 實際近距離 Front／Side／Back capture 揭露 L3 visual child 被 Prefab builder 重設為 identity rotation；Blender Z-up／-Y-forward 網格在 Unity 幾乎沿地面躺倒。舊高角度相機掩蓋了錯誤，也是移動方式看起來不合理的主要原因。
+  - `PrototypeUnitArtView` 與 `UnitySelectableView` 以 Renderer 為單位寫 `_BaseColor`，使盾牌 Base 木／鐵 slot 一起被隊伍色或選取色覆蓋；空場景也沒有 Directional Light。2.5 m 鏡頭仍維持 55°，臉與胸甲被俯視壓縮。
+- Scope In：保留 L2 LOD0 幾何／UV／貼圖、Unity basis 與落地修正、站立 bounds gate、Base／Normal／ORM importer、材質槽級 Team Color／selection、規格藍紅色、燈光、近距離 inspection pitch、三方向／四 Move pose capture、完整 regression、文件與 Windows build。Scope Out：重新設計角色、提高 triangle budget、重畫 L1 等級貼圖、人工雕模／重拓樸、自由旋轉相機、其他兵種、gameplay 規則與數值。
+- Changed：
+  - `InfantryL3PrefabBuilder` 明確把 imported visual 旋轉 `X=-90°`，轉成 Unity Y-up／Z-forward，再按 combined renderer `bounds.min.y` 對齊 gameplay ground；新增 standing orientation gate，拒絕身高低於 1.65 m、Y 不是身體主軸、沉入地面或超出 1.95 m 的 Prefab。
+  - BaseColor 設 sRGB；Normal 設 NormalMap／linear；ORM 與 TeamColor Mask 設 linear；全部開 mipmaps、1024 max size、驗收階段不壓縮。Base material 接回 BaseMap／NormalMap；Team material 保持單一白底、GPU instancing。
+  - `PrototypeUnitArtView.ApplyTeamColor` 與 `UnitySelectableView.SetSelected` 改為逐 material slot 寫 MaterialPropertyBlock；只有 material name 含 `TeamColor` 的 slot 會收到隊伍／選取色，Base 木盾、鐵邊與人物本色不再被覆蓋。沒有命名 contract 的舊 placeholder 才使用 renderer-wide fallback。
+  - Bootstrap 使用精確我方 `#4AA3D8`／敵方 `#D94A45`，並建立暖中性 Directional Light、soft shadows 與 trilight ambient；這只改善 URP Lit 可讀性，不改資產幾何。
+  - `RtsCameraController` 在 2.5～8 m 將 pitch 由 55°漸變到 38°，配合既有 body-height focus；Yaw 仍鎖定，保持不可旋轉的固定上帝視角。
+  - 新增近距離 detail regression：Front／Side／Back、Idle 與 Move 0／25／50／75% pose；測試同時檢查站立 bounds、in-place drift、材質槽 tint、燈光與 camera pitch，避免「技術上有 Animator」卻視覺躺倒再次通過。
+- Behavior Before／After：Before 為人物 visual 躺倒、盾面整片被隊伍色染掉、Lit 材質缺光且近距離仍過度俯視；After 為同一套 L2 4,376-triangle 外觀在 Unity 正確直立落地，木盾 Base 與藍／紅 team panel 分離，頭盔、臉、札甲、圍巾、盾、劍和四肢能在 2.5 m／38° 檢查，Move 四個相位維持站立且 gameplay root 不漂移。
+- Architecture／API／Data：
+  - Definition／Runtime／View 分層不變；修正都在 Editor import/build 與 Presentation／Demo view。Combat、Movement、Player／AI Command、Content Pack、Save schema 均未改。
+  - `UnitySelectableView` public API 未變；只收窄 `SetSelected(bool)` 寫色範圍。`PrototypeUnitArtView` public API 未變。
+  - `RtsCameraController` 新增 private serialized `closeInspectionPitch=38`；既有 camera model 與 public API 未改。
+  - 沒有新增世界觀 hardcode；隊伍色仍由 runtime presentation 套用同一套幾何。
+- Files／Assets：主要修改 `InfantryL3PrefabBuilder.cs`、`PrototypeUnitArtView.cs`、`UnitySelectableView.cs`、`PlayablePrototypeBootstrap.cs`、`RtsCameraController.cs`、`PlayablePrototypePlayModeTests.cs`、Infantry materials／texture import metadata／Prefab、`ArtSource/.../v002/Documentation`、ArtSpecs 與操作手冊。
+- Tests／Validation：
+  - Unity orientation builder attempt 1：FAIL；只保留 imported rotation 時 bounds size=`(1.85, 1.40, 1.88)`，Y 仍不是主軸。
+  - Unity orientation builder attempt 2：FAIL；明確 `X=-90°` 後直立，但未 ground-align，bounds Y=`-1.367…0.508`。
+  - Unity orientation builder attempt 3：PASS；`X=-90°`＋combined bounds ground alignment，Humanoid `isHuman=True`／`isValid=True`、clips=5、Prefab 完成。
+  - 新增 test 首次編譯：FAIL，遺漏 `System.Collections.Generic` 導致 `IReadOnlyList` 找不到；補 using 後修正。
+  - Targeted close detail／material／camera test：PASS 1/1；Move 四 phase standing bounds test：PASS 1/1；真實場景 movement test：PASS 1/1。
+  - Blender 5.2 manifest-only rebuild：PASS；正式交付 26 files，SHA-256 26/26 相符。
+  - `dotnet restore`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors。先前單獨 `--no-restore` 因 Unity 清除 `Temp/obj` 得到 NETSDK1004，按正確 restore 流程重跑後通過。
+  - Full EditMode：PASS 177/177；Full PlayMode：PASS 34/34。
+  - Game View smoke：PASS；2 infantry、LOD、Team Color、anchors、valid Humanoid Avatar；輸出 `C:/projects/Unity/AegisRTS.BuildValidation/Infantry_GameView.png`。
+  - Windows Development Build：PASS，BuildReport 186,823,929 bytes；輸出 331 files／187,176,482 bytes。`PlayablePrototype_01.exe` 實際啟動 5 秒仍正常執行，再由驗證流程關閉。
+- Acceptance：
+  - `[PASS]` L3 使用 L2 的 LOD0 4,376 triangles／UV／貼圖，沒有以較低階 Mesh 取代近距模型。
+  - `[PASS]` Unity 中人物 Y-up 直立、腳底落地，Move 四個 phase 不倒下、不大幅 planar drift。
+  - `[PASS]` 只有 TeamColor slot 接受 `#4AA3D8`／`#D94A45`；盾牌木／鐵 Base 保留。
+  - `[PASS]` BaseColor／Normal／ORM import 與 URP Lit lighting 生效；2.5 m close inspection 使用約 38° 且 Yaw 鎖定。
+  - `[PASS]` 完整 tests、Game View、Windows build／launch。
+  - `[DEFERRED]` 由 L2 blockout 升級到 L1 概念圖的雕模、重拓樸、手繪材質、更多甲片／布料結構與 final animation polish。
+- Completed：已找出並修正真正的 Unity 軸向、落地、材質覆蓋、燈光與鏡頭問題；增加可自動阻擋同類錯誤的 bounds／pose／material tests，並更新完整交付與操作文件。
+- Not Completed／Deferred：目前模型仍是收到的 L2 程式化 low-poly blockout；沒有憑空生成 L1 圖中未存在於 Mesh／texture 的護肩分層、綁腿、盾牌木紋、五官雕刻等細節。若使用者所說的「L1 精細度」是字面要求，需要另立 L2.1 正式角色美術任務。
+- Known Issues／Risks：現有近距離畫面能忠實暴露 L2 的 blockout 感，這是來源資產限制而非動畫降模；固定上帝視角仍不能像模型檢視器自由旋轉；deterministic Move 已有 pose／drift gate，但 professional foot-lock、重量感和 shield-leg intersection 仍需人工美術審查。
+- Git：Branch `main`；32 個 tracked/untracked status entries，包含同一批尚未提交的 L3 工作；本任務未 commit／push。Unity build 自動重寫的 Scene fileIDs、URP prefilter／Volume、batching 與 Unity Connect 設定已逐項還原；`git diff --check` PASS（只有既有 LF→CRLF 提示）。
+- Next：
+  1. 專案擁有者在 `PlayablePrototype_01` 選取步兵，按 `F` 後滾輪放大到 2.5～4 m，檢查直立、木盾、胸甲與連續 Move。
+  2. 若接受現在就是 L2 的預期外觀，停止在步兵上追加 patch，回到玩家守城／AI 正式攻城／維修成本等系統工作。
+  3. 若要求真正接近 L1 概念圖，建立 `CHR_Infantry_A_v003`／L2.1 正式美術任務：以 L1 正側背為造型基準，人工雕模／重拓樸／UV／PBR atlas，再沿用現有 Humanoid、動畫與 Unity validation pipeline。
+
+## 2026-08-12 — Infantry L3 移動修正與近距離檢視
+
+- Status：Completed（prototype correction；使用者最終視覺接受與 professional animation polish 仍為 gate）
+- Goal：針對「人物移動方式完全不對」的回報，用 `PlayablePrototype_01` 真實移動命令重現並修正滑行／僵硬步態，同時讓固定上帝視角可縮放到足以檢查單位建模的距離。
+- Baseline：
+  - Branch／HEAD：`main`／`7ab232d Add the infantry L2`；工作樹已有本次尚未提交的 L3 整合與文件，全部保留並在其上修正。
+  - 實際 capture 顯示 GameplayRoot 方向正確，但舊 Move 約 0.87 秒、腿部幅度低且上半身近乎不動；遊戲以 4.5 m/s 平移時產生明顯 moonwalk／滑行感。相機最小 zoom 8 m，也不足以檢查頭盔、裝甲、盾牌與武器。
+  - 原有 automated L3 test 只驗 Avatar／events／Root Motion，無法判斷連續畫面的動作品質；這是前一筆技術驗收過早宣告視覺完成的缺口。
+- Scope In：Move 動作重建、步頻與真實速度同步、實際場景移動 capture、2.5–40 m zoom、close-inspection framing、操作文件、交付 metadata／manifest、回歸測試與 Windows build。Scope Out：自由旋轉相機、改 gameplay movement speed/pathfinding、專業 mocap／手工動畫 polish、重新建模、其他兵種與地圖美術。
+- Changed：
+  - `build_unit03_l3_blender.py` 將 Move 重建為 0–24 frames 的 grounded stride：左右 heel contact、左右 passing pose、34° thigh stride、passing／trailing knee、foot articulation、hips／chest counter-twist，以及受控盾牌／短劍手臂動作；Root 仍完全不設 key。
+  - 用 Blender 5.2 `--factory-startup` 重建 `.blend`、master FBX 與五個 animation FBX；Move 事件改到實際接觸 frames 1／13，並把 locomotion frame range、poses、4.5 m/s reference speed 與 1.8 reference rate 寫入 `BUILD_RESULT.json`。
+  - 新增 Animator `MoveRate`，`PrototypeUnitAnimatorView.Refresh` 接收 authoritative `MovementStateSnapshot.Velocity` 換算的 world speed；4.5 m/s 使用 1.8 倍 clip rate，其他速度 clamp 0.65～2.4。`Speed` 仍只控制 Idle／Move，Root Motion 仍關閉。
+  - Playable camera model 改為 2.5～40 m；2.5～8 m 逐步把 pivot 抬到角色身體高度，近距離不會只對著地面。相機 pitch／yaw 固定，保持原本不可旋轉的 2.5D／上帝視角設計。
+  - 教學與操作文件補上「滾輪縮放 2.5～40 m」與 `F` 聚焦選取；新增真實場景 PlayMode test，可選擇輸出八張 960×540 movement review frames。
+- Behavior Before／After：Before 為角色以正確方向在世界座標平移，但腿部低幅度慢循環造成滑行感，最接近只能看 8 m；After 為腿／膝／腳左右交替並有軀幹 counter-motion，clip rate 跟隨實際速度，單位仍由 gameplay movement 擁有位置；選取單位後按 `F` 並滾輪放大可到 2.5 m 查看模型。
+- Architecture／API／Data：
+  - Gameplay movement／combat truth 未移入 Animator；Bootstrap 只把 snapshot 投影到 presentation view，Player／AI Command、Content Pack schema、Save schema 均未改。
+  - `PrototypeUnitAnimatorView.Refresh` presentation API 由 `(bool, CombatantSnapshot)` 擴充為 `(bool, double worldSpeed, CombatantSnapshot)`；Animator Controller 新增 float `MoveRate`。
+  - `RtsCameraController` 只新增 private serialized close-inspection focus height；既有 `RtsCameraRigModel` public API 未改，prototype 初始化改用其既有 min／max 參數。
+- Files／Assets：主要修改 `PlayablePrototypeBootstrap.cs`、`PrototypeUnitAnimatorView.cs`、`RtsCameraController.cs`、`InfantryL3PrefabBuilder.cs`、`PlayablePrototypePlayModeTests.cs`、重建後 Infantry `.blend`／FBX／Prefab、L3 Documentation／ArtSpecs、`docs/37...操作與驗收手冊.md`。
+- Tests／Validation：
+  - Blender clean rebuild：PASS，exit 0；fatal pattern 0；LOD0／1／2 = 4376／1512／542；manifest 26/26 hashes 相符。Blender 5.2 對 `Material.use_nodes` 有兩個未來棄用 warning，不影響本版輸出。
+  - Unity L3 prefab builder：PASS；Humanoid `isHuman=True`／`isValid=True`，clips=5，Prefab 重建成功。
+  - Actual movement＋close zoom targeted PlayMode：PASS 1/1；真實命令位移 >1 m、面向與位移方向 dot >0.98、Animator Speed >0.5、zoom=2.5 m；八張畫面位於 `C:/projects/Unity/AegisRTS.BuildValidation/InfantryMovementReview/Move_00.png`～`Move_07.png`，逐格檢查可見 contact／passing 與左右腿交替。
+  - 初次 final capture 指令：FAIL 0/1，原因是同時指定 `-nographics` 和 RenderTexture capture；移除 `-nographics` 後同一測試 PASS。此失敗是驗證環境衝突，不是產品路徑失敗。
+  - `dotnet restore`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors。
+  - Full EditMode：PASS 177/177；Full PlayMode：PASS 33/33。
+  - Game View smoke：PASS，2 infantry、Humanoid Avatar、LOD／Team Color／anchors；`C:/projects/Unity/AegisRTS.BuildValidation/Infantry_GameView.png`。
+  - Windows Development Build：PASS，BuildReport 177,551,533 bytes；輸出 341 files／178,697,614 bytes。Player 以 960×540 視窗實際啟動、取得 input idle，3 秒後仍正常執行，再由驗證流程關閉。
+- Acceptance：
+  - `[PASS]` 真實場景不是反向／側向滑動；GameplayRoot 朝實際行進方向。
+  - `[PASS]` Move 有左右接觸與 passing poses，並按 4.5 m/s reference 同步步頻。
+  - `[PASS]` Root Motion Off，動畫不改寫 movement truth。
+  - `[PASS]` 可縮放至 2.5 m 並把單位身體置於 close-inspection framing；`F` 可先聚焦選取。
+  - `[PASS]` 完整 tests、Game View、Windows build／launch。
+  - `[DEFERRED]` professional animator 的 foot-lock、weight、secondary motion 與 final-art polish；不冒充 production animation。
+- Completed：已重現原始視覺缺陷、重建可再生 locomotion asset、同步 runtime rate、加入 close zoom、補 capture regression、文件與完整建置驗證。
+- Not Completed／Deferred：使用者仍需在自己螢幕上確認主觀動作手感；未加入自由旋轉／模型展示模式；未調整 gameplay 4.5 m/s balance；未導入 mocap 或專業手工動畫。
+- Known Issues／Risks：固定 55° 上帝視角在最接近時仍會壓縮腿部深度，這是維持不可旋轉 RTS 視角的取捨；近距離血條會靠近畫面上緣；deterministic prototype 動畫已消除明顯滑行，但仍不是 commercial final-quality locomotion。Blender 6 前需更新 `Material.use_nodes` 已棄用用法。
+- Git：Branch `main`；26 個 tracked/untracked status entries；本任務未 commit／push。Unity build 自動重寫的 Scene fileIDs、URP prefilter、Volume、batching 與 Unity Connect 設定已逐項還原；`git diff --check` PASS（僅 `.gitignore` LF→CRLF 提示）。
+- Next：
+  1. 在 Unity 開 `PlayablePrototype_01`，選步兵後按 `F`、滾輪放大到 2.5～4 m，連續走 5～10 秒確認主觀節奏；若仍不接受，請指出是腳步、速度、身體重心、盾劍或轉向，我會只針對該層迭代。
+  2. 若此 prototype locomotion 接受，先回到系統優先：玩家守城、AI 正式攻城、維修資源成本。
+  3. 下一個美術垂直切片再做弓兵 L3＋projectile／命中 placeholder，沿用本次實際場景 capture gate。
+
+## 2026-08-12 — Infantry L3 Blender 建置與 Unity Humanoid 整合
+
+- Status：Completed（Prototype L3 technical acceptance；Commercial／final-art release 尚有 gate）
+- Goal：接收 `Unit_03_Infantry_L3_v002_CORRECTED`，在已安裝 Blender 的環境補齊真實 BLEND／FBX，整理到 `ArtSource` 與 Unity Runtime 邊界，完成 Humanoid、五段動畫、事件、LOD2、Team Color、Prefab 與遊戲實際驗證。
+- Baseline：
+  - Branch／HEAD：`main`／`7ab232d Add the infantry L2`；原工作樹已有 L2／L3 規格與文件變更，均保留。
+  - Incoming：19 個來源檔，含 v001 GLB／貼圖、Blender Python 與 blocked 文件；沒有實體 `.blend`／`.fbx`，腳本在 Blender 5.2 首次執行因 `Action.fcurves` API 變更出錯，且文件聲稱的 LOD2 未實作。
+  - Runtime：`PF_Unit_Infantry` 為靜態 L2，只有 LOD0／LOD1；Bootstrap 沒有 Animator presentation bridge，Idle／Move／Attack／Hit／Death 不會播放。
+- Scope In：來源包分類、Blender 5 相容修正、LOD2、A-Pose Humanoid、rigid shield／sword、五段 In-Place 動畫、事件、Team Color Mask、FBX／BLEND、Unity Importer／Avatar／Controller／Prefab、presentation 串接、tests、smoke、Windows build、交付／授權／checksum 文件。Scope Out：重新設計角色、修改 authoritative combat damage、正式手工動畫 polish、其他兵種、美術來源權利的最終法律確認。
+- Changed：
+  - 將收到的包移至 `ArtSource/Units/Infantry/CHR_Infantry_A/v002/`，保留 `Input_v001`、Reference、Documentation 與可重建 Source；Runtime 只複製 master／animation FBX 與 Team Color Mask 至 `Assets/AegisRTS/Content/Shared/Art/Units/Infantry/`。
+  - 修正 `build_unit03_l3_blender.py` 的 Blender 5 Action API、實作 LOD2 deterministic decimation、保留盾牌 Team material slot、加入 gameplay anchors／bone sockets、依 action frame range 匯出、補 UTF-8 Prompt／build metadata／SHA-256 manifest；加入 `--factory-startup` build 流程。
+  - 實際用 Blender 5.2.0 LTS 生成 `CHR_Infantry_A_v002.blend`、master FBX 與 Idle／Move／Attack_A／Hit／Death 五個 FBX；三角面為 4,376／1,512／542，30 FPS，A-Pose，Root 不設 key。
+  - 新增 `InfantryL3PrefabBuilder`：master 採 Humanoid／Create From This Model，五個 clip Copy From Other Avatar，建立 `AC_Infantry.controller`、URP materials、LODGroup、anchors、collider 與 L3 Prefab，並輸出 import warnings debug。
+  - 新增 `PrototypeUnitAnimatorView`，Bootstrap 只把 authoritative movement／combat snapshot 投影成 Animator 參數；動畫事件只記錄 Footstep／AttackImpact／DeathSettled 視覺時序，不改 gameplay damage truth。死亡先播放後延遲移除 view。
+  - 修正 Unity importer event contract：`ModelImporterClipAnimation.events.time` 必須使用 normalized 0～1，而非秒；當時 Move 為 4/24、17/24，Attack 13/30，Death 35/38；後續滑行修正版已把 Move contact events 更新為 1/24、13/24。
+  - `PlayablePrototypeSmokeValidation` 從 L2「renderer 數量剛好 2」改為驗證每個 L3 至少跨三層 LOD 提供 Team Color renderer；`.gitignore` 加入 Python／Blender cache。
+- Behavior Before／After：Before 為靜態步兵模型隨 GameplayRoot 位移；After 為同一 v001 造型的藍／紅 Humanoid 步兵，依移動、戰鬥受擊與死亡播放五段 Animator state，Root Motion 關閉且 gameplay root 不被動畫改寫，盾劍跟隨左右手骨骼，LOD2 可在遠距使用。
+- Architecture／API／Data：
+  - Definition／Runtime／View 邊界保持不變；`PrototypeUnitAnimatorView` 位於 Demo presentation，`CombatSystem` 仍唯一擁有傷害與生命真相。
+  - 新增的 public presentation surface 為 `PrototypeUnitArtView.AnimatorView` 與 animation event receivers；沒有修改 package gameplay API、Content Pack schema 或 Save schema。
+  - Player／AI 仍透過共同 Command／Combat state；Animator Controller 不直接派送攻擊命令或扣血。
+- Files／Assets：主要為 `ArtSource/.../v002`、Infantry `Models/Animations/Textures`、`PF_Unit_Infantry.prefab`、`PrototypeUnitAnimatorView.cs`、`PrototypeUnitArtView.cs`、`PlayablePrototypeBootstrap.cs`、`InfantryL3PrefabBuilder.cs`、Smoke／PlayMode tests 與 ArtSpecs／交付文件。
+- Tests／Validation：
+  - Blender clean build：PASS，exit 0 且 log scan 無 Traceback／AttributeError／Error／missing asset；Blender 5.2.0，LOD0／1／2 = 4376／1512／542，AttackImpact frame 13；清理後交付包為 26 個正式檔，manifest hash 26/26 相符。
+  - Unity L3 builder：PASS；Avatar `isHuman=True`、`isValid=True`、5 clips、Prefab 成功。修正 normalized event 後 build log 不再產生新的 animation import warning。
+  - L3 targeted PlayMode：PASS 1/1；驗證 Avatar、Animator、LODGroup、Footstep、AttackImpact、DeathSettled 與 root position 不變。
+  - Full Unity EditMode：PASS 177/177；Full PlayMode：PASS 32/32。
+  - `dotnet restore`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors。
+  - Game View smoke：PASS；2 個 Infantry、雙方 Team Color、LOD、anchors 可見，screenshot 為 `C:/projects/Unity/AegisRTS.BuildValidation/Infantry_GameView.png`。
+  - Windows Development Build：PASS；`PlayablePrototype_01.exe` 667,648 bytes，輸出資料夾合計 332 files／178,096,464 bytes。
+- Acceptance：真實 BLEND／FBX、基於 v001、A-Pose Humanoid、分離盾劍、五動畫、In Place／Root Motion Off、AttackImpact、單一 Team Mask、LOD2、Unity Valid Avatar、Prefab runtime 與機械性回歸測試 PASS；本紀錄當時未完成連續移動的 visual acceptance，後續由「Infantry L3 移動修正與近距離檢視」補正。
+- Completed：來源包整理、DCC 重建、Unity runtime 整合、動畫事件時序修正、測試、build、完整交付與授權狀態文件。
+- Not Completed／Deferred：人工 animator 對動作自然度的 final-art review；原 v001 生成來源與商用權利仍須專案擁有者保存／確認；弓兵／指揮官／建築尚未 L3。
+- Known Issues／Risks：Unity `.meta` 仍保存第一次錯誤匯入的舊 `animationImportWarnings` 字串，但修正後的 importer log 無新 warning，event time 已是 35/38，且 1.25 秒內 DeathSettled runtime test 已通過；生成動畫仍需人工 final-art review。
+- Git：Branch `main`；本任務未 commit／push；保留既有未提交文件與美術規格變更。最終 `git diff --check` 於交付前執行。
+- Next：
+  1. 由人工在 Unity Animator Preview／Game View 做 Idle、Move、Attack、Hit、Death 的視覺品質評分；只調 animation presentation，不改 combat truth。
+  2. 以相同 L3 pipeline 製作弓兵，並先接 projectile／命中 VFX placeholder，建立遠程戰鬥完整視覺垂直切片。
+  3. 商用發布前補齊／確認 v001 的生成 Prompt、工具、Job ID 與權利紀錄；通過後才把狀態改為 Production Accepted。
+
+## 2026-08-12 — Infantry L3 骨架動畫交付規格
+
+- Status：Completed（規格完成；L3 資產尚未製作）
+- Goal：建立一份可直接交給 3D／動畫 AI 的步兵 L3 規格，確保其升級既有 v001 L2，而不是重新生成不同角色，並能穩定接回目前 Unity Prefab。
+- Baseline：步兵 Prototype L2 已接入遊戲；現有 GLB 有 LOD0／LOD1 與 Team Color，但沒有 rig、skin、animation clips、LOD2、可編輯 DCC 原始檔或完整授權追溯。
+- Changed：
+  - 新增 `docs/ArtSpecs/Unit_03_步兵_L3骨架動畫交付規格.md`。
+  - 完整鎖定 v001 的 1.80 m 尺寸、bounds、盾／劍、Pivot、軸向、材質、Team Color、anchors 與三角面預算。
+  - 定義 Unity Humanoid 骨架、Root／Hips 契約、最多 4 weights、共用 Avatar／Bind Pose、rigid 武器盾牌與必要 sockets。
+  - 定義 30 fps 的 Idle／Move／Attack_A／Hit／Death 長度、frame 區段、Loop、Root Motion 容差及 `Footstep_L/R`、`AttackImpact`、`DeathSettled` 事件。
+  - 定義 LOD2、FBX 首選／GLB 條件式備選、Prefab hierarchy、Animator 參數、交付資料夾、事件 JSON、Unity screenshots、生成／授權紀錄與退件條件。
+  - 更新步兵摘要、ArtSpecs 索引、製作流程與開發總覽連結。
+- Behavior：N/A；本次只新增交付規格，未修改 runtime。規格明確要求動畫事件只表達視覺時機，不得在動畫資產內擁有傷害 truth。
+- Tests / Validation：
+  - 檢查文件包含五個必要 clips、Humanoid／Root Motion、LOD2、Team Color、Socket／Anchor、FBX／GLB、事件 JSON、授權、驗收與完整英文 Prompt：PASS。
+  - Markdown 連結與 `git diff --check`：PASS。
+  - Unity tests／build：NOT RUN；docs-only，不改 runtime／assets／package。
+- Known Issues / Risks：
+  - 規格完成不等於 L3 資產完成；目前遊戲中的步兵仍是無動畫的靜態 L2。
+  - 若製作 AI 不能對既有 GLB 做 rig，必須回報 blocked，不能重新生成相似角色替代。
+  - Humanoid L3 正式交付首選 FBX；只有 GLB 時仍須實際證明 Unity Avatar Valid，否則只能標記 Generic／Conditional。
+- Git：Branch `main`；Commit／Push 未執行。
+- Next：把 L3 規格連同 v001 LOD0／LOD1 Blue GLB、三張材質、L1 Concept Final 與 L2 Delivery Report 交給可編輯既有 mesh、Rig 並輸出 FBX 的工具或製作者。
 
 ## 2026-08-12 — Infantry GLB Prototype 整合
 

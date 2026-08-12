@@ -1,0 +1,6 @@
+請基於 `CHR_Infantry_A_v001` 補交 L3。
+需要可編輯 `.blend` 原始檔及 Unity Humanoid 相容 FBX。角色必須為 A-Pose 或 T-Pose，盾牌與短劍分離並可掛到左右手骨骼。
+動畫包含 Idle、Move、Attack_A、Hit、Death，全部 In Place、Root Motion 關閉。
+Attack_A 需要 `AttackImpact` 事件時間。
+另提供單一灰階 Team Color Mask，不要再輸出藍紅兩套重複網格。
+請附生成工具、版本、完整 Prompt、Seed／Job ID、人工修改、第三方素材及商用授權紀錄。

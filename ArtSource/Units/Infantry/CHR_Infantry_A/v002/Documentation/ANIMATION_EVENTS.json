@@ -1,0 +1,40 @@
+{
+  "fps": 30,
+  "clips": [
+    {
+      "name": "AN_Infantry_Move",
+      "events": [
+        {
+          "name": "Footstep_L",
+          "frame": 1,
+          "time_seconds": 0.0333333333
+        },
+        {
+          "name": "Footstep_R",
+          "frame": 13,
+          "time_seconds": 0.4333333333
+        }
+      ]
+    },
+    {
+      "name": "AN_Infantry_Attack_A",
+      "events": [
+        {
+          "name": "AttackImpact",
+          "frame": 13,
+          "time_seconds": 0.4333333333
+        }
+      ]
+    },
+    {
+      "name": "AN_Infantry_Death",
+      "events": [
+        {
+          "name": "DeathSettled",
+          "frame": 35,
+          "time_seconds": 1.1666666667
+        }
+      ]
+    }
+  ]
+}

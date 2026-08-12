@@ -1,5 +1,9 @@
 # 單位美術規格：步兵
 
+> L1／L2 外觀與共通摘要使用本文件；現有 v001 升級骨架、蒙皮、動畫與 LOD2 時，必須改用 [`Unit_03_步兵_L3骨架動畫交付規格.md`](Unit_03_步兵_L3骨架動畫交付規格.md)。
+
+目前狀態：`CHR_Infantry_A_v002` 已完成 Prototype L3 Unity 整合與技術驗收。L3 保留 L2 的 4,376 triangles、UV、BaseColor／Normal／ORM 與既有外觀，不把動畫版重新設計成較粗略角色；Unity 端另有 Y-up 站立 bounds、材質槽級 Team Color、近距離三方向與 Move 四姿勢檢查。原 v001 商用來源權利、比 L2 更接近 L1 概念圖的正式雕模／貼圖，以及最終動畫美術審查仍是 Release gate。
+
 ## 任務摘要
 
 製作目前原型最優先的基礎近戰步兵。它必須是最容易量產、效能穩定、遠距辨識清楚的普通單位，使用盾與短兵器建立厚實輪廓。
@@ -52,8 +56,9 @@ Create a production-ready stylized low-poly 3D basic melee infantry unit for a U
 
 ## 驗收
 
-- [ ] 尺寸可直接替換目前 0.8 m 寬、1.6 m 高的 Capsule Placeholder，不影響半徑 0.38 Agent。
-- [ ] 盾與短兵器輪廓在最遠 Zoom 可辨識。
-- [ ] 兩個材質槽以內，隊伍色可替換。
-- [ ] 動畫無腳滑、盾牌穿腿與 Root Motion。
-
+- [x] 尺寸可直接替換目前 0.8 m 寬、1.6 m 高的 Capsule Placeholder，不影響半徑 0.38 Agent；Unity combined renderer bounds 以 Y 為直立主軸並落在 gameplay ground。
+- [x] 盾與短兵器輪廓在最遠 Zoom 可辨識；2.5 m／38° inspection framing 可檢查頭盔、臉、胸甲、盾、劍與四肢。
+- [x] 兩個材質槽以內，隊伍色可替換；只有 `TeamColor` slot 會被染色，Base 木／鐵材質不變。
+- [x] Root Motion 關閉；Move 四個 phase 的站立 bounds 與 planar drift 已自動驗證。
+- [ ] 專業動畫師人工確認 foot-lock、重量感、盾／腿穿插與最終節奏。
+- [ ] 若目標是 L1 概念圖等級，另做 L2.1 正式雕模／重拓樸／手繪貼圖；這不是靠加骨架或 Unity 材質能補回的幾何細節。

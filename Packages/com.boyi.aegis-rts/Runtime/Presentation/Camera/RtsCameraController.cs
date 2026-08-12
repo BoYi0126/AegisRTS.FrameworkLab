@@ -17,6 +17,8 @@ namespace AegisRTS.Presentation.Camera
         [SerializeField, Min(0.1f)] private float zoomSpeed = 0.025f;
         [SerializeField, Range(20f, 80f)] private float pitch = 55f;
         [SerializeField] private float yaw = 0f;
+        [SerializeField, Min(0f)] private float closeInspectionFocusHeight = 0.9f;
+        [SerializeField, Range(20f, 80f)] private float closeInspectionPitch = 38f;
 
         private RtsCameraRigModel _model;
         private UnityEngine.Camera _camera;
@@ -85,8 +87,11 @@ namespace AegisRTS.Presentation.Camera
 
         private void ApplyTransform()
         {
-            Vector3 pivot = new Vector3((float)_model.PivotX, 0f, (float)_model.PivotZ);
-            Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
+            float inspectionBlend = Mathf.InverseLerp(8f, 2.5f, (float)_model.Zoom);
+            Vector3 pivot = new Vector3((float)_model.PivotX,
+                Mathf.Lerp(0f, closeInspectionFocusHeight, inspectionBlend), (float)_model.PivotZ);
+            float appliedPitch = Mathf.Lerp(pitch, closeInspectionPitch, inspectionBlend);
+            Quaternion rotation = Quaternion.Euler(appliedPitch, yaw, 0f);
             transform.SetPositionAndRotation(pivot + rotation * Vector3.back * (float)_model.Zoom, rotation);
         }
     }
