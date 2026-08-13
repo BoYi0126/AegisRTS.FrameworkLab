@@ -11,6 +11,8 @@
 
 2026-08-13 Phase 03.5 Revision 01 addendum：Reviewer確認P035 arm length是real proportion issue；新建且未覆寫的P035R1把UpperArm／Forearm由0.15494H修至0.176H／0.165H，combined Shoulder→Wrist為0.341H，Hand width為0.06065H、Head width為0.120H。Hip／Knee／Torso／Chest／Shoulder origin、Helmet、Boot、Shield 0.600×0.862 m與Sword 1.061 m保持；Unity final A-Pose／L1Pose均1.824011 m、ground 0、98 renderers。狀態`READY FOR PHASE03_5 REVISION REVIEW`，human gate與production acceptance仍pending。
 
+2026-08-13 Phase 03.5 Revision 02 addendum：P035R1 shield placement被量化為Top／Center／Bottom 0.5094H／0.2730H／0.0366H，明顯低於L1估計。新建且未覆寫的P035R2只修正shield base／review attachment、grip／forearm strap fit、review pitch／inward rotation及左臂review pose，收斂為0.7016H／0.4643H／0.2271H；shield仍為0.600×0.862 m，body proportions、33,248 tris、23 bones與Sword保持。Unity A-Pose／L1Pose均1.824011 m、ground 0、98 renderers。狀態`READY FOR PHASE03_5 REVISION02 REVIEW`，human gate與production acceptance仍pending。
+
 ## 評分定義
 
 `PASS` 可直接保留；`NEEDS IMPROVEMENT` 可修改；`REBUILD` 現有部分不適合production；`CANNOT VERIFY` repository證據不足。

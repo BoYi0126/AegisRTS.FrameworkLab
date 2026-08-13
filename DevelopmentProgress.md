@@ -4,12 +4,59 @@
 
 ## Current Status
 
-- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；依Phase 03.5 Revision 01任務已從受保護的P035建立`CHR_Infantry_A_v004_P035R1`，只修正手臂實際長度、手掌與頭部比例並完成隔離Unity evidence，狀態為`READY FOR PHASE03_5 REVISION REVIEW`；19項Gate仍待人工決定，未進Phase 04，也不是Production Ready。
+- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；依Phase 03.5 Revision 02任務已從受保護的P035R1建立`CHR_Infantry_A_v004_P035R2`，只修正盾牌attachment／grip／strap、review rotation與左臂review pose，盾牌Top／Center／Bottom已從0.5094H／0.2730H／0.0366H收斂至0.7016H／0.4643H／0.2271H；狀態為`READY FOR PHASE03_5 REVISION02 REVIEW`，18項Gate仍待人工決定，未進Phase 04，也不是Production Ready。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。2026-08-13 P035R1另完成Unity 6000.5.7f1 isolated A-Pose／L1Pose review import、C# compile、scene／prefab build與4張capture，batchmode return code 0；未執行EditMode／PlayMode／Windows build且未修改正式Runtime Prefab，歷史runtime結果不代表P035R1通過。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。2026-08-13 P035R2另完成Unity 6000.5.7f1 isolated A-Pose／L1Pose review import、C# compile、scene／prefab build與6張raw capture（含同角度P035R1 baseline），batchmode return code 0；未執行EditMode／PlayMode／Windows build且未修改正式Runtime Prefab，歷史runtime結果不代表P035R2通過。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：Art／Design／Technical Art審核`docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision01_Review/05_Review_Checklist.md`、P035 vs P035R1 ArmFocus、final L1 overlay與Unity L1Pose RTS Normal；明確批准前不得建立PRE-UV GEOMETRY LOCK、進Phase 04或替換Runtime Prefab。
+- Highest Priority：Art／Design／Technical Art審核`docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision02_Shield_Alignment_Review/05_Review_Checklist.md`、P035R1 vs P035R2 shield focus、grip／strap close-up、final L1 overlay與Unity L1Pose RTS Normal；明確批准前不得建立PRE-UV GEOMETRY LOCK、進Phase 04或替換Runtime Prefab。
 - Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam。新 production 規格的 20k–35k LOD0、LOD3／Impostor、packed team mask 與多 influence deformation 是 `PROPOSED` 量產 gate，不是目前低模 Prototype 已實作的 runtime baseline。
+
+## 2026-08-13 — Infantry Phase 03.5 Revision 02 Shield Alignment v004_P035R2
+
+- Status：`READY FOR PHASE03_5 REVISION02 REVIEW`（versioned source、盾牌三點量測、grip／strap fit、Blender／Unity evidence、18-item pending gate、folder、ZIP與逐檔驗證完成；未自行宣告PASS、PRE-UV lock或進Phase 04）
+- Goal：完整執行`mission/Infantry_Remaster_Phase03_5_Revision02_Shield_Alignment_Task.md`；以P035R1為唯一受保護輸入建立`CHR_Infantry_A_v004_P035R2.blend`，鎖定Shield 0.600×0.862 m與front geometry，只修正placement／grip／forearm strap／review rotation／必要左臂review pose，輸出Blender／Unity review package與ZIP；不覆寫baseline、不改正式Runtime Prefab、不commit／push。
+- Baseline：
+  - Branch／HEAD：`main`／`a31329b2ae0fc1db324cab374148db0b12eb203c`；開始時tracked worktree clean，只有使用者提供的任務檔為1個untracked entry，該檔全程保留。
+  - Task：1,501 lines／18,630 bytes／SHA-256`98BB62666DE434F6FC2F0AB79DBA6E47EEE922414C9F79F0AB2DA86C05E4186C`；明確指定P035R1為approved body-proportion baseline、P035R2為新輸出、Shield geometry size／front geometry LOCK，且不得commit／push。
+  - Protected P035R1：412,843 bytes／SHA-256`A0CCC9771CD7A62D966891784745F138A9DCBF1230DF5E71A4F5D60900A84D0A`；開始與結案hash一致。正式`PF_Unit_Infantry.prefab`在Git status中無變更。
+- Scope：
+  - In：讀取00／03／04／09／27、DevelopmentProgress、目前Revision task、P035R1 reports／measurements／tools與受影響Production Spec；量測P035R1 Shield Top／Center／Bottom、Left Shoulder／Elbow／Wrist、Grip／Strap；建立L1 pixel estimate；修正shield base local offset、review attachment offset、grip／strap fit、small pitch／inward rotation與左臂review-only pose；產出DCC／Unity／screen-size／overlay／before-after／ZIP證據。
+  - Out／Deferred：Shield resize或front remodel、body／head／arm／leg比例、Sword、Phase 04、Final UV／Texture／Bake／Team Color shader、Final Skinning、Animation Polish、正式LOD、gameplay/API change、Runtime Prefab replacement、PRE-UV／Golden Sample lock與Production Ready。
+- Changed Files／Assets：
+  - `ArtSource/.../v004/Source/CHR_Infantry_A_v004_P035R2.blend`：412,402 bytes／SHA-256`D8DCD84D888204D65385A94CF15B0C07BEA227236D47EA5EC3D54992999E551D`；新增build／render／comparison／FBX export／audit／finalize共6個工具、`P035R2_BUILD_RESULT.json`，並更新v004 README。
+  - `Assets/AegisRTS/Review/InfantryPhase035Revision02/`：2 review FBX、7 materials、2 Prefabs、1 Scene與完整`.meta`；新增`InfantryPhase035Revision02ReviewBuilder.cs`。正式runtime art path未替換。
+  - `docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision02_Shield_Alignment_Review/`：61 files，含8 top-level Markdown、29 PNG、3 measurement JSON、Blend＋6 tools、2 FBX、2 task snapshots、L1 reference與manifests／Unity log；同名ZIP 14,605,324 bytes／SHA-256`6708D3A2E94AEA1D84D9A53A9AF55872E155A78A7E8D840C5A69E5E9328A8C92`。
+  - 同步Production Spec 08／09／16／17／99並更新`RTS_Asset_Production_Spec_v1.zip`：21 entries／64,571 bytes／SHA-256`DE11714AAEA9D8AF244806EED984429CFBA162328FE19AAC7E50EB9562A57288`，folder／ZIP逐檔hash一致。
+- Behavior：
+  - Before P035R1 L1 Compare Pose：Shield Top／Center／Bottom為`0.509444H／0.273035H／0.036626H`，盾頂約腰線、盾底接近ground；Left Elbow／Wrist為`0.587439H／0.424446H`，整體防禦質量偏低。
+  - After P035R2：Shield base local上移0.080 m，L1 review attachment另加0.113 m；Grip／Strap相對base回調0.040／0.060 m；review pitch−3°、inward 4°；Left UpperArm−10°、LowerArm追加−20°。最終Top／Center／Bottom為`0.701604H／0.464339H／0.227074H`，相對L1估計`0.701863H／0.465839H／0.229814H`差皆小於0.003H。
+  - Preserved：Shield尺寸`0.600000×0.862424 m`、front wood／rim／boss／reinforcement／outline、人物1.824011 m、98 meshes／16,858 verts／33,248 tris、23-bone rest hierarchy、P035R1 body proportions、Source A-Pose body、Sword與正式runtime Prefab。
+- Architecture／API／Data：
+  - Architecture：Definition／Runtime／View、Player／AI Command與UI/gameplay authority完全不變；新增C#只在Editor與隔離Review folder，未新增runtime manager或dependency。
+  - API：N/A；public gameplay／presentation API、Animator parameters、events、bone／socket／attachment names均未更改。`REVIEW_ONLY_POSE_L1_COMPARE`不是active action或gameplay Idle。
+  - Data：N/A；Content Pack、Prefab ID、Save／Replay schema未改。新增JSON僅為review measurement／manifest。
+- Tests／Validation：
+  - Blender 5.2.0 deterministic build：input exact-hash gate PASS；輸出98 meshes、16,858 vertices、33,248 triangles、23 bones、1.824011 m。Source與package Blend SHA相同，P035R1 hash未變。
+  - Topology audit：non-manifold 0、boundary 0、loose 0、zero-area 0；Shield size before／after均0.600000×0.862424 m。
+  - DCC evidence：L1Pose 5、ShieldFocus 4、Grip 1、Overlay 2、Comparison 5、ScreenSize 2，共19張；front／3Q／back、grip close、overlay、64／32 px逐張目視，未見torso／thigh／knee／shoulder armor穿插，palm／grip與forearm／strap有接觸。
+  - Unity 6000.5.7f1 graphics-enabled batch：首次沙箱內啟動因license unavailable終止，沒有被計為PASS；依規範在沙箱外重跑後return code 0、C# compile與2 FBX import成功、A-Pose／L1Pose均1.824011 m／98 renderers／boot ground 0、P035R1 baseline存在、runtime replacement=false，log結尾`Exiting batchmode successfully now!`。Unity輸出P035R1 baseline Close／RTS、P035R2 A-Pose／Close／RTS／Far共6張raw capture及2張同角度before／after composite，共8張並已目視。
+  - Scripts／docs／data：build／render／FBX export／audit與PowerShell compose皆實際執行成功；JSON parse 6/6、CSV parse 4/4、PNG 29/29可開啟、top-level Markdown H1 8/8、Unity fatal pattern 0 hits、temporary `.blend1`／`__pycache__`清除後0。
+  - Review ZIP：folder 61 files＝ZIP 61 file entries；required 15/15、hash mismatch 0。Production Spec ZIP：21 files＝21 entries、hash mismatch 0。`git diff --check` PASS。
+  - Unity EditMode／PlayMode、Windows build、Profiler與animated clearance：`NOT RUN`；本次為隔離art attachment revision，未用歷史runtime結果冒充P035R2 gameplay／animation acceptance。
+- Acceptance：
+  - Versioned P035R2且P035R1 preserved：PASS。
+  - Shield 0.600×0.862 m與front geometry locked：PASS（量測／topology／hash evidence）。
+  - Top／Center／Bottom接近L1且符合Unity RTS rules：PASS（數值差<0.003H，Close／RTS目視）。
+  - Grip／Strap／Wrist／Elbow、clipping、64／32 px與Unity evidence交付：PASS（machine-delivery／agent visual inspection）；最終art-direction決定仍`REVIEW PENDING`。
+  - 18-item human PASS gate：`REVIEW PENDING`；Phase04／PRE-UV lock與所有deferred項目：`NOT RUN / NOT AUTHORIZED`。
+- Completed：required reading、baseline hash lock、before／L1／after measurements、focused shield／grip／strap／review-pose correction、27 screenshots、2 review FBX、isolated Unity Prefabs／Scene、reports／pending checklist／manifests、review folder／ZIP、Production Spec同步與兩個ZIP parity verification。
+- Not Completed／Deferred：human Revision02 decision、PRE-UV geometry lock、Phase04、final UV／texture／shader／team mask、final skin／deformation、animation raise／lower／combat clearance、formal LOD／profile、provenance／license、Golden Sample lock與Production Ready。
+- Known Issues／Risks：L1 shield landmarks是medium-confidence stylized 2D estimate；primitive hand與rigid object pose只能證明contact／clearance，不能證明finger wrap或final skin deformation；A-Pose body／rest bones保留但shield base attachment已上移；Phase06需逐動畫驗證。沒有已知final evidence clipping或ground penetration。
+- Git：結案仍為`main`／HEAD`a31329b2ae0fc1db324cab374148db0b12eb203c`；`git status --porcelain=v1 --untracked-files=all`為106 entries（8 modified／98 untracked）／23 collapsed，包含使用者提供的task及本次versioned成果；未commit、未push、未reset或清理使用者檔案。
+- Next（排序）：
+  1. Art／Design／Technical Art逐項審核`05_Review_Checklist.md`的18項，重點看shield focus、grip／strap close-up、L1 overlay與Unity Close／RTS Normal。
+  2. 若change requested，只建立下一個versioned focused revision並保留P035R1／P035R2；若批准，仍須明確授權PRE-UV GEOMETRY LOCK與Phase04。
+  3. 後續獨立處理UV／Texture／Team Color shader、skin／animation clearance、LOD／performance與provenance，不得把本次READY狀態當作Production Ready。
 
 ## 2026-08-13 — Infantry Phase 03.5 Revision 01 Arm Proportion v004_P035R1
 

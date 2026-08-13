@@ -1,0 +1,97 @@
+{
+  "status": "READY FOR PHASE03_5 REVISION02 REVIEW",
+  "source_version": "CHR_Infantry_A_v004_P035R2",
+  "source_baseline": "CHR_Infantry_A_v004_P035R1",
+  "source_baseline_sha256": "A0CCC9771CD7A62D966891784745F138A9DCBF1230DF5E71A4F5D60900A84D0A",
+  "opened_file": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004_P035R2.blend",
+  "opened_file_sha256": "D8DCD84D888204D65385A94CF15B0C07BEA227236D47EA5EC3D54992999E551D",
+  "build_result_sha_matches": true,
+  "blender_version": "5.2.0 LTS",
+  "saved_by_audit_script": false,
+  "height_m": 1.8240108489990234,
+  "bounds": {
+    "min": [
+      -0.9355851411819458,
+      -0.28071996569633484,
+      0.0
+    ],
+    "max": [
+      1.073930025100708,
+      0.19922910630702972,
+      1.8240108489990234
+    ],
+    "dimensions": [
+      2.0095152854919434,
+      0.47994905710220337,
+      1.8240108489990234
+    ]
+  },
+  "mesh_count": 98,
+  "vertices": 16858,
+  "triangles": 33248,
+  "armatures": 1,
+  "bones": 23,
+  "topology": {
+    "non_manifold_edges": 0,
+    "boundary_edges": 0,
+    "loose_edges": 0,
+    "zero_area_faces": 0
+  },
+  "shield_size_before_m": {
+    "width": 0.6000000238418579,
+    "height": 0.8624239563941956
+  },
+  "shield_size_after_m": {
+    "width": 0.6000000238418579,
+    "height": 0.8624240159988403
+  },
+  "before_alignment": {
+    "source_version": "CHR_Infantry_A_v004_P035R1",
+    "pose": "REVIEW_ONLY_POSE_L1_COMPARE",
+    "character_height_m": 1.8240108489990234,
+    "shield_height_m": 0.8624239563941956,
+    "shield_width_m": 0.6000000238418579,
+    "shield_top_y_m": 0.929230809211731,
+    "shield_center_y_m": 0.4980188310146332,
+    "shield_bottom_y_m": 0.0668068528175354,
+    "shield_top_y_normalized": 0.5094436854482922,
+    "shield_center_y_normalized": 0.27303501582127915,
+    "shield_bottom_y_normalized": 0.036626346194266066,
+    "left_shoulder_y_normalized": 0.7574851093843296,
+    "left_elbow_y_normalized": 0.5874388402469082,
+    "left_wrist_y_normalized": 0.42444568010063716,
+    "shield_grip_center_y_normalized": 0.4080188651499989,
+    "forearm_strap_center_y_normalized": 0.4518782279121663,
+    "left_upper_arm_rotation_degrees": -46.0,
+    "left_lower_arm_rotation_degrees": -6.0,
+    "shield_pitch_degrees": 0.0,
+    "shield_inward_degrees": 0.0
+  },
+  "after_alignment": {
+    "source_version": "CHR_Infantry_A_v004_P035R1",
+    "pose": "REVIEW_ONLY_POSE_L1_COMPARE",
+    "character_height_m": 1.8240108489990234,
+    "shield_height_m": 0.8624240159988403,
+    "shield_width_m": 0.6000000238418579,
+    "shield_top_y_m": 1.2797335386276245,
+    "shield_center_y_m": 0.8469596058130264,
+    "shield_bottom_y_m": 0.41418567299842834,
+    "shield_top_y_normalized": 0.7016041266036953,
+    "shield_center_y_normalized": 0.46433912730169286,
+    "shield_bottom_y_normalized": 0.22707412799969048,
+    "left_shoulder_y_normalized": 0.7574851093843296,
+    "left_elbow_y_normalized": 0.6465944644345383,
+    "left_wrist_y_normalized": 0.5050809062884618,
+    "shield_grip_center_y_normalized": 0.5735187059438026,
+    "forearm_strap_center_y_normalized": 0.606425486271668,
+    "left_upper_arm_rotation_degrees": -10.0,
+    "left_lower_arm_rotation_degrees": -20.0,
+    "shield_pitch_degrees": -3.0,
+    "shield_inward_degrees": 4.0
+  },
+  "body_proportion_changed": false,
+  "shield_front_geometry_changed": false,
+  "source_apose_body_preserved": true,
+  "review_pose_not_active": true,
+  "runtime_prefab_replaced": false
+}

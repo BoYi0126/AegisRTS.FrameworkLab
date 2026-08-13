@@ -35,3 +35,9 @@ P035 SHA-256為`234383811F66F26DE29C8DBEF5E31C1B65D58B6B1E07C3FD08F3FF0AAF46422B
 `Source/CHR_Infantry_A_v004_P035R1.blend` 從上述exact-hash P035建立，狀態為`READY FOR PHASE03_5 REVISION REVIEW`。本次依Reviewer change request實際延長UpperArm至`0.176H`、Forearm至`0.165H`，使Shoulder→Wrist為`0.341H`；Hand width修至`0.06065H`、Head width修至`0.120H`，並重做arm cloth／bracer／grip attachment與review-only L1 Compare Pose。Hip、Knee、Torso、Chest、Shoulder width、Helmet、Boot、Shield與Sword尺寸保持。
 
 P035R1 SHA-256為`A0CCC9771CD7A62D966891784745F138A9DCBF1230DF5E71A4F5D60900A84D0A`。Source A-Pose與23-bone hierarchy保留，33,248 tris不變；review package位於`docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision01_Review/`。沒有進Phase 04或替換正式Runtime Prefab。
+
+## Phase 03.5 Revision 02 — Shield Alignment
+
+`Source/CHR_Infantry_A_v004_P035R2.blend`從受保護的P035R1建立，狀態為`READY FOR PHASE03_5 REVISION02 REVIEW`。本次只調整shield base／review attachment offset、back grip／forearm strap fit、review rotation與左臂L1 Compare Pose；shield尺寸保持`0.600000 × 0.862424 m`，front geometry、body proportion、23-bone rest hierarchy與sword不變。
+
+P035R2 SHA-256為`D8DCD84D888204D65385A94CF15B0C07BEA227236D47EA5EC3D54992999E551D`。Shield Top／Center／Bottom由P035R1的`0.5094H／0.2730H／0.0366H`修至`0.7016H／0.4643H／0.2271H`；review package位於`docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision02_Shield_Alignment_Review/`。未自行宣告PASS、PRE-UV lock或Phase04 authorization。

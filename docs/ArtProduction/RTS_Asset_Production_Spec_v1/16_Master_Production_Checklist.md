@@ -87,7 +87,8 @@ The checked boxes below mean only that repository evidence exists. They do not i
 - [x] Versioned v004_P03R1 focused revision, required comparison evidence, isolated Unity RTS captures and verified revision ZIP exist.
 - [x] Versioned v004_P035 candidate, L1／3D landmarks, pose-vs-proportion overlays, controlled correction and isolated Unity review exist.
 - [x] Versioned v004_P035R1 focused revision, actual arm rest-length correction, posed landmark before／after, arm-focused comparisons and isolated Unity review exist.
-- [ ] Phase 03.5 Revision 01 proportion gate is approved and PRE-UV GEOMETRY LOCK is authorized by human review.
+- [x] Versioned v004_P035R2 focused revision, shield／grip／strap alignment measurements, before／after comparisons and isolated Unity review exist.
+- [ ] Phase 03.5 Revision 02 shield-alignment gate is approved and PRE-UV GEOMETRY LOCK is authorized by human review.
 - [ ] Phase 03 Secondary Forms is approved by human art／technical-art review.
 - [x] Editable v2 `.blend`, deterministic rebuild script and runtime FBX exports exist.
 - [x] Prototype LOD0/1/2 geometry, Humanoid avatar, 23-bone rig and five runtime animation FBXs exist.

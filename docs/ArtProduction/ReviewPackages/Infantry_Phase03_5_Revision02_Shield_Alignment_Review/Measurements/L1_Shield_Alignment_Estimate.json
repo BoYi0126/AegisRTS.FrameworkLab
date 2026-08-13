@@ -1,0 +1,28 @@
+{
+  "source": "Unit_03_Infantry_L1_Concept_Final.png",
+  "view": "friendly_front",
+  "normalization": {
+    "plume_top_y_px": 133,
+    "ground_y_px": 455,
+    "height_px": 322
+  },
+  "shield_top": {
+    "y_px": 229,
+    "normalized": 0.7018633540372671,
+    "confidence": "medium",
+    "estimated": true
+  },
+  "shield_center": {
+    "y_px": 305,
+    "normalized": 0.4658385093167702,
+    "confidence": "medium",
+    "estimated": true
+  },
+  "shield_bottom": {
+    "y_px": 381,
+    "normalized": 0.22981366459627328,
+    "confidence": "medium",
+    "estimated": true
+  },
+  "note": "Stylized 2D concept; shield landmarks are estimates normalized by ground and full presented height."
+}

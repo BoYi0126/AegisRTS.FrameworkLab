@@ -1,0 +1,22 @@
+{
+  "source_version": "CHR_Infantry_A_v004_P035R1",
+  "pose": "REVIEW_ONLY_POSE_L1_COMPARE",
+  "character_height_m": 1.8240108489990234,
+  "shield_height_m": 0.8624239563941956,
+  "shield_width_m": 0.6000000238418579,
+  "shield_top_y_m": 0.929230809211731,
+  "shield_center_y_m": 0.4980188310146332,
+  "shield_bottom_y_m": 0.0668068528175354,
+  "shield_top_y_normalized": 0.5094436854482922,
+  "shield_center_y_normalized": 0.27303501582127915,
+  "shield_bottom_y_normalized": 0.036626346194266066,
+  "left_shoulder_y_normalized": 0.7574851093843296,
+  "left_elbow_y_normalized": 0.5874388402469082,
+  "left_wrist_y_normalized": 0.42444568010063716,
+  "shield_grip_center_y_normalized": 0.4080188651499989,
+  "forearm_strap_center_y_normalized": 0.4518782279121663,
+  "left_upper_arm_rotation_degrees": -46.0,
+  "left_lower_arm_rotation_degrees": -6.0,
+  "shield_pitch_degrees": 0.0,
+  "shield_inward_degrees": 0.0
+}

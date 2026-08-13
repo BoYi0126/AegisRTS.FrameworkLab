@@ -11,6 +11,8 @@
 
 2026-08-13 Phase 03.5 Revision 01 update：Reviewer對P035提出Arm／Hand／Head focused change request；已建立`CHR_Infantry_A_v004_P035R1`（1.824 m／33,248 tris／98 meshes／23 bones），UpperArm／Forearm修至0.176H／0.165H、Hand width至0.06065H、Head width至0.120H，並重做posed landmarks、arm-focus overlays與隔離Unity A-Pose／L1Pose／RTS Normal evidence。狀態僅為`READY FOR PHASE03_5 REVISION REVIEW`；19項revision gate待human review，未建立PRE-UV GEOMETRY LOCK或啟動Phase 04。
 
+2026-08-13 Phase 03.5 Revision 02 update：Reviewer指出P035R1盾牌placement偏低；已建立未覆寫的`CHR_Infantry_A_v004_P035R2`（1.824 m／33,248 tris／98 meshes／23 bones），只調整shield attachment／grip／strap／review rotation與左臂review pose。Shield保持0.600×0.862 m，Top／Center／Bottom由0.5094H／0.2730H／0.0366H收斂至0.7016H／0.4643H／0.2271H，並完成Blender／Unity Close／RTS／Far evidence。狀態僅為`READY FOR PHASE03_5 REVISION02 REVIEW`；18項human gate待審，未建立PRE-UV lock或啟動Phase 04。
+
 ## 目的
 
 Infantry與Archer共同鎖定Production Pipeline。Infantry驗證Heavy Armor、Sword、Shield、Melee Animation、Heavy Silhouette、Hard Surface Armor、Team Color、Skinning；Archer驗證Light Armor、Bow、Arrow、Quiver、Projectile Spawn、Ranged Animation、Thin Silhouette、Arm Deformation。
@@ -40,6 +42,7 @@ Infantry與Archer共同鎖定Production Pipeline。Infantry驗證Heavy Armor、S
 - [x] Phase 03 Revision 01 的versioned source、指定部位comparison、Unity RTS preview與verified review package存在；human revision gate仍pending。
 - [x] Phase 03.5 versioned source、landmark diagnosis、A-Pose／L1Pose overlays、Unity evidence與verified package存在；human proportion gate仍pending。
 - [x] Phase 03.5 Revision 01 versioned source、實際arm rest-length correction、posed landmark before／after、arm-focus／Unity evidence與verified package存在；human revision gate仍pending。
+- [x] Phase 03.5 Revision 02 versioned source、shield alignment／grip／strap measurements、focus／overlay與Unity evidence存在；human revision gate仍pending。
 - [ ] Archer建立獨立L1；不能只是Infantry換弓。
 - [ ] 兩者都有approved L2 production sheets、orthographic views、equipment breakdown與material callouts。
 - [ ] 黑剪影在128／64／32 px blind test通過。
