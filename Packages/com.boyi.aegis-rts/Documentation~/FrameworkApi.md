@@ -27,12 +27,15 @@ Selection-driven products can observe `SelectionService.Revision` and map the cu
 | Restore active production | Restore economy first, then call each system's `RestoreQueuedJob`; restored jobs are already paid/reserved |
 | Snapshot or restore movement | `MovementSystem.SnapshotOrders` and `MovementSystem.RestoreOrders` |
 | Restore transient runtime state | `CombatSystem.RestoreRuntimeState`, `ArmySystem.RestoreRuntimeState`, and `AiSystem.RestoreRuntimeState` |
+| Read or adjust camera zoom sensitivity | `RtsCameraController.ZoomSensitivity`, `IncreaseZoomSensitivity`, and `DecreaseZoomSensitivity` |
 
 ## Composition rule
 
 Setup operations such as faction, settlement, and unit creation belong to the application's composition layer. Runtime intents use commands, mutations stay inside their owning subsystem, and consumers read state through query interfaces and immutable snapshots.
 
 Do not wrap these systems in a manager that owns combat, economy, AI, persistence, and presentation state. A thin application-specific composition root may expose convenience methods, but it must delegate to these public contracts.
+
+`RtsCameraController` applies `ZoomSensitivity` as a multiplier to its serialized base zoom speed. Products can call `IncreaseZoomSensitivity` and `DecreaseZoomSensitivity`; the controller clamps the multiplier to the supported 1x-6x range while `RtsCameraRigModel` continues to own the zoom-distance bounds.
 
 ## Minimal command flow
 

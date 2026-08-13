@@ -28,6 +28,8 @@ namespace AegisRTS.Presentation.Input
         private InputAction _command;
         private InputAction _cameraMove;
         private InputAction _cameraZoom;
+        private InputAction _zoomSensitivityIncrease;
+        private InputAction _zoomSensitivityDecrease;
         private InputAction _queueCommand;
         private InputAction _stop;
         private InputAction _hold;
@@ -60,6 +62,8 @@ namespace AegisRTS.Presentation.Input
             Vector2 pointerDelta = Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
             bool middleDragging = Mouse.current != null && Mouse.current.middleButton.isPressed;
             bool pointerBlocked = _pointerBlocker != null && _pointerBlocker(pointer);
+            if (_zoomSensitivityIncrease.WasPressedThisFrame()) _cameraController.IncreaseZoomSensitivity();
+            if (_zoomSensitivityDecrease.WasPressedThisFrame()) _cameraController.DecreaseZoomSensitivity();
             _cameraController.ProcessInput(
                 _cameraMove.ReadValue<Vector2>(), pointer, pointerDelta, middleDragging,
                 _cameraZoom.ReadValue<Vector2>().y, Time.unscaledDeltaTime);
@@ -234,6 +238,12 @@ namespace AegisRTS.Presentation.Input
                 .With("Up", "<Keyboard>/w").With("Down", "<Keyboard>/s")
                 .With("Left", "<Keyboard>/a").With("Right", "<Keyboard>/d");
             _cameraZoom = _map.AddAction("CameraZoom", InputActionType.PassThrough, "<Mouse>/scroll");
+            _zoomSensitivityIncrease = _map.AddAction("ZoomSensitivityIncrease", InputActionType.Button);
+            _zoomSensitivityIncrease.AddBinding("<Keyboard>/equals");
+            _zoomSensitivityIncrease.AddBinding("<Keyboard>/numpadPlus");
+            _zoomSensitivityDecrease = _map.AddAction("ZoomSensitivityDecrease", InputActionType.Button);
+            _zoomSensitivityDecrease.AddBinding("<Keyboard>/minus");
+            _zoomSensitivityDecrease.AddBinding("<Keyboard>/numpadMinus");
             InputAction controlGroup = _map.AddAction("ControlGroup", InputActionType.Button);
             for (int index = 0; index <= 9; index++) controlGroup.AddBinding($"<Keyboard>/digit{index}");
             _queueCommand = _map.AddAction("QueueCommand", InputActionType.Button, "<Keyboard>/shift");

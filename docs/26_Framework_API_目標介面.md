@@ -172,7 +172,7 @@ selection.RecallControlGroup(1);
 ### Camera / Unity adapters
 
 - `RtsCameraRigModel`：提供 `Pan`、`Focus`、`ZoomBy`，所有 pivot／zoom 都限制在建構時設定的 bounds。
-- `RtsCameraController`：套用 WASD、edge pan、middle drag、wheel zoom 與 focus-selected 到 Unity Camera transform。
+- `RtsCameraController`：套用 WASD、edge pan、middle drag、wheel zoom 與 focus-selected 到 Unity Camera transform；wheel 預設為基準 `×3`，公開 `ZoomSensitivity`／`ZoomSensitivitySummary` 與 `IncreaseZoomSensitivity`／`DecreaseZoomSensitivity`，在 `×1～×6` 內調整而不改變 `RtsCameraRigModel` 的 zoom bounds。
 - `UnitySelectableView`：Entity descriptor 與 scene renderer 的 bridge；selection highlight 使用 `MaterialPropertyBlock`，不複製 shared material。
 - `UnityRtsInputAdapter`：將 Input System actions、drag rectangle 與 raycast 轉成 Selection API 或共用 Gameplay commands。
 - `RtsSandboxBootstrap`：僅作 composition root 與 debug acceptance visualization，不是全域 God Manager。

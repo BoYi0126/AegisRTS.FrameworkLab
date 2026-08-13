@@ -48,6 +48,7 @@ namespace AegisRTS.Demo.PlayablePrototype
         private GameObject _inputObject;
         private SelectionService _selection;
         private UnityRtsInputAdapter _input;
+        private RtsCameraController _cameraController;
         private NavMeshSurface _navigationSurface;
         private PrototypeUnityNavigationAdapter _unityNavigation;
         private GameObject _fortressGate;
@@ -94,6 +95,7 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         private void Awake()
         {
+            PrototypeDisplayAdapter.ApplyNativeFullscreen();
             ConfigureCamera();
             ConfigureLighting();
             _startupRestore = s_sceneReloadRestore;
@@ -180,6 +182,18 @@ namespace AegisRTS.Demo.PlayablePrototype
                 return Session.Restart();
 
             return BuildSession(null);
+        }
+
+        public void ReturnToMenuNow()
+        {
+            DisposeSession();
+            Session.ReturnToMenu();
+        }
+
+        public void QuitNow()
+        {
+            DisposeSession();
+            PrototypeApplicationAdapter.Quit();
         }
 
         public bool LoadNow()
@@ -409,13 +423,13 @@ namespace AegisRTS.Demo.PlayablePrototype
         private void ComposeInput()
         {
             Camera mainCamera = Camera.main;
-            var controller = mainCamera.GetComponent<RtsCameraController>();
-            if (controller == null) controller = mainCamera.gameObject.AddComponent<RtsCameraController>();
-            controller.Initialize(new RtsCameraRigModel(0d, 0d, 31d, minimumZoom: 2.5d, maximumZoom: 40d));
+            _cameraController = mainCamera.GetComponent<RtsCameraController>();
+            if (_cameraController == null) _cameraController = mainCamera.gameObject.AddComponent<RtsCameraController>();
+            _cameraController.Initialize(new RtsCameraRigModel(0d, 0d, 31d, minimumZoom: 2.5d, maximumZoom: 40d));
             _inputObject = new GameObject("Prototype_RTS_Input");
             _inputObject.transform.SetParent(transform);
             _input = _inputObject.AddComponent<UnityRtsInputAdapter>();
-            _input.Initialize(_selection, Composition.Commands, controller);
+            _input.Initialize(_selection, Composition.Commands, _cameraController);
             _input.SetPointerBlocker(IsPointerOverProductHud);
         }
 
@@ -620,6 +634,7 @@ namespace AegisRTS.Demo.PlayablePrototype
                 GUI.enabled = _save.HasSlot;
                 if (GUILayout.Button("Load Game", GUILayout.Height(42f))) Session.LoadGame();
                 GUI.enabled = true;
+                if (GUILayout.Button("Quit Game", GUILayout.Height(42f))) QuitNow();
                 GUILayout.Label(_uiMessage);
                 GUILayout.EndArea();
                 GUI.backgroundColor = previousBackground;
@@ -653,7 +668,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             if (Session.State == GameSessionState.Paused && GUILayout.Button("Resume")) Session.Resume();
             if (GUILayout.Button("Settings")) _showSettings = !_showSettings;
             if (GUILayout.Button("Restart")) RestartNow();
-            if (GUILayout.Button("Menu")) { DisposeSession(); Session.ReturnToMenu(); }
+            if (GUILayout.Button("Menu")) ReturnToMenuNow();
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Save")) SaveNow();
@@ -733,6 +748,8 @@ namespace AegisRTS.Demo.PlayablePrototype
             GUI.enabled = _save.HasSlot;
             if (GUILayout.Button("載入進度", _buttonStyle, GUILayout.Height(42f))) Session.LoadGame();
             GUI.enabled = true;
+            GUILayout.Space(8f);
+            if (GUILayout.Button("離開遊戲", _buttonStyle, GUILayout.Height(42f))) QuitNow();
             GUILayout.Space(10f);
             GUILayout.Label(HumanizeMessage(_uiMessage), _mutedStyle);
             GUILayout.EndArea();
@@ -836,7 +853,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             GUILayout.EndHorizontal();
             if (GUILayout.Button("重新開始", _buttonStyle)) RestartNow();
             if (GUILayout.Button("設定", _buttonStyle)) _showSettings = !_showSettings;
-            if (GUILayout.Button("主選單", _buttonStyle)) { DisposeSession(); Session.ReturnToMenu(); }
+            if (GUILayout.Button("主選單", _buttonStyle)) ReturnToMenuNow();
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
@@ -959,7 +976,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             GUILayout.Label("3　切換到「攻城行動」：破壞可修復城門、進入內院、攻擊主堡並接管城市。", _bodyStyle);
             GUILayout.Space(14f);
             GUILayout.Label("敵軍會先發展經濟，90 秒後才主動進攻。說明開啟期間遊戲完全暫停。", _statusStyle);
-            GUILayout.Label("快捷鍵：WASD 相機｜滾輪縮放 2.5–40m｜F 聚焦選取｜X 停止｜H 原地防守｜F1 說明｜F3 Debug", _mutedStyle);
+            GUILayout.Label("快捷鍵：WASD 相機｜滾輪縮放｜+／- 調整縮放速度｜F 聚焦｜X 停止｜H 防守｜F1 說明｜F3 Debug", _mutedStyle);
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("我了解了，開始遊戲", _primaryButtonStyle, GUILayout.Height(48f))) DismissTutorialNow();
             GUILayout.EndArea();
@@ -988,15 +1005,17 @@ namespace AegisRTS.Demo.PlayablePrototype
             GUILayout.Label(victory ? "敵方堡壘已被你佔領。" : "指揮官已陣亡。重新整理軍隊，再試一次。", _bodyStyle);
             GUILayout.Space(18f);
             if (GUILayout.Button("重新開始", _primaryButtonStyle, GUILayout.Height(44f))) RestartNow();
-            if (GUILayout.Button("返回主選單", _buttonStyle, GUILayout.Height(38f))) { DisposeSession(); Session.ReturnToMenu(); }
+            if (GUILayout.Button("返回主選單", _buttonStyle, GUILayout.Height(38f))) ReturnToMenuNow();
             GUILayout.EndArea();
         }
 
         private void DrawSettingsPanel()
         {
-            GUILayout.BeginArea(new Rect(Screen.width - 280f, 198f, 268f, 150f), _panelStyle);
+            GUILayout.BeginArea(new Rect(Screen.width - 280f, 198f, 268f, 185f), _panelStyle);
             GUILayout.Label("顯示設定", _headingStyle);
             GUILayout.Label($"解析度：{Screen.width} × {Screen.height}", _bodyStyle);
+            GUILayout.Label(PrototypeDisplayAdapter.LastSummary, _bodyStyle);
+            GUILayout.Label($"滾輪速度：{(_cameraController != null ? _cameraController.ZoomSensitivitySummary : "×3")}（+／- 調整）", _bodyStyle);
             GUILayout.Label($"配色：{ActiveThemeName}", _bodyStyle);
             if (GUILayout.Button("切換高對比", _buttonStyle)) ToggleThemeNow();
             if (GUILayout.Button("關閉", _buttonStyle)) _showSettings = false;

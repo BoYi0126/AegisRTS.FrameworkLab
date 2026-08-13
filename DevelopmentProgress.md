@@ -6,10 +6,205 @@
 
 - Current Phase：PlayablePrototype_01 已切換為 `fortified-city` 要塞城市規則；第一個玩家攻城垂直切片（主堡直募、固定城牆、可修城門、主堡壓制後佔領）為 `Completed`，玩家守城與隨機武將模式尚未完成。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 34/34；Windows Development Build PASS（BuildReport 186,823,929 bytes；輸出 331 files／187,176,482 bytes），`.exe` 實際啟動 5 秒並維持正常執行；2026-08-12 Infantry L3 站立軸向、四個 Move 姿勢、材質槽 Team Color、2.5 m／38° close inspection 與 Game View smoke PASS；solution build 0 warnings／0 errors。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 36/36；clean package validation（前一筆 package runtime）EditMode 6/6、PlayMode 3/3；Windows Development Build PASS（BuildReport 186,829,217 bytes；輸出 332 files／187,185,803 bytes），`.exe` 實際以 1920×1080 `FullScreenWindow` 啟動 10 秒且 process responding、Player log error scan 0 hits；Idle 站立與 Move→Idle targeted PlayMode 各 1/1；solution build 0 warnings／0 errors。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：先由專案擁有者在 Unity Game View 檢查直立、材質與 Move；若「L1 精細度」是正式目標，下一個美術工作應是 Infantry L2.1 正式雕模／重拓樸／手繪貼圖，而不是繼續在目前 4,376-triangle 程式化 blockout 上調 Animator。若目前 L2 blockout 可接受，系統面續補玩家守城／AI 正式攻城與維修資源成本。
+- Highest Priority：由專案擁有者啟動最新 Windows Player，命令步兵移動後停止，從正面與側面確認雙腿位於身體下方且不再坐倒／躺下；並確認預設 3 倍滾輪速度與 `+`、`-` 倍率手感。通過後再回到玩家守城／AI 正式攻城／維修成本，或另立 Infantry L2.1 正式美術任務。
 - Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam，不是產品功能缺口。
+
+## 2026-08-13 — 步兵停止後 Idle 站立姿勢修正
+
+- Status：Completed（程式、骨骼驗證、正／側面 capture、完整測試與 Windows Player 啟動完成；專案擁有者主觀動作驗收待確認）
+- Goal：修正步兵停止移動後雙腿向前平伸、側面看起來像坐倒／躺下的問題，確保初始 Idle 與 Move→Idle 轉場最後都呈現直立站姿。
+- Baseline：
+  - Branch／HEAD：`main`／`1048f1aa5cf3c0feb5e7fde6fe5696f19fe1d9e4`；開始時 14 個 status entries，包含尚未提交的原生全螢幕、主選單退出與滾輪倍率工作，本次全部保留。
+  - 實際以 `AEGIS_CAPTURE_INFANTRY_DETAIL=1` 執行既有 close-inspection PlayMode test：測試雖 PASS 1/1，但 `InfantryDetail_Side.png` 清楚顯示 Idle 雙腳在身體前方、腿部近水平。舊測試只在播放 Idle 後取得 renderer bounds，實際站立 envelope assertion 僅套在 Move 四個 samples；盾牌／武器又會撐大整體 bounds，因此錯誤被漏掉。
+  - Humanoid 診斷值：錯誤 Idle 的 Head 到雙腳平均垂直距離 1.264 m、XZ planar lean 0.462 m；正面容易誤認直立，側面才能清楚重現。
+- Scope：
+  - In：Idle-only Humanoid leg stance correction、Move→Idle transition、頭／腳骨骼站立 regression、正面／側面 capture、Demo architecture／操作／L3 delivery 文件、manifest integrity、solution/full tests、Windows build／launch。
+  - Out／Deferred：重做 Blender rig／skin／Idle FBX、修改 Move／Attack／Hit／Death、專業 foot IK、重新建模、Gameplay 移動／碰撞／傷害、其他兵種動畫。
+- Changed：
+  - `Assets/AegisRTS/Demo/PlayablePrototype/PrototypeUnitAnimatorView.cs`：保存目前 moving 狀態；只在 Animator 已進入 `Idle`、不在 transition、非 moving、非 death 時於 `LateUpdate` 校正左右腿。每腿將 thigh→shin、shin→foot 的世界方向對齊 `Vector3.down`，並在祖先旋轉後還原 foot world rotation，讓腳掌方向不被連帶扭轉。新增 `IdleStanceCorrectionCount` 作 debug／regression 證據。
+  - `Assets/AegisRTS/Tests/PlayMode/PlayablePrototypePlayModeTests.cs`：既有 L3 prefab test 新增初始 rendered Idle 與 Move→Idle 驗證；close-inspection test 新增 Idle correction count 與 `AssertHumanoidStanding`。判斷改用 Head／LeftFoot／RightFoot 骨骼，要求 head-to-feet height >1.2 m、planar lean <0.25 m，不再被盾牌 renderer bounds 誤導。
+  - `docs/37...操作與驗收手冊.md`：更新已整合 Humanoid L3 與停止後直立預期；`docs/38...架構與維護.md`：更新已過時的「靜態 L2」敘述，記錄 Animator state boundary 與 Idle 相容層。
+  - `ArtSource/.../L3_DELIVERY_REPORT.md`：如實記錄 v002 Humanoid Idle leg baseline 缺陷、目前 presentation correction 與正式美術替換條件；`MANIFEST.json` 同步更新 bytes／SHA-256。
+- Behavior Before／After：
+  - Before：步兵初始 Idle 或由 Move 停止後，torso 大致直立但雙腿向前伸；正面不明顯，側面像坐在空中或躺倒。
+  - After：完成 Animator transition 進 Idle 後，左右大腿與小腿垂直落在身體下方，腳的世界旋轉保持；Move、Attack、Hit、Death 不套用校正，Gameplay root、位置、碰撞與 Root Motion contract 不變。
+- Architecture／API／Data：
+  - Architecture：相容修正位於 Demo Presentation bridge，讀 Animator state 並只改 View bones；Movement／Combat snapshots 仍是 authoritative truth，沒有反向寫入 Gameplay Transform、Command 或 domain state。
+  - API：Demo public `PrototypeUnitAnimatorView` 新增 read-only `IdleStanceCorrectionCount`；package Framework public API 無變更。
+  - Data：Content Pack、Scenario、Definition、Save schema、Input Actions 均無變更；只更新 L3 delivery report 的 manifest hash，26/26 entries 相符。
+- Tests／Validation：
+  - Baseline close-inspection capture：PASS 1/1，但人工檢視 `C:\projects\Unity\AegisRTS.BuildValidation\InfantryDetailReview\InfantryDetail_Side.png` 判定 Idle 失敗；證明原 regression 有 false negative。
+  - 新骨骼 diagnostic 首次 Unity compile：FAIL，測試暫時使用 `Debug.Log` 時與 `System.Diagnostics.Debug` 名稱衝突，CS0104；改成完整限定名取得數值後移除 diagnostic log，產品 runtime 未受影響。
+  - Corrected Idle close-inspection targeted PlayMode：PASS 1/1；0 failed／0 skipped；`Logs/IdleStandingFinalInspection.xml`。正／側面 capture 已人工檢視，雙腿位於身體下方。
+  - Move→Idle／Avatar／events／Root Motion targeted PlayMode：PASS 1/1；0 failed／0 skipped；`Logs/IdleStandingFinalTransition.xml`。
+  - `dotnet restore AegisRTS.FrameworkLab.slnx`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors。
+  - FrameworkLab Full EditMode：PASS 177/177；0 failed／0 skipped；`Logs/IdleStandingFullEditMode.xml`。
+  - FrameworkLab Full PlayMode：PASS 36/36；0 failed／0 skipped；`Logs/IdleStandingFullPlayMode.xml`。
+  - Clean package validation：`NOT RUN` — 本次沒有修改 package Runtime；沿用前一筆實際 6/6、3/3 證據，不冒充本次重跑。
+  - L3 delivery manifest：PASS，26 entries、0 missing／hash mismatch。
+  - Windows Development Build：PASS；BuildReport 186,829,217 bytes；輸出 332 files／187,185,803 bytes；`Logs/IdleStandingWindowsBuild.log`。
+  - Windows Player smoke：PASS；process 執行 10 秒未提前退出且 responding，1920×1080 native fullscreen，Player log error scan 0 hits，之後由驗證流程關閉。
+- Acceptance：
+  - 初始靜止單位直立：`PASS` — rendered Idle 骨骼 regression 與 corrected 正／側面 capture。
+  - Move→Idle 後直立：`PASS` — 0.25 秒 transition 後 head／feet stance gate 通過。
+  - 不影響非 Idle animations：`PASS` — correction 明確排除 moving、transition、Attack／Hit／Death state；events／Root Motion targeted 與 full PlayMode 通過。
+  - 不修改 gameplay truth：`PASS` — 只改 Animator 子骨骼；既有 root position <0.001 m regression 通過。
+  - 實際玩家主觀停止動作：`NOT RUN` — automated player 以 hidden window 驗啟動與 log，最終手感仍需專案擁有者操作。
+- Completed：已重現側面錯誤、補足測試盲點、加入 Idle-only 站立校正與 debug counter、完成 capture／文件／manifest／full tests／Windows build／launch。
+- Not Completed／Deferred：沒有重製來源 Blender rig／Idle FBX；目前是 Prototype presentation compatibility fix。正式 L2.1／final-art asset 應在 DCC 直接交付正確 Unity Humanoid Idle，再刪除本相容層。
+- Known Issues／Risks：Idle 校正讓腿部保持直立，會降低原生成 clip 在下肢的細微擺動；上半身 Idle breathing／持盾姿勢仍由 clip 保留。每個 Idle 步兵每 frame 只處理 6 個 Humanoid bone transforms，成本低但仍應在 G09 300+ visible animated units profiling 中量測。若未來 rig 缺少標準 leg bones，校正會安全跳過，但 `IdleStanceCorrectionCount` 與 regression 將暴露缺口。
+- Git：Branch `main`；本次 Animator／test／docs 與前面三筆累積變更均納入本筆紀錄所在 commit，commit message 為 `fix Infantry pose`；push 未執行。Commit 前共有 18 個 status entries；Unity build 自動重寫的 Scene fileIDs、URP／Volume、batching 與 Unity Connect 設定已逐項還原；`git diff --check` PASS（只有既有 line-ending 提示）。
+- Next：
+  1. 啟動 `C:\projects\Unity\AegisRTS.BuildValidation\IdleStandingBuild\PlayablePrototype_01.exe`，選一名步兵走 3～5 m 後停止，從遊戲固定視角與近距離 `F` 聚焦確認站姿。
+  2. 若站姿接受，保留此 Prototype correction 並回系統工作；若要求自然 Idle 腿部微動，另立 DCC Idle clip 重製，不在 LateUpdate 疊更多動畫規則。
+  3. 後續 G09 效能階段量測大量可見 Humanoid units 的 Animator／LateUpdate 成本。
+
+## 2026-08-13 — 滾輪縮放加速與 +/- 即時速度調整
+
+- Status：Completed（機械性、自動化與 Windows Player 啟動驗證完成；實體滾輪主觀手感待專案擁有者確認）
+- Goal：把原本過慢的滑鼠滾輪縮放提高數倍，並讓玩家不必離開遊戲即可用 `+`／`-` 調整縮放速度。
+- Baseline：
+  - Branch／HEAD：`main`／`1048f1aa5cf3c0feb5e7fde6fe5696f19fe1d9e4`；開始時有前兩筆原生解析度與主選單退出工作的 9 個尚未提交 tracked／untracked entries，本次全部保留。
+  - `RtsCameraController.zoomSpeed` 為 `0.025`，Windows 常見一格 scroll delta `120` 只改變 3 m（20→17 m）；沒有靈敏度倍率、快捷鍵或遊戲內目前倍率提示。
+- Scope：
+  - In：預設縮放加速、1～6 倍離散倍率、主鍵盤與數字鍵盤 `+`／`-`、設定面板倍率顯示、Input Action 資產、camera public API、targeted／full tests、clean package validation、操作／API／畫面規格文件、Windows build／launch。
+  - Out／Deferred：改變 2.5～40 m 距離邊界、相機旋轉、平滑／慣性 zoom、設定持久化、可拖曳 slider、重新設計 UI、修改 gameplay 或 save schema。
+- Changed：
+  - `RtsCameraController.cs`：保留 `zoomSpeed=0.025` 作為 base speed，新增預設 `ZoomSensitivity=3`，scroll delta 乘上倍率；新增 `IncreaseZoomSensitivity()`／`DecreaseZoomSensitivity()` 並 clamp 在 1～6，倍率改變時輸出 camera debug log。
+  - `UnityRtsInputAdapter.cs`：runtime Input Map 新增縮放速度加／減 action；綁定 `<Keyboard>/equals`、`<Keyboard>/numpadPlus`、`<Keyboard>/minus`、`<Keyboard>/numpadMinus`，每次按下委派 controller 調整。
+  - `AegisRTS_RTS.inputactions`：同步加入 `ZoomSensitivityIncrease`／`ZoomSensitivityDecrease` 與四個鍵盤 binding，避免資產規格和 runtime map 漂移。
+  - `PlayablePrototypeBootstrap.cs`：保留 controller reference；設定面板顯示目前 `×N` 並增加高度，教學快捷鍵補 `+／-`。
+  - `PlayablePrototypePlayModeTests.cs`：擴充 display／wheel regression，驗證預設 ×3 的 20→11→20 m、×4 與 ×2 數值，以及連續按鍵調整時 1／6 上下限。
+  - `Packages/.../Documentation~/FrameworkApi.md`、`docs/26...API.md`、`docs/37...操作與驗收手冊.md`、`docs/ArtSpecs/02...解析度相機與安全區.md`：同步記錄 public surface、預設倍率、快捷鍵、範圍與設定面板提示。
+- Behavior Before／After：
+  - Before：一格 `120` 的滾輪量只縮放 3 m，速度固定，玩家只能要求工程端修改 serialized base speed。
+  - After：預設 ×3，因此同一格縮放 9 m；`+` 每次增加一級、`-` 每次減少一級，範圍 ×1～×6。縮放距離仍由 `RtsCameraRigModel` 限制在 2.5～40 m，設定面板可看目前倍率。
+- Architecture／API／Data：
+  - Architecture：鍵盤裝置讀取留在 Presentation input adapter，倍率與 clamp 留在 Presentation camera controller，距離真相仍由 camera model 擁有；Gameplay、Player／AI Command、UI→gameplay 邊界與 God Manager 規則均未改。
+  - API：package public `RtsCameraController` 新增 read-only `ZoomSensitivity`／`ZoomSensitivitySummary`，以及回傳是否真的改變倍率的 `IncreaseZoomSensitivity()`／`DecreaseZoomSensitivity()`。
+  - Data：修改 Demo `.inputactions` 控制規格；Content Pack、Scenario、Definition、Save schema 與既有存檔均無變更。倍率目前是 session presentation state，不寫入存檔。
+- Tests／Validation：
+  - `.inputactions` JSON parse：PASS；PowerShell `ConvertFrom-Json` 無錯誤。
+  - `dotnet restore AegisRTS.FrameworkLab.slnx`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors。
+  - Targeted PlayMode `DisplayAndMouseWheel_UseNativeFullscreenPolicyAndZoomBothDirections`：PASS 1/1；`Logs/ZoomSensitivityTargeted.xml`。
+  - FrameworkLab Full EditMode：PASS 177/177，0 failed／0 skipped；`Logs/ZoomSensitivityFullEditMode.xml`。
+  - FrameworkLab Full PlayMode：PASS 36/36，0 failed／0 skipped；`Logs/ZoomSensitivityFullPlayMode.xml`。
+  - Clean package project `C:\projects\Unity\AegisRTS.PackageValidation`：EditMode PASS 6/6、PlayMode PASS 3/3；file-installed package 可編譯並執行 package tests。
+  - Windows Development Build：PASS；BuildReport 186,827,749 bytes；輸出 332 files／187,184,348 bytes；`Logs/ZoomSensitivityWindowsBuild.log`。
+  - Windows Player smoke：PASS；process 執行 10 秒未提前退出且 responding，Player log 顯示 `Native Fullscreen · 1920×1080`，掃描 `Unhandled`／`NullReferenceException`／`MissingReferenceException`／`error CS`／`Aborting`／`InvalidOperationException` 為 0 hits，之後由驗證流程關閉。
+- Acceptance：
+  - 預設比原本快數倍：`PASS` — 預設 ×3，常見 scroll 120 從 3 m 提高為 9 m，targeted test 鎖定數值。
+  - `+` 加快、`-` 減慢：`PASS` — runtime action map 與 Input Action 資產均有主鍵盤／數字鍵盤 binding；controller API regression 通過。
+  - 速度有安全範圍：`PASS` — 重複調整 clamp 在 ×1～×6，test 覆蓋兩端。
+  - 不破壞 zoom 距離邊界：`PASS` — 仍使用既有 `RtsCameraRigModel.ZoomBy` 與 2.5～40 m clamp；full suite 通過。
+  - 玩家能看到倍率：`PASS` — 顯示設定面板即時讀 controller summary。
+  - 實體鍵盤／滾輪主觀操作：`NOT RUN` — 自動化驗證數值、binding、build 與 player lifecycle，但未以桌面輸入自動化代替使用者手感。
+- Completed：預設 ×3、1～6 倍即時調整、四個鍵盤 binding、設定提示、debug、API／操作文件、完整 regression、clean package validation 與 Windows build／launch 均完成。
+- Not Completed／Deferred：沒有把倍率持久化到設定檔；沒有加入 slider／文字 toast；沒有改 zoom inertia。主鍵盤的 `+` 與 `=` 共用同一實體 key，因此不按 Shift 的 `=` 也會加速，數字鍵盤 `+` 則為獨立鍵。
+- Known Issues／Risks：預設 ×3 在高解析度 free-spin 滾輪上可能仍偏快或偏慢，可先用 ×1～×6 現場調整；若未來需要裝置／語系鍵盤專屬 mapping，應改為 rebindable settings，而不是繼續硬加 control path。倍率離開 Player 後會回到預設 ×3。
+- Git：Branch `main`；14 個 status entries，包含前兩筆尚未提交的 display／application adapter，以及本次 camera／input／test／docs／progress；未 commit／push。Unity build 自動重寫的 Scene fileIDs、URP／Volume、batching 與 Unity Connect 設定已逐項還原；`git diff --check` PASS（只有既有 `.inputactions` LF→CRLF 提示）。
+- Next：
+  1. 啟動 `C:\projects\Unity\AegisRTS.BuildValidation\ZoomSensitivityBuild\PlayablePrototype_01.exe`，各滾一格向上／向下，再按 `+`、`-` 確認自己最舒服的倍率。
+  2. 若 ×1～×6 仍不夠，只調整倍率上限或 base speed，避免同時改距離邊界造成鏡頭規格混亂。
+  3. 手感接受後，回到玩家守城／AI 正式攻城／維修成本；如需保留倍率，再新增獨立 user settings persistence，不塞進 gameplay save。
+
+## 2026-08-13 — 主選單離開遊戲
+
+- Status：Completed
+- Goal：修正主選單只有開始／載入、沒有正常離開遊戲入口的 UI／application lifecycle 缺口；同一功能需在 Windows Player 與 Unity Editor 都有合理行為。
+- Baseline：
+  - Branch／HEAD：`main`／`1048f1aa5cf3c0feb5e7fde6fe5696f19fe1d9e4`；開始時有前一筆原生解析度／滾輪工作的 7 個尚未提交 tracked／untracked entries，本次保留並在其上修改。
+  - `DrawMainMenu` 只有「開始新遊戲」與「載入進度」；legacy debug menu 同樣只有 New／Load。專案沒有 `Application.Quit`，`GameSessionController` 也刻意只負責 session state，不應承擔 platform application lifecycle。
+- Scope：
+  - In：中文主選單與 legacy menu 的離開按鈕、Player／Editor 分流、離開前 session cleanup、返回主選單 cleanup 共用途徑、PlayMode regression、操作文件、Windows build／launch。
+  - Out／Deferred：退出確認對話框、未保存進度警告、自動存檔、鍵盤快捷鍵、作業系統關閉視窗事件、多平台 console／mobile quit policy。
+- Changed：
+  - `PrototypeApplicationAdapter.cs`：新增 Demo application boundary；Player 呼叫 `Application.Quit()`，`UNITY_EDITOR` 分支呼叫 `EditorApplication.ExitPlaymode()`，另提供純函式 `ResolveExitAction` 供 lifecycle test。
+  - `PlayablePrototypeBootstrap.cs`：新增 `QuitNow()`，先 `DisposeSession()` 再委派 application adapter；`DrawMainMenu` 增加「離開遊戲」，legacy menu 增加 `Quit Game`。新增 `ReturnToMenuNow()` 統一遊戲中、結果畫面與 legacy menu 的 cleanup＋`Session.ReturnToMenu()`，避免測試或 UI 重複撰寫 cleanup sequence。
+  - `PlayablePrototypePlayModeTests.cs`：新增 `MainMenuQuit_CleansSessionAndResolvesEditorAndPlayerLifecycle`，驗證 Editor／Player action mapping，載入真實 scene 後返回主選單並確認 `GameSessionState.MainMenu` 與 `Composition == null`。
+  - `docs/37...操作與驗收手冊.md`：記錄主選單三個入口，以及 Player 正常結束／Editor 停止 Play Mode 的差異。
+- Behavior：
+  - Before：Player 進入主選單後只能開始或載入，只能用 Alt+F4／作業系統視窗手段離開；Editor 只能手動按上方 Stop。
+  - After：主選單顯示「離開遊戲」。Windows Player 按下會先釋放 Composition、NavMesh、views、selection、input 與 subscriptions，再要求 Unity 正常退出；Editor 按下只停止 Play Mode，不關閉 Unity Editor。
+- Architecture／API／Data：
+  - Architecture：Application lifecycle 留在 Demo／Unity adapter；Gameplay `GameSessionController`、CommandBus、simulation state ownership 與 package dependency 都沒有改。Bootstrap 只組裝 cleanup 與 adapter 呼叫。
+  - API：新增 Demo public `PrototypeApplicationAdapter.ResolveExitAction(bool)`／`Quit()`、`PrototypeExitAction`，以及 Bootstrap `ReturnToMenuNow()`／`QuitNow()`。Framework package public API 未改。
+  - Data：Content Pack、Scenario、Save schema、Input Actions 與 Player Settings 無變更。
+- Tests／Validation：
+  - Unity batch import：PASS；無 compile error，正常 exit。
+  - `dotnet restore`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors；最終 refactor 後再跑一次同結果。
+  - 初版 targeted lifecycle test：PASS 1/1，驗證 Editor／Player action mapping。
+  - 首次主選單 scene/capture targeted test：FAIL 0/1；原因為 Unity batchmode 不會觸發 `WaitForEndOfFrame`，測試框架明確拋錯，並非產品 quit path 失敗。
+  - 將 `WaitForEndOfFrame` 改成一般 frame yield 後 targeted scene test：PASS 1/1；batchmode 不可靠輸出 IMGUI screenshot，因此移除未產生證據的 optional capture 分支，不把它記為視覺通過。
+  - Final Full EditMode：PASS 177/177；0 failed／0 skipped；`Logs/MainMenuQuitFinalEditMode.xml`。
+  - Final Full PlayMode：PASS 36/36；0 failed／0 skipped；`Logs/MainMenuQuitFinalPlayMode.xml`。
+  - Final Windows Development Build：PASS；BuildReport 186,826,473 bytes；輸出 332 files／187,183,067 bytes；`Logs/MainMenuQuitFinalWindowsBuild.log`。
+  - Final Windows Player smoke：PASS；process 執行 6 秒未提前退出，1920×1080 FullScreen log 正常，掃描 `Unhandled`／`NullReferenceException`／`MissingReferenceException`／`error CS`／`Aborting` 為 0 hits，之後由驗證流程關閉。
+- Acceptance：
+  - 主選單有中文「離開遊戲」：`PASS` — `DrawMainMenu` 實際按鈕已加入。
+  - Windows Player 正常 quit path：`PASS` — non-Editor build 編譯 `Application.Quit()` 分支，Windows build／launch 成功。
+  - Unity Editor 不被整個關閉：`PASS` — compile-time Editor 分支使用 `ExitPlaymode()`。
+  - 離開／返回主選單前清理 session：`PASS` — `QuitNow`／`ReturnToMenuNow` 都先呼叫 `DisposeSession`；scene regression 確認 Composition 已釋放。
+  - 實際人工點擊 Windows Player 按鈕：`NOT RUN` — automated run 驗證 build／branch／cleanup，但本輪未用桌面滑鼠自動化代替使用者操作。
+- Completed：主選單與 legacy menu 均有離開入口；Player／Editor lifecycle、cleanup、tests、文件與最終 Windows build 已完成。
+- Not Completed／Deferred：未做退出確認或未存檔警告；未直接以 GUI automation 點擊 final Player 按鈕，留給專案擁有者做一次人工 UI 驗收。
+- Known Issues／Risks：目前按「離開遊戲」立即退出，尚未確認玩家是否有未儲存進度；正式產品加入 autosave／dirty-state 後應先顯示確認視窗。IMGUI 的按鈕 label 沒有可由無頭 Test Runner 查詢的 semantic tree，因此自動測試驗 lifecycle 與 source wiring，視覺存在仍需人工看一眼。
+- Git：Branch `main`；9 個 status entries，包含前一筆尚未提交的 display adapter／docs，以及本次 application adapter／Bootstrap／tests／progress；未 commit／push。Unity build 自動重寫的 Scene fileIDs、URP／Volume、batching 與 Unity Connect 設定已還原；`git diff --check` PASS。
+- Next：
+  1. 啟動 `MainMenuQuitFinalBuild/PlayablePrototype_01.exe`，從遊戲返回主選單後按「離開遊戲」，確認程式正常關閉。
+  2. 決定正式版本離開前是否要「未儲存進度」確認；目前 Prototype 採立即退出。
+  3. 人工 UI 驗收完成後再進玩家守城／AI 正式攻城／維修成本或 Infantry L2.1。
+
+## 2026-08-12 — 原生解析度全螢幕與滑鼠滾輪相機縮放
+
+- Status：Completed（自動化與 Windows Player 啟動驗證完成；實體滑鼠主觀手感待專案擁有者確認）
+- Goal：讓 Windows 遊戲啟動時使用目前主螢幕相同解析度的全螢幕畫面，並保證滑鼠滾輪能雙向縮放固定上帝視角。
+- Baseline：
+  - Branch／HEAD：`main`／`1048f1aa5cf3c0feb5e7fde6fe5696f19fe1d9e4`；開始時工作樹乾淨。
+  - `ProjectSettings.asset` 已有 `defaultIsNativeResolution: 1` 與 `fullscreenMode: 1`，但 Prototype 啟動流程沒有 runtime display adapter，也沒有 Player log 能證明它實際向哪個顯示器尺寸提出要求。
+  - `UnityRtsInputAdapter` 已把 `<Mouse>/scroll` 的 Y 值傳給 `RtsCameraController.ProcessInput`，controller 也會呼叫 `RtsCameraRigModel.ZoomBy`；操作文件已有滾輪說明，但沒有直接鎖定方向與距離變化的 regression test。
+- Scope：
+  - In：Windows Player 原生解析度無邊框全螢幕、Editor Game View 不受強制切換、runtime display diagnostics、滾輪向上拉近／向下拉遠、2.5～40 m clamp 沿用、設定面板與操作／畫面規格文件、targeted／full tests、Windows build／launch。
+  - Out／Deferred：獨佔式 `ExclusiveFullScreen`、解析度選單、多螢幕選擇、UI scale slider、自由旋轉相機、修改 zoom 範圍、實體滑鼠主觀靈敏度調校。
+- Changed：
+  - `PrototypeDisplayAdapter.cs`：新增 Demo presentation adapter；Player 讀 `Display.main.systemWidth/systemHeight`，無有效值時退回 `Screen.currentResolution`，再呼叫 `Screen.SetResolution(..., FullScreenMode.FullScreenWindow)`。Editor 只回報 Game View 尺寸，不搶占桌面全螢幕。
+  - `PlayablePrototypeBootstrap.cs`：composition root 在建立 camera／session 前套用 display policy；顯示設定面板增加目前 display summary。
+  - `PlayablePrototypePlayModeTests.cs`：新增 `DisplayAndMouseWheel_UseNativeFullscreenPolicyAndZoomBothDirections`，驗證主顯示器尺寸優先、fallback，以及 Windows 常見 ±120 scroll delta 對 20→17→20 m 的雙向 zoom。
+  - `docs/ArtSpecs/02...解析度相機與安全區.md`：明定 Player／Editor 行為、主顯示器尺寸來源、fallback 與 `<Mouse>/scroll` data flow。
+  - `docs/37...操作與驗收手冊.md`：補原生解析度全螢幕啟動、設定面板顯示、滾輪方向、Player log 與 `Alt+Enter` 說明。
+- Behavior：
+  - Before：只依賴 Player Settings 預設值；不同啟動環境是否仍以桌面解析度全螢幕不易確認。滾輪程式路徑存在，但方向與縮放量沒有 regression。
+  - After：Windows executable 每次進入 Prototype 都以主顯示器原生尺寸要求 `FullScreenWindow`；本機實際回報 1920×1080。Unity Editor 維持使用者設定的 Game View。滾輪向上拉近、向下拉遠，距離由 `RtsCameraRigModel` 限制在 2.5～40 m。
+- Architecture／API／Data：
+  - Architecture：Display 屬 Demo presentation／platform adapter，只由 Bootstrap composition root 呼叫；不進 Gameplay、不建立 God Manager，也不影響 Player／AI Command、simulation tick 或 save state。
+  - API：新增 Demo public static `PrototypeDisplayAdapter.ResolveNativeSize`、`ApplyNativeFullscreen` 與 read-only `LastSummary`。Package Framework public API 未改。
+  - Data：Content Pack、Scenario JSON、Save schema、Input Action asset格式均未改；既有 runtime action map 的 `<Mouse>/scroll` binding 保留。
+- Tests／Validation：
+  - 首次 `dotnet restore`＋build：FAIL，2 errors；Unity 尚未重新產生 `.csproj`，新 `PrototypeDisplayAdapter.cs` 不在 Compile 清單。以 Unity 6000.5.7f1 batch import 更新 generated project 後修正；不是 runtime／namespace defect。
+  - Unity batch import：PASS，無 `error CS`／`Compilation failed`，正常 exit。
+  - 第二次 `dotnet restore`＋`dotnet build --no-restore`：PASS，0 warnings／0 errors。
+  - Targeted PlayMode `DisplayAndMouseWheel_UseNativeFullscreenPolicyAndZoomBothDirections`：PASS 1/1；result `Logs/DisplayWheelTargeted.xml`。
+  - Full EditMode：PASS 177/177；0 failed／0 skipped；result `Logs/DisplayFullEditMode.xml`。
+  - Full PlayMode：PASS 35/35；0 failed／0 skipped；result `Logs/DisplayFullPlayMode.xml`。
+  - Windows Development Build：PASS；BuildReport 186,825,517 bytes；輸出 332 files／187,182,121 bytes；log `Logs/DisplayWindowsBuild.log`。
+  - Windows Player launch：PASS；不傳 `-screen-width`／`-screen-height`／windowed override，process 執行 7 秒未提前退出；Player log 實際輸出 `[PlayablePrototype Display] Native Fullscreen · 1920×1080`，之後由驗證流程關閉。
+- Acceptance：
+  - 主顯示器原生解析度：`PASS` — runtime 讀到本機 1920×1080 並寫入 Player log。
+  - 無邊框全螢幕：`PASS` — runtime 明確呼叫 `FullScreenMode.FullScreenWindow`，既有 Player Settings 同為 native/fullscreen。
+  - Editor 不被強制全螢幕：`PASS` — `Application.isEditor` 分支只回報 Game View。
+  - 滾輪向上拉近、向下拉遠：`PASS` — targeted test 驗證 20→17→20 m。
+  - Zoom 不超過 2.5～40 m：`PASS` — 沿用既有 model clamp 與既有 camera tests。
+  - 實體滑鼠在使用者桌面上的主觀靈敏度：`NOT RUN` — automated test 能驗 data flow／數值，無法代替使用者手感。
+- Completed：Player display policy、diagnostics、滾輪方向契約、完整 regression、Windows build／launch與兩份規格文件均已完成。
+- Not Completed／Deferred：未加入遊戲內解析度／螢幕選擇器；未改成 exclusive fullscreen；未調整每格滾輪的 3 m 靈敏度，等使用者實際試玩回饋再做。
+- Known Issues／Risks：`Display.main` 只代表主顯示器；多螢幕選擇尚未提供。無邊框全螢幕採桌面 refresh rate／系統顯示模式，不會切換獨佔解析度。`Alt+Enter` 可暫時切換，但下次啟動仍依規格回到原生解析度全螢幕。
+- Git：Branch `main`；結束時 7 個 tracked/untracked status entries（display adapter＋meta、Bootstrap、PlayMode test、2 份 docs、`DevelopmentProgress.md`）；未 commit／push。Unity build 自動重寫的 Scene fileIDs、URP／Volume、batching 與 Unity Connect 設定已還原；`git diff --check` PASS。
+- Next：
+  1. 專案擁有者直接啟動最新 `PlayablePrototype_01.exe`，確認畫面覆蓋 1920×1080 螢幕，並滾輪上下各操作 5 次確認方向與速度。
+  2. 若每格 3 m 太快／太慢，只調 `RtsCameraController.zoomSpeed` 並重跑 targeted test，不改 zoom 邊界。
+  3. 顯示與相機手感接受後，回到玩家守城／AI 正式攻城／維修成本或 Infantry L2.1 的優先級選擇。
 
 ## 2026-08-12 — Infantry L3 人物細節、材質與 Unity 軸向修正
 

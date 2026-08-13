@@ -13,7 +13,7 @@
 
 ## 目前結論
 
-`PlayablePrototype_01` 的 PP00～PP08 程式、Content、scene、HUD、Save／Load、自動測試與 Windows Development Build 已建立。自動化流程可完成 New Game → Economy → Recruit → Army → Battle → Siege → Capture → Victory，另有可重現的 Defeat path。步兵已使用 GLB 衍生的靜態 L2 Prefab；英雄與其他兵種仍使用 primitive placeholder。
+`PlayablePrototype_01` 的 PP00～PP08 程式、Content、scene、HUD、Save／Load、自動測試與 Windows Development Build 已建立。自動化流程可完成 New Game → Economy → Recruit → Army → Battle → Siege → Capture → Victory，另有可重現的 Defeat path。步兵已使用 Humanoid L3 Prefab 與 Idle／Move／Attack／Hit／Death；停止後應保持雙腿在身體下方的直立防守姿勢。英雄與其他兵種仍使用 primitive placeholder。
 
 目前可宣稱 PP00～PP08 的系統優先 Prototype 已完成，但不可宣稱正式遊戲或 G01～G12 完成，原因如下：
 
@@ -31,6 +31,10 @@
 3. 確認 Console 沒有 compile error 或 missing script。
 4. 按 Play。Scene 預設直接建立 New Game；也可按 `Menu` 回主選單測試 New Game／Load Game。
 5. 左側 HUD 顯示 session、objective、systems、resources、population、queues、combat、siege、AI 與最近命令；右側顯示 notifications。
+
+主選單提供「開始新遊戲」、「載入進度」與「離開遊戲」。Windows Player 按「離開遊戲」會先清理目前 Prototype session，再正常結束程式；Unity Editor 中同一按鈕會停止 Play Mode，不會關閉 Unity Editor。
+
+Unity Editor 使用目前 Game View 尺寸，不會搶占桌面全螢幕。Windows executable 啟動時會自動切換成主顯示器原生解析度的無邊框全螢幕；例如螢幕為 2560×1440，遊戲就使用 2560×1440。設定面板會顯示實際 `Screen.width × Screen.height` 與目前 Display mode。
 
 如要單獨重驗步兵美術接線，使用 Unity menu：
 
@@ -66,7 +70,8 @@ Rebuild 會重新建立 scene、綁定 PrototypeNeutral Content／Scenario／The
 | 停止 | `X` | 派送 Stop。 |
 | 原地防守 | `H` | 派送 Hold。 |
 | 移動相機 | `WASD` | 平移 RTS camera。 |
-| 放大／縮小 | 滑鼠滾輪 | 相機距離可在 2.5–40 m 間縮放；2.5–4 m 會自動降低俯角並聚焦身體，用於查看臉、甲片、盾牌、武器與動畫。 |
+| 放大／縮小 | 滑鼠滾輪 | 滾輪向上拉近、向下拉遠；預設速度為原本的 3 倍，相機距離限制在 2.5–40 m。2.5–4 m 會自動降低俯角並聚焦身體。 |
+| 調整縮放速度 | `+`／`-` | `+` 加快、`-` 減慢；主鍵盤與數字鍵盤都支援，倍率限制為 ×1～×6，預設 ×3。設定面板會顯示目前倍率。 |
 | 聚焦選取 | `F` | 將相機中心移到目前選取單位，再用滾輪拉近。 |
 
 Prototype 的 HUD 按鈕是完整系統流程的可重現入口，不會直接寫 resources、HP、owner 或 objective。所有 mutation 都必須經 CommandBus、domain validator 或 authoritative event／fact。
@@ -129,6 +134,8 @@ AegisRTS.Editor.PlayablePrototypeSceneBuilder.BuildWindowsDevelopment
 ```
 
 可先設定環境變數 `AEGIS_PP_BUILD_DIR` 改變輸出資料夾。此 method 會先 rebuild scene，再建立 Windows x86_64 Development Build。Build 完成後需實際啟動 `.exe`，至少完成一次本文件的 A～E；只證明 process 能啟動不等於人工 playable gate 通過。
+
+Player Settings 與 runtime display adapter 都要求 `FullScreenWindow`＋主顯示器原生解析度；runtime log 會輸出 `[PlayablePrototype Display] Native Fullscreen · <width>×<height>`，可用來核對實際要求值。`Alt+Enter` 仍可由 Unity Player 的 Allow Fullscreen Switch 提供暫時切換，但重新啟動時會回到原生解析度全螢幕。
 
 ## PP00～PP08 狀態
 

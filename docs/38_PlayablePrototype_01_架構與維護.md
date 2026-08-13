@@ -19,9 +19,9 @@
 
 Content Pack 的 `prefabId` 只保存穩定的資產 ID，不保存 Unity object reference。`PrototypeEntityRecord` 將該 ID 帶到 presentation；`PrototypeUnitArtCatalog` 再從 Resources 載入產品層 Prefab。找不到支援的 ID／Prefab 時，Bootstrap 會回退到原本的 primitive，避免未完成的美術阻斷玩法測試。
 
-第一個已接入的 ID 是 `PF_Unit_Infantry`，Prefab 位於 `Assets/AegisRTS/Content/Shared/Art/Units/Infantry/Resources/AegisRTS/Units/Infantry/`。它包含 LOD0／LOD1、Base／Team Color renderers、`SelectionAnchor`、`HealthBarAnchor` 與 collider；陣營色與選取高亮使用 `MaterialPropertyBlock`，不複製材質 instance。衍生 mesh／material／prefab 由 `Tools/AegisRTS/Art/Rebuild Infantry L2 Prefab` 重建。
+第一個已接入的 ID 是 `PF_Unit_Infantry`，Prefab 位於 `Assets/AegisRTS/Content/Shared/Art/Units/Infantry/Resources/AegisRTS/Units/Infantry/`。它包含 LOD0／LOD1／LOD2、Base／Team Color renderers、Humanoid Avatar、Animator、`SelectionAnchor`、`HealthBarAnchor` 與 collider；陣營色與選取高亮使用 `MaterialPropertyBlock`，不複製材質 instance。衍生 model／clips／material／prefab 由 `Tools/AegisRTS/Art/Rebuild Infantry L3 Prefab` 重建。
 
-目前步兵是靜態 L2 模型。Gameplay root 會依實際移動方向旋轉，但動畫狀態機必須等 Rigged L3 與 Idle／Move／Attack／Hit／Death clips 交付後再建立。
+`PrototypeUnitAnimatorView` 將 authoritative movement／combat snapshots 投影為 Idle／Move／Attack／Hit／Death；Root Motion 關閉，Animator 不擁有 gameplay Transform 或傷害。現有 v002 生成骨架的 Humanoid Idle retarget 會讓雙腿向前傾，bridge 只在 `Idle`、非 transition、非死亡時於 `LateUpdate` 將左右 thigh／shin 朝世界下方校正並保留 foot world rotation；Move、Attack、Hit、Death 不套用此校正。`IdleStanceCorrectionCount` 提供 regression／debug 證據；未來替換成正確 final-art Idle asset 後應移除此相容層。
 
 ## Command 與狀態流程
 

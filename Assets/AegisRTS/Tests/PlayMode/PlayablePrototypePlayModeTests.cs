@@ -380,6 +380,7 @@ namespace AegisRTS.Tests.PlayMode
 
                 Vector3 rootPosition = instance.transform.position;
                 yield return null;
+                AssertHumanoidStanding(animator, "Initial rendered Idle pose");
                 animator.SetFloat("MoveRate", 1.8f);
                 animator.SetFloat("Speed", 1f);
                 yield return new WaitForSeconds(0.8f);
@@ -387,6 +388,8 @@ namespace AegisRTS.Tests.PlayMode
                 Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
 
                 animator.SetFloat("Speed", 0f);
+                yield return new WaitForSeconds(0.25f);
+                AssertHumanoidStanding(animator, "Move-to-Idle transition");
                 animator.SetTrigger("Attack");
                 yield return new WaitForSeconds(0.55f);
                 Assert.That(art.AnimatorView.AttackImpactCount, Is.GreaterThan(0));
@@ -494,6 +497,9 @@ namespace AegisRTS.Tests.PlayMode
             detailAnimator.Play("Idle", 0, 0.25f);
             detailAnimator.Update(0f);
             yield return null;
+            AssertHumanoidStanding(detailAnimator, "Idle clip");
+            Assert.That(art.AnimatorView.IdleStanceCorrectionCount, Is.GreaterThan(0),
+                "The presentation bridge must correct the malformed generated Idle legs into a standing stance.");
             Bounds idleBounds = CalculateBounds(art.GetComponentsInChildren<Renderer>(true));
             float[] poseSamples = { 0f, 0.25f, 0.5f, 0.75f };
             foreach (float poseSample in poseSamples)
@@ -589,6 +595,78 @@ namespace AegisRTS.Tests.PlayMode
                     CaptureCamera(Camera.main, Path.Combine(directory, $"InfantryMovePose_{index:00}.png"));
                 }
             }
+        }
+
+        [Test]
+        public void DisplayAndMouseWheel_UseNativeFullscreenPolicyAndZoomBothDirections()
+        {
+            Assert.That(PrototypeDisplayAdapter.ResolveNativeSize(2560, 1440, 1920, 1080),
+                Is.EqualTo(new Vector2Int(2560, 1440)));
+            Assert.That(PrototypeDisplayAdapter.ResolveNativeSize(0, 0, 1920, 1080),
+                Is.EqualTo(new Vector2Int(1920, 1080)));
+
+            var cameraObject = new GameObject("MouseWheelZoomTest");
+            try
+            {
+                cameraObject.AddComponent<UnityEngine.Camera>();
+                var controller = cameraObject.AddComponent<RtsCameraController>();
+                controller.Initialize(new RtsCameraRigModel(
+                    pivotX: 0d,
+                    pivotZ: 0d,
+                    zoom: 20d,
+                    minimumZoom: 2.5d,
+                    maximumZoom: 40d));
+                Vector2 pointer = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+                controller.ProcessInput(Vector2.zero, pointer, Vector2.zero, false, 0f, 0f);
+                controller.ProcessInput(Vector2.zero, pointer, Vector2.zero, false, 0f, 0f);
+                Assert.That(controller.ZoomSensitivity, Is.EqualTo(3));
+
+                controller.ProcessInput(Vector2.zero, pointer, Vector2.zero, false, 120f, 0f);
+                Assert.That(controller.Model.Zoom, Is.EqualTo(11d).Within(0.001d),
+                    "Default mouse-wheel zoom must be three times faster and move the camera closer.");
+
+                controller.ProcessInput(Vector2.zero, pointer, Vector2.zero, false, -120f, 0f);
+                Assert.That(controller.Model.Zoom, Is.EqualTo(20d).Within(0.001d),
+                    "Mouse wheel down must move the RTS camera farther away.");
+
+                Assert.That(controller.IncreaseZoomSensitivity(), Is.True);
+                Assert.That(controller.ZoomSensitivity, Is.EqualTo(4));
+                controller.ProcessInput(Vector2.zero, pointer, Vector2.zero, false, 120f, 0f);
+                Assert.That(controller.Model.Zoom, Is.EqualTo(8d).Within(0.001d));
+                Assert.That(controller.DecreaseZoomSensitivity(), Is.True);
+                Assert.That(controller.DecreaseZoomSensitivity(), Is.True);
+                Assert.That(controller.ZoomSensitivity, Is.EqualTo(2));
+                controller.ProcessInput(Vector2.zero, pointer, Vector2.zero, false, -120f, 0f);
+                Assert.That(controller.Model.Zoom, Is.EqualTo(14d).Within(0.001d));
+
+                for (int index = 0; index < 10; index++) controller.DecreaseZoomSensitivity();
+                Assert.That(controller.ZoomSensitivity, Is.EqualTo(1), "Minus must clamp at ×1.");
+                for (int index = 0; index < 10; index++) controller.IncreaseZoomSensitivity();
+                Assert.That(controller.ZoomSensitivity, Is.EqualTo(6), "Plus must clamp at ×6.");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator MainMenuQuit_CleansSessionAndResolvesEditorAndPlayerLifecycle()
+        {
+            Assert.That(PrototypeApplicationAdapter.ResolveExitAction(true),
+                Is.EqualTo(PrototypeExitAction.StopEditorPlayMode));
+            Assert.That(PrototypeApplicationAdapter.ResolveExitAction(false),
+                Is.EqualTo(PrototypeExitAction.QuitPlayer));
+
+            SceneManager.LoadScene("PlayablePrototype_01", LoadSceneMode.Single);
+            yield return null;
+            yield return null;
+            PlayablePrototypeBootstrap bootstrap = UnityEngine.Object.FindAnyObjectByType<PlayablePrototypeBootstrap>();
+            Assert.That(bootstrap, Is.Not.Null);
+            bootstrap.ReturnToMenuNow();
+            yield return null;
+            Assert.That(bootstrap.Session.State, Is.EqualTo(GameSessionState.MainMenu));
+            Assert.That(bootstrap.Composition, Is.Null, "Returning to the menu must dispose the active gameplay session.");
         }
 
         [UnityTest]
@@ -827,6 +905,26 @@ namespace AegisRTS.Tests.PlayMode
             Bounds bounds = renderers[0].bounds;
             for (int index = 1; index < renderers.Count; index++) bounds.Encapsulate(renderers[index].bounds);
             return bounds;
+        }
+
+        private static void AssertHumanoidStanding(Animator animator, string context)
+        {
+            Transform head = animator.GetBoneTransform(HumanBodyBones.Head);
+            Transform leftFoot = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+            Transform rightFoot = animator.GetBoneTransform(HumanBodyBones.RightFoot);
+            Assert.That(head, Is.Not.Null, $"{context}: Head bone is unavailable.");
+            Assert.That(leftFoot, Is.Not.Null, $"{context}: LeftFoot bone is unavailable.");
+            Assert.That(rightFoot, Is.Not.Null, $"{context}: RightFoot bone is unavailable.");
+
+            Vector3 feet = (leftFoot.position + rightFoot.position) * 0.5f;
+            float verticalHeight = head.position.y - feet.y;
+            float planarLean = Vector2.Distance(
+                new Vector2(head.position.x, head.position.z),
+                new Vector2(feet.x, feet.z));
+            Assert.That(verticalHeight, Is.GreaterThan(1.2f),
+                $"{context}: head-to-feet height {verticalHeight:F3} m indicates a collapsed/lying pose.");
+            Assert.That(planarLean, Is.LessThan(0.25f),
+                $"{context}: head-to-feet planar lean {planarLean:F3} m indicates a seated/lying pose.");
         }
 
         private static void Tick(PrototypeSystemComposition value, double seconds)

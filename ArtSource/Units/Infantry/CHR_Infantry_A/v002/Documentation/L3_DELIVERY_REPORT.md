@@ -45,6 +45,7 @@ The previous delivery only contained LOD0/LOD1. The corrected build derives LOD2
 - Runtime prefab: `PF_Unit_Infantry.prefab`.
 - Presentation bridge: `PrototypeUnitAnimatorView`; gameplay damage remains authoritative in `CombatSystem`.
 - Animator `applyRootMotion=False`.
+- Unity Humanoid retarget note: the generated v002 Idle leg baseline leans forward after import. The prototype presentation bridge applies an Idle-only thigh/shin standing correction while preserving foot world rotation; Move, Attack, Hit, and Death are unaffected. This compatibility correction must be removed when a final-art Idle clip with a correct Unity stance is delivered.
 - Gameplay movement velocity drives the presentation-only `MoveRate`; the 4.5 m/s prototype speed uses a 1.8 playback rate so the stride does not visibly moonwalk against world translation.
 - The FBX retains the Blender Z-up/-Y-forward source basis. The Unity prefab applies one deterministic -90° X visual-basis conversion, then offsets the imported renderer bounds so the feet are at gameplay Y=0. The prefab root remains at zero/identity/scale one.
 - The builder rejects the asset unless combined Unity renderer bounds are upright on Y, at least 1.65 m tall, grounded, and within the 1.95 m vertical envelope; a green Humanoid Avatar alone is no longer accepted as orientation proof.

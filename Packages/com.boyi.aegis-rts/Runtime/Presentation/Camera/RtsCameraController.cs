@@ -11,10 +11,15 @@ namespace AegisRTS.Presentation.Camera
     [RequireComponent(typeof(UnityEngine.Camera))]
     public sealed class RtsCameraController : MonoBehaviour
     {
+        private const int MinimumZoomSensitivity = 1;
+        private const int MaximumZoomSensitivity = 6;
+
         [SerializeField, Min(1f)] private float panSpeed = 18f;
         [SerializeField, Min(1f)] private float dragSpeed = 0.04f;
         [SerializeField, Min(0f)] private float edgeSize = 14f;
-        [SerializeField, Min(0.1f)] private float zoomSpeed = 0.025f;
+        [SerializeField, Min(0.001f)] private float zoomSpeed = 0.025f;
+        [SerializeField, Range(MinimumZoomSensitivity, MaximumZoomSensitivity)]
+        private int zoomSensitivity = 3;
         [SerializeField, Range(20f, 80f)] private float pitch = 55f;
         [SerializeField] private float yaw = 0f;
         [SerializeField, Min(0f)] private float closeInspectionFocusHeight = 0.9f;
@@ -25,6 +30,11 @@ namespace AegisRTS.Presentation.Camera
         private int _ignoreInputFrames;
 
         public RtsCameraRigModel Model => _model;
+        public int ZoomSensitivity => zoomSensitivity;
+        public string ZoomSensitivitySummary => $"×{zoomSensitivity}";
+
+        public bool IncreaseZoomSensitivity() => SetZoomSensitivity(zoomSensitivity + 1);
+        public bool DecreaseZoomSensitivity() => SetZoomSensitivity(zoomSensitivity - 1);
 
         public void Initialize(RtsCameraRigModel model)
         {
@@ -64,8 +74,17 @@ namespace AegisRTS.Presentation.Camera
                 _model.Pan(dragWorld.x * dragSpeed * speedScale, dragWorld.z * dragSpeed * speedScale);
             }
 
-            if (!Mathf.Approximately(scroll, 0f)) _model.ZoomBy(-scroll * zoomSpeed);
+            if (!Mathf.Approximately(scroll, 0f)) _model.ZoomBy(-scroll * zoomSpeed * zoomSensitivity);
             ApplyTransform();
+        }
+
+        private bool SetZoomSensitivity(int value)
+        {
+            int clamped = Mathf.Clamp(value, MinimumZoomSensitivity, MaximumZoomSensitivity);
+            if (clamped == zoomSensitivity) return false;
+            zoomSensitivity = clamped;
+            Debug.Log($"[RTS Camera] Zoom sensitivity {ZoomSensitivitySummary}", this);
+            return true;
         }
 
         public bool FocusSelection(ISelectionQuery selection, IEnumerable<UnitySelectableView> views)
