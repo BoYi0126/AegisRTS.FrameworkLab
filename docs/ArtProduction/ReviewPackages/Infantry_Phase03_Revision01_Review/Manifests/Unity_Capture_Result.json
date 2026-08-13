@@ -1,0 +1,14 @@
+{
+  "status": "READY FOR PHASE03 REVISION REVIEW",
+  "unity_version": "6000.5.7f1",
+  "scene": "Assets/AegisRTS/Review/InfantryPhase03Revision01/SCN_Infantry_P03R1_Review.unity",
+  "review_prefab": "Assets/AegisRTS/Review/InfantryPhase03Revision01/PF_Unit_Infantry_v004_P03R1_Review.prefab",
+  "fbx": "Assets/AegisRTS/Review/InfantryPhase03Revision01/SK_Infantry_A_v004_P03R1_Review.fbx",
+  "material": "Neutral Clay plus preview Material ID",
+  "camera": "Perspective, 35 degree FOV at 7.5 m for RTS Normal",
+  "imported_height_m": 1.824011,
+  "ground_min_y_m": 0.000000,
+  "renderer_count": 98,
+  "runtime_prefab_replaced": false,
+  "captures": ["Unity_Close.png", "Unity_RTS_Normal.png", "Unity_Far.png", "Unity_MaterialID_RTS_Normal.png"]
+}

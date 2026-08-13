@@ -1,0 +1,66 @@
+{
+  "status": "READY FOR PHASE03 REVISION REVIEW",
+  "source_version": "CHR_Infantry_A_v004_P03R1",
+  "opened_file": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004_P03R1.blend",
+  "opened_file_sha256": "C6429918EA147E65713B31EF9D6940EC313C46DA1D2F4404032CA253B4B72F31",
+  "blender_version": "5.2.0 LTS",
+  "saved_by_review_script": false,
+  "height_m": 1.8240108489990234,
+  "bounds": {
+    "min": [
+      -0.8899999856948853,
+      -0.28071996569633484,
+      0.0
+    ],
+    "max": [
+      1.0283448696136475,
+      0.19922910630702972,
+      1.8240108489990234
+    ],
+    "dimensions": [
+      1.9183448553085327,
+      0.47994905710220337,
+      1.8240108489990234
+    ]
+  },
+  "mesh_count": 98,
+  "vertices": 16858,
+  "triangles": 33248,
+  "material_ids": [
+    "MATID_Cloth",
+    "MATID_Leather",
+    "MATID_Metal",
+    "MATID_Skin",
+    "MATID_Team",
+    "MATID_Wood"
+  ],
+  "armatures": 1,
+  "bones": 23,
+  "empties": 10,
+  "actions": 0,
+  "collections": [
+    "CHR_Infantry_A_v004",
+    "GEO_ARMOR",
+    "GEO_BODY",
+    "GEO_CLOTH",
+    "GEO_WEAPONS",
+    "REVIEW",
+    "RIG"
+  ],
+  "topology": {
+    "non_manifold_edges": 0,
+    "boundary_edges": 0,
+    "loose_edges": 0,
+    "zero_area_faces": 0
+  },
+  "protected_v004_sha256": "E1B6B3DFF07258184484186E5AEF8A380457A04E7899107D77908ECABCAA0046",
+  "deferred": [
+    "Phase 04",
+    "Final UV",
+    "Final Texture",
+    "Animation Polish",
+    "Final Skinning",
+    "Formal LOD",
+    "Runtime Prefab replacement"
+  ]
+}

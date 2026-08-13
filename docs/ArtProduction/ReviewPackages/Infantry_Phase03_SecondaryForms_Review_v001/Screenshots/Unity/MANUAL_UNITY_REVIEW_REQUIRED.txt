@@ -1,0 +1,2 @@
+MANUAL UNITY REVIEW REQUIRED
+No Runtime Prefab was created or replaced. Import CHR_Infantry_A_v004 into an isolated review path, create PF_Unit_Infantry_v004_Review, and capture Close / Medium / RTS_Normal / Far under current URP lighting.

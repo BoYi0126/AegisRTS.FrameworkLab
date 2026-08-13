@@ -1,7 +1,7 @@
 # 17 — Asset Production Backlog
 
 > Version: 1.0  
-> Snapshot: 2026-08-13, repository HEAD `ec0560192863a763d6beb3be6b9c0c642b1d4137`  
+> Snapshot: 2026-08-13, repository HEAD `0422d6b98907095ffe8b47a7673a90aa72c8bea0`
 > Status vocabulary: `BLOCKED`, `READY FOR GATE`, `IN PROGRESS`, `PROTOTYPE`, `PROPOSED`, `PRODUCTION READY`
 
 ## 1. Scheduling rules
@@ -17,7 +17,7 @@
 
 | Priority | Candidate | Current runtime ID | Current status | Blocking gates | Next authorized work |
 |---|---|---|---|---|---|
-| P0.1 | Infantry | `unit.infantry` | PHASE 02 REVISION 01 `READY FOR PHASE02 REVISION REVIEW` / partial-remaster candidate | Human P02R1 review; provenance; durable source actions; production texture/team-mask shader; production LOD and deformation; Unity evidence | Review `docs/ArtProduction/ReviewPackages/Infantry_Phase02_PrimaryForms_Revision01_Review/04_Review_Checklist.md`; approve/conditionally approve or request focused R2 without replacing runtime |
+| P0.1 | Infantry | `unit.infantry` | PHASE 03.5 R1 `READY FOR PHASE03_5 REVISION REVIEW` / v004_P035R1 pre-UV candidate | Human 19-item revision review and PRE-UV geometry-lock decision; provenance; production texture/team-mask shader; production skin/deformation and LOD | Review `docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision01_Review/05_Review_Checklist.md`, especially arm drop, hand／head scale, grip and L1／Unity comparisons; Phase 04 requires explicit approval |
 | P0.2 | Archer | `unit.archer` | PROTOTYPE / partial-remaster candidate | Formal L1 and L2 absent; source actions; materials/textures; production LOD/deformation; Unity evidence | Author and approve L1/L2 from the preserved prototype role; then scope shared-body versus class-specific rebuild |
 | P0.3 | Shared character foundation | N/A | PROPOSED | Skeleton family/version, modular socket contract, production URP/team-color shader and packing, target performance | Prototype and validate through Infantry/Archer only; freeze after dual-sample evidence |
 | P0.4 | Golden Sample lock | N/A | BLOCKED | Both candidates and shared foundation must pass `16_Master_Production_Checklist.md` | Run design, art and technical-art sign-off; record lock revision and evidence root |

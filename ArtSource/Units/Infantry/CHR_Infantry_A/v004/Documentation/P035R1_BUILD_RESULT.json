@@ -1,0 +1,536 @@
+{
+  "status": "READY FOR PHASE03_5 REVISION REVIEW",
+  "input": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004_P035.blend",
+  "input_sha256": "234383811F66F26DE29C8DBEF5E31C1B65D58B6B1E07C3FD08F3FF0AAF46422B",
+  "output": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004_P035R1.blend",
+  "output_sha256": "A0CCC9771CD7A62D966891784745F138A9DCBF1230DF5E71A4F5D60900A84D0A",
+  "blender_version": "5.2.0 LTS",
+  "geometry": {
+    "height_m": 1.8240108489990234,
+    "meshes": 98,
+    "vertices": 16858,
+    "triangles": 33248,
+    "bones": 23,
+    "review_actions": 1
+  },
+  "targets": {
+    "upper_arm_ratio": 0.176,
+    "forearm_ratio": 0.165,
+    "combined_shoulder_to_wrist_ratio": 0.34099999999999997,
+    "hand_width_ratio": 0.06,
+    "head_width_ratio": 0.12
+  },
+  "corrections": {
+    "upper_arm_scale": 1.1359031279754983,
+    "forearm_scale": 1.064909319793387,
+    "hand_lateral_scale": 0.7778385229291942,
+    "hand_length_scale": 0.92,
+    "head_uniform_scale": 0.9474892431742171,
+    "neck_width_scale": 0.96,
+    "left_equipment_translation_m": [
+      -0.04558515548706055,
+      0.0,
+      -0.025365591049194336
+    ],
+    "right_equipment_translation_m": [
+      0.04558515548706055,
+      0.0,
+      -0.025365591049194336
+    ],
+    "shoulder_origin": "PRESERVED",
+    "hip_knee_torso": "PRESERVED",
+    "chest_width": "PRESERVED",
+    "helmet_outer_silhouette": "PRESERVED",
+    "shield_geometry_and_size": "PRESERVED",
+    "sword_geometry_and_size": "PRESERVED"
+  },
+  "before": {
+    "character_height_m": 1.8240108489990234,
+    "bounds": {
+      "min": [
+        -0.8899999856948853,
+        -0.28071996569633484,
+        0.0
+      ],
+      "max": [
+        1.0283448696136475,
+        0.19922910630702972,
+        1.8240108489990234
+      ],
+      "dimensions": [
+        1.9183448553085327,
+        0.47994905710220337,
+        1.8240108489990234
+      ]
+    },
+    "vertical_landmarks_m": {
+      "L00_Ground": 0.0,
+      "L01_Ankle": 0.1372510939836502,
+      "L02_Knee": 0.45500001311302185,
+      "L03_Crotch_HipJoint": 0.6499999761581421,
+      "L04_Belt_Waist": 1.0475000143051147,
+      "L05_ChestCenter": 1.2635579705238342,
+      "L06_ShoulderJoint": 1.381661057472229,
+      "L07_Chin": 1.426900029182434,
+      "L08_HeadTop": 1.7431000471115112,
+      "L09_HelmetTop": 1.7747999429702759,
+      "L10_PlumeTop": 1.8240108489990234
+    },
+    "vertical_landmarks_normalized": {
+      "L00_Ground": 0.0,
+      "L01_Ankle": 0.07524686273602514,
+      "L02_Knee": 0.24945027786578997,
+      "L03_Crotch_HipJoint": 0.3563575164669923,
+      "L04_Belt_Waist": 0.5742838727521601,
+      "L05_ChestCenter": 0.6927359950831689,
+      "L06_ShoulderJoint": 0.7574851093843296,
+      "L07_Chin": 0.782287029688165,
+      "L08_HeadTop": 0.9556412715791058,
+      "L09_HelmetTop": 0.973020497078867,
+      "L10_PlumeTop": 1.0
+    },
+    "arm_landmarks_world_m": {
+      "left": {
+        "shoulder_joint": [
+          -0.23790189623832703,
+          0.0,
+          1.381661057472229
+        ],
+        "elbow_joint": [
+          -0.4849538803100586,
+          0.0,
+          1.2444099187850952
+        ],
+        "wrist_joint": [
+          -0.7320058345794678,
+          0.0,
+          1.1071587800979614
+        ],
+        "palm_center": [
+          -0.7823312282562256,
+          0.0,
+          1.0797085762023926
+        ],
+        "hand_end": [
+          -0.8326566219329834,
+          0.0,
+          1.0522583723068237
+        ]
+      },
+      "right": {
+        "shoulder_joint": [
+          0.23790189623832703,
+          0.0,
+          1.381661057472229
+        ],
+        "elbow_joint": [
+          0.4849538803100586,
+          0.0,
+          1.2444099187850952
+        ],
+        "wrist_joint": [
+          0.7320058345794678,
+          0.0,
+          1.1071587800979614
+        ],
+        "palm_center": [
+          0.7823312282562256,
+          0.0,
+          1.0797085762023926
+        ],
+        "hand_end": [
+          0.8326566219329834,
+          0.0,
+          1.0522583723068237
+        ]
+      }
+    },
+    "horizontal_measurements_m": {
+      "head_width": 0.23101191222667694,
+      "helmet_width": 0.28756001591682434,
+      "neck_width": 0.164000004529953,
+      "anatomical_shoulder_width": 0.47580379247665405,
+      "armored_shoulder_width": 0.7249360084533691,
+      "chest_width": 0.5038400292396545,
+      "waist_width": 0.49667084217071533,
+      "hip_width": 0.4000000059604645,
+      "upper_arm_max_width": 0.10092497617006302,
+      "forearm_max_width": 0.18507762253284454,
+      "hand_width": 0.126628577709198,
+      "thigh_width": 0.28820598125457764,
+      "calf_width": 0.23841172456741333,
+      "boot_width": 0.20183679461479187
+    },
+    "horizontal_measurements_normalized": {
+      "head_width": 0.12665051436149688,
+      "helmet_width": 0.15765257979393646,
+      "neck_width": 0.08991174839774256,
+      "anatomical_shoulder_width": 0.2608557908182205,
+      "armored_shoulder_width": 0.39744062314716927,
+      "chest_width": 0.27622644323423334,
+      "waist_width": 0.27229599124548914,
+      "hip_width": 0.21929694452199974,
+      "upper_arm_max_width": 0.055331346425624824,
+      "forearm_max_width": 0.1014673912901401,
+      "hand_width": 0.06942314941749878,
+      "thigh_width": 0.15800672535075033,
+      "calf_width": 0.13070740489194368,
+      "boot_width": 0.11065547922895054
+    },
+    "segment_lengths_m": {
+      "upper_arm_length": 0.2826173347362037,
+      "forearm_length": 0.2826173083734155,
+      "hand_length": 0.11465006015643076,
+      "torso_length": 0.7316610813140869,
+      "upper_leg_length": 0.19521451824396294,
+      "lower_leg_length": 0.31774890619745483,
+      "leg_length": 0.6499999761581421,
+      "foot_length": 0.2588559367661256
+    },
+    "segment_lengths_normalized": {
+      "upper_arm_length": 0.15494279263267421,
+      "forearm_length": 0.15494277817947716,
+      "hand_length": 0.06285601876729414,
+      "torso_length": 0.40112759291733724,
+      "upper_leg_length": 0.10702486684829332,
+      "lower_leg_length": 0.1742034080399403,
+      "leg_length": 0.3563575164669923,
+      "foot_length": 0.14191578789576828
+    },
+    "weapon_measurements_m": {
+      "shield_width": 0.6000000238418579,
+      "shield_height": 0.8624239563941956,
+      "sword_projected_overall_length": 1.0612170696258545
+    }
+  },
+  "after": {
+    "character_height_m": 1.8240108489990234,
+    "bounds": {
+      "min": [
+        -0.9355851411819458,
+        -0.28071996569633484,
+        0.0
+      ],
+      "max": [
+        1.073930025100708,
+        0.19922910630702972,
+        1.8240108489990234
+      ],
+      "dimensions": [
+        2.0095152854919434,
+        0.47994905710220337,
+        1.8240108489990234
+      ]
+    },
+    "vertical_landmarks_m": {
+      "L00_Ground": 0.0,
+      "L01_Ankle": 0.1372510939836502,
+      "L02_Knee": 0.45500001311302185,
+      "L03_Crotch_HipJoint": 0.6499999761581421,
+      "L04_Belt_Waist": 1.0475000143051147,
+      "L05_ChestCenter": 1.2635579705238342,
+      "L06_ShoulderJoint": 1.381661057472229,
+      "L07_Chin": 1.4352020025253296,
+      "L08_HeadTop": 1.7347980737686157,
+      "L09_HelmetTop": 1.7747999429702759,
+      "L10_PlumeTop": 1.8240108489990234
+    },
+    "vertical_landmarks_normalized": {
+      "L00_Ground": 0.0,
+      "L01_Ankle": 0.07524686273602514,
+      "L02_Knee": 0.24945027786578997,
+      "L03_Crotch_HipJoint": 0.3563575164669923,
+      "L04_Belt_Waist": 0.5742838727521601,
+      "L05_ChestCenter": 0.6927359950831689,
+      "L06_ShoulderJoint": 0.7574851093843296,
+      "L07_Chin": 0.7868385230893427,
+      "L08_HeadTop": 0.9510897781779282,
+      "L09_HelmetTop": 0.973020497078867,
+      "L10_PlumeTop": 1.0
+    },
+    "arm_landmarks_world_m": {
+      "left": {
+        "shoulder_joint": [
+          -0.23790189623832703,
+          0.0,
+          1.381661057472229
+        ],
+        "elbow_joint": [
+          -0.5185290575027466,
+          0.0,
+          1.225757122039795
+        ],
+        "wrist_joint": [
+          -0.7816169857978821,
+          0.0,
+          1.0795971155166626
+        ],
+        "palm_center": [
+          -0.8279163837432861,
+          0.0,
+          1.0543429851531982
+        ],
+        "hand_end": [
+          -0.8742157220840454,
+          0.0,
+          1.0290887355804443
+        ]
+      },
+      "right": {
+        "shoulder_joint": [
+          0.23790189623832703,
+          0.0,
+          1.381661057472229
+        ],
+        "elbow_joint": [
+          0.5185290575027466,
+          0.0,
+          1.225757122039795
+        ],
+        "wrist_joint": [
+          0.7816169857978821,
+          0.0,
+          1.0795971155166626
+        ],
+        "palm_center": [
+          0.8279163837432861,
+          0.0,
+          1.0543429851531982
+        ],
+        "hand_end": [
+          0.8742157220840454,
+          0.0,
+          1.0290887355804443
+        ]
+      }
+    },
+    "horizontal_measurements_m": {
+      "head_width": 0.21888130903244019,
+      "helmet_width": 0.28756001591682434,
+      "neck_width": 0.15744000673294067,
+      "anatomical_shoulder_width": 0.47580379247665405,
+      "armored_shoulder_width": 0.7249360084533691,
+      "chest_width": 0.5038400292396545,
+      "waist_width": 0.49667084217071533,
+      "hip_width": 0.4000000059604645,
+      "upper_arm_max_width": 0.10092497617006302,
+      "forearm_max_width": 0.18507762253284454,
+      "hand_width": 0.1106305718421936,
+      "thigh_width": 0.28820598125457764,
+      "calf_width": 0.23841172456741333,
+      "boot_width": 0.20183679461479187
+    },
+    "horizontal_measurements_normalized": {
+      "head_width": 0.12000000392133489,
+      "helmet_width": 0.15765257979393646,
+      "neck_width": 0.08631527976894449,
+      "anatomical_shoulder_width": 0.2608557908182205,
+      "armored_shoulder_width": 0.39744062314716927,
+      "chest_width": 0.27622644323423334,
+      "waist_width": 0.27229599124548914,
+      "hip_width": 0.21929694452199974,
+      "upper_arm_max_width": 0.055331346425624824,
+      "forearm_max_width": 0.1014673912901401,
+      "hand_width": 0.060652365035495925,
+      "thigh_width": 0.15800672535075033,
+      "calf_width": 0.13070740489194368,
+      "boot_width": 0.11065547922895054
+    },
+    "segment_lengths_m": {
+      "upper_arm_length": 0.32102591454695223,
+      "forearm_length": 0.30096180562177177,
+      "hand_length": 0.10547806557381936,
+      "torso_length": 0.7316610813140869,
+      "upper_leg_length": 0.19521451824396294,
+      "lower_leg_length": 0.31774890619745483,
+      "leg_length": 0.6499999761581421,
+      "foot_length": 0.2588559367661256
+    },
+    "segment_lengths_normalized": {
+      "upper_arm_length": 0.1760000028087136,
+      "forearm_length": 0.16500000851800464,
+      "hand_length": 0.05782754287437675,
+      "torso_length": 0.40112759291733724,
+      "upper_leg_length": 0.10702486684829332,
+      "lower_leg_length": 0.1742034080399403,
+      "leg_length": 0.3563575164669923,
+      "foot_length": 0.14191578789576828
+    },
+    "weapon_measurements_m": {
+      "shield_width": 0.6000000238418579,
+      "shield_height": 0.8624239563941956,
+      "sword_projected_overall_length": 1.0612170696258545
+    }
+  },
+  "posed_before": {
+    "pose": "REVIEW_ONLY_POSE_L1_COMPARE",
+    "height_reference_m": 1.8240108489990234,
+    "ground_m": 0.0,
+    "upper_arm_rotation_degrees": 46.0,
+    "lower_arm_rotation_degrees": 6.0,
+    "sides": {
+      "left_shield_side": {
+        "world_m": {
+          "shoulder": [
+            -0.23790189623832703,
+            0.0,
+            1.381661057472229
+          ],
+          "elbow": [
+            -0.3107883930206299,
+            0.0,
+            1.108604073524475
+          ],
+          "wrist": [
+            -0.354733407497406,
+            0.0,
+            0.829424262046814
+          ],
+          "palm": [
+            -0.36408576369285583,
+            0.0,
+            0.7728673219680786
+          ],
+          "hand_end": [
+            -0.37343811988830566,
+            0.0,
+            0.7163103222846985
+          ]
+        },
+        "vertical_normalized": {
+          "shoulder": 0.7574851093843296,
+          "elbow": 0.6077837059647163,
+          "wrist": 0.45472550917226373,
+          "palm": 0.42371859925735145,
+          "hand_end": 0.39271165666464847
+        }
+      },
+      "right_sword_side": {
+        "world_m": {
+          "shoulder": [
+            0.23790189623832703,
+            0.0,
+            1.381661057472229
+          ],
+          "elbow": [
+            0.3107883930206299,
+            0.0,
+            1.108604073524475
+          ],
+          "wrist": [
+            0.354733407497406,
+            0.0,
+            0.829424262046814
+          ],
+          "palm": [
+            0.36408576369285583,
+            0.0,
+            0.7728673219680786
+          ],
+          "hand_end": [
+            0.37343811988830566,
+            0.0,
+            0.7163103222846985
+          ]
+        },
+        "vertical_normalized": {
+          "shoulder": 0.7574851093843296,
+          "elbow": 0.6077837059647163,
+          "wrist": 0.45472550917226373,
+          "palm": 0.42371859925735145,
+          "hand_end": 0.39271165666464847
+        }
+      }
+    }
+  },
+  "posed_after": {
+    "pose": "REVIEW_ONLY_POSE_L1_COMPARE",
+    "height_reference_m": 1.8240108489990234,
+    "ground_m": 0.0,
+    "upper_arm_rotation_degrees": 46.0,
+    "lower_arm_rotation_degrees": 6.0,
+    "sides": {
+      "left_shield_side": {
+        "world_m": {
+          "shoulder": [
+            -0.23790189623832703,
+            0.0,
+            1.381661057472229
+          ],
+          "elbow": [
+            -0.3206939399242401,
+            0.0,
+            1.0714948177337646
+          ],
+          "wrist": [
+            -0.3674914538860321,
+            0.0,
+            0.774193525314331
+          ],
+          "palm": [
+            -0.37609559297561646,
+            0.0,
+            0.722161054611206
+          ],
+          "hand_end": [
+            -0.3846997618675232,
+            0.0,
+            0.6701286435127258
+          ]
+        },
+        "vertical_normalized": {
+          "shoulder": 0.7574851093843296,
+          "elbow": 0.5874388402469082,
+          "wrist": 0.42444568010063716,
+          "palm": 0.3959192759228992,
+          "hand_end": 0.367392904422952
+        }
+      },
+      "right_sword_side": {
+        "world_m": {
+          "shoulder": [
+            0.23790189623832703,
+            0.0,
+            1.381661057472229
+          ],
+          "elbow": [
+            0.3206939399242401,
+            0.0,
+            1.0714948177337646
+          ],
+          "wrist": [
+            0.3674914538860321,
+            0.0,
+            0.774193525314331
+          ],
+          "palm": [
+            0.37609559297561646,
+            0.0,
+            0.722161054611206
+          ],
+          "hand_end": [
+            0.3846997618675232,
+            0.0,
+            0.6701286435127258
+          ]
+        },
+        "vertical_normalized": {
+          "shoulder": 0.7574851093843296,
+          "elbow": 0.5874388402469082,
+          "wrist": 0.42444568010063716,
+          "palm": 0.3959192759228992,
+          "hand_end": 0.367392904422952
+        }
+      }
+    }
+  },
+  "deferred": [
+    "Phase 04",
+    "Final UV",
+    "Final Texture",
+    "Final Skinning",
+    "Animation Polish",
+    "Formal LOD",
+    "Runtime Prefab replacement"
+  ]
+}

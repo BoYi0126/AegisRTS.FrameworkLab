@@ -1,0 +1,57 @@
+{
+  "status": "READY FOR PHASE03 REVISION REVIEW",
+  "source_version": "CHR_Infantry_A_v004_P03R1",
+  "input": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004.blend",
+  "input_sha256": "E1B6B3DFF07258184484186E5AEF8A380457A04E7899107D77908ECABCAA0046",
+  "output": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004_P03R1.blend",
+  "output_sha256": "C6429918EA147E65713B31EF9D6940EC313C46DA1D2F4404032CA253B4B72F31",
+  "blender_version": "5.2.0 LTS",
+  "height_m": 1.8240108489990234,
+  "mesh_count": 98,
+  "vertices": 16858,
+  "triangles": 33248,
+  "material_ids": [
+    "MATID_Cloth",
+    "MATID_Leather",
+    "MATID_Metal",
+    "MATID_Skin",
+    "MATID_Team",
+    "MATID_Wood"
+  ],
+  "armatures": 1,
+  "bones": 23,
+  "empties": 10,
+  "actions": 0,
+  "topology": {
+    "non_manifold_edges": 0,
+    "boundary_edges": 0,
+    "loose_edges": 0,
+    "zero_area_faces": 0
+  },
+  "revision_changes": [
+    "Front waist cloth integrated folds/thickness/hem",
+    "Broad flat scarf drape and tapered termination",
+    "Planed/compressed upper-arm sleeve forms",
+    "Simplified shield back brace plus readable strap/grip",
+    "Boot panels integrated into base boot; soles preserved"
+  ],
+  "preserved": [
+    "Head",
+    "Helmet",
+    "Plume direction",
+    "Three-layer shoulders",
+    "Chest lamellar rows",
+    "Shield front/rim/boss",
+    "Sword",
+    "Primary silhouette"
+  ],
+  "deferred": [
+    "Phase 04",
+    "Final UV",
+    "Final Texture",
+    "Animation Polish",
+    "Final Skinning",
+    "Formal LOD",
+    "Runtime Prefab replacement"
+  ]
+}

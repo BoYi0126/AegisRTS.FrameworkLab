@@ -1,0 +1,17 @@
+{
+  "status": "READY FOR PHASE03_5 REVIEW",
+  "unity_version": "6000.5.7f1",
+  "scene": "Assets/AegisRTS/Review/InfantryPhase035/SCN_Infantry_P035_Review.unity",
+  "apose_prefab": "Assets/AegisRTS/Review/InfantryPhase035/PF_Unit_Infantry_P035_Review.prefab",
+  "l1pose_prefab": "Assets/AegisRTS/Review/InfantryPhase035/PF_Unit_Infantry_P035_L1Pose_Review.prefab",
+  "apose_height_m": 1.824011,
+  "l1pose_height_m": 1.841581,
+  "apose_boot_ground_y_m": 0.000000,
+  "l1pose_boot_ground_y_m": 0.000000,
+  "l1pose_overall_min_y_m": -0.017570,
+  "apose_renderers": 98,
+  "l1pose_renderers": 98,
+  "camera": "Perspective, 35 degree FOV, 7.5 m RTS Normal",
+  "runtime_prefab_replaced": false,
+  "captures": ["Unity_Apose_Close.png", "Unity_L1Pose_Close.png", "Unity_L1Pose_RTS_Normal.png"]
+}

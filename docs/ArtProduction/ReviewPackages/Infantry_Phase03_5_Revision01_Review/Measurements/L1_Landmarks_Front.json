@@ -1,0 +1,63 @@
+{
+  "source": "Unit_03_Infantry_L1_Concept_Final.png",
+  "source_sha256": "C6BD352DE06854F8CD59AC92C891E43A0D40070D8F1AB72613358845847F461F",
+  "view": "friendly_front",
+  "image_width": 1254,
+  "image_height": 1254,
+  "character_bounds_px": {
+    "center_x": 278,
+    "plume_top_y": 133,
+    "ground_y": 455,
+    "normalized_character_height_px": 322
+  },
+  "vertical_landmarks": {
+    "L00_Ground": {"x": 278, "y": 455, "confidence": "high", "estimated": false},
+    "L01_Ankle": {"x": 242, "y": 425, "confidence": "medium", "estimated": true},
+    "L02_Knee": {"x": 241, "y": 372, "confidence": "medium", "estimated": true},
+    "L03_Crotch_HipJoint": {"x": 278, "y": 338, "confidence": "low", "estimated": true},
+    "L04_Belt_Waist": {"x": 278, "y": 275, "confidence": "high", "estimated": false},
+    "L05_ChestCenter": {"x": 278, "y": 233, "confidence": "medium", "estimated": true},
+    "L06_ShoulderJoint": {"x": 278, "y": 204, "confidence": "medium", "estimated": true},
+    "L07_Chin": {"x": 278, "y": 191, "confidence": "medium", "estimated": true},
+    "L08_HeadTop": {"x": 278, "y": 151, "confidence": "low", "estimated": true},
+    "L09_HelmetTop": {"x": 278, "y": 143, "confidence": "high", "estimated": false},
+    "L10_PlumeTop": {"x": 278, "y": 133, "confidence": "high", "estimated": false}
+  },
+  "arm_landmarks": {
+    "sword_side": {
+      "shoulder_joint": {"x": 231, "y": 205, "confidence": "medium", "estimated": true},
+      "elbow_joint": {"x": 216, "y": 263, "confidence": "medium", "estimated": true},
+      "wrist_joint": {"x": 204, "y": 316, "confidence": "medium", "estimated": true},
+      "palm_center": {"x": 200, "y": 327, "confidence": "medium", "estimated": true},
+      "hand_end": {"x": 194, "y": 339, "confidence": "medium", "estimated": true}
+    },
+    "shield_side": {
+      "shoulder_joint": {"x": 323, "y": 206, "confidence": "medium", "estimated": true},
+      "elbow_joint": {"x": 340, "y": 263, "confidence": "low", "estimated": true},
+      "wrist_joint": {"x": 339, "y": 315, "confidence": "low", "estimated": true},
+      "palm_center": {"x": 338, "y": 326, "confidence": "low", "estimated": true},
+      "hand_end": {"x": 341, "y": 338, "confidence": "low", "estimated": true}
+    }
+  },
+  "horizontal_measurements_px": {
+    "head_width": {"value": 36, "confidence": "medium", "estimated": true},
+    "helmet_width": {"value": 50, "confidence": "high", "estimated": false},
+    "neck_width": {"value": 25, "confidence": "medium", "estimated": true},
+    "anatomical_shoulder_width": {"value": 79, "confidence": "medium", "estimated": true},
+    "armored_shoulder_width": {"value": 122, "confidence": "high", "estimated": false},
+    "chest_width": {"value": 86, "confidence": "medium", "estimated": true},
+    "waist_width": {"value": 85, "confidence": "medium", "estimated": true},
+    "hip_width": {"value": 100, "confidence": "low", "estimated": true},
+    "upper_arm_max_width": {"value": 25, "confidence": "medium", "estimated": true},
+    "forearm_max_width": {"value": 19, "confidence": "medium", "estimated": true},
+    "hand_width": {"value": 16, "confidence": "medium", "estimated": true},
+    "thigh_width": {"value": 37, "confidence": "medium", "estimated": true},
+    "calf_width": {"value": 25, "confidence": "medium", "estimated": true},
+    "boot_width": {"value": 34, "confidence": "high", "estimated": false}
+  },
+  "notes": [
+    "Pixel coordinates were measured from the friendly-blue front figure, not from the example coordinates in the task.",
+    "Armor obscures hip, shield-side elbow and wrist; these are explicitly low-confidence estimates.",
+    "Uniform normalization uses plume-top to ground because the L1 height bracket includes the complete presented silhouette."
+  ]
+}

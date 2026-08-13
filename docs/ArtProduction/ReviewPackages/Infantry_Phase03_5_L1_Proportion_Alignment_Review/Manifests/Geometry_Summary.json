@@ -1,0 +1,56 @@
+{
+  "status": "READY FOR PHASE03_5 REVIEW",
+  "source_version": "CHR_Infantry_A_v004_P035",
+  "opened_file": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v004\\Source\\CHR_Infantry_A_v004_P035.blend",
+  "opened_file_sha256": "234383811F66F26DE29C8DBEF5E31C1B65D58B6B1E07C3FD08F3FF0AAF46422B",
+  "blender_version": "5.2.0 LTS",
+  "saved_by_audit_script": false,
+  "height_m": 1.8240108489990234,
+  "bounds": {
+    "min": [
+      -0.8899999856948853,
+      -0.28071996569633484,
+      0.0
+    ],
+    "max": [
+      1.0283448696136475,
+      0.19922910630702972,
+      1.8240108489990234
+    ],
+    "dimensions": [
+      1.9183448553085327,
+      0.47994905710220337,
+      1.8240108489990234
+    ]
+  },
+  "mesh_count": 98,
+  "vertices": 16858,
+  "triangles": 33248,
+  "materials": [
+    "MATID_Cloth",
+    "MATID_Leather",
+    "MATID_Metal",
+    "MATID_Skin",
+    "MATID_Team",
+    "MATID_Wood"
+  ],
+  "armatures": 1,
+  "bones": 23,
+  "actions": [
+    {
+      "name": "REVIEW_ONLY_POSE_L1_COMPARE",
+      "review_only": true,
+      "purpose": "Pose-vs-proportion comparison; never export as gameplay idle",
+      "fake_user": true
+    }
+  ],
+  "topology": {
+    "non_manifold_edges": 0,
+    "boundary_edges": 0,
+    "loose_edges": 0,
+    "zero_area_faces": 0
+  },
+  "source_apose_preserved": true,
+  "review_pose_not_active": true,
+  "runtime_prefab_replaced": false
+}

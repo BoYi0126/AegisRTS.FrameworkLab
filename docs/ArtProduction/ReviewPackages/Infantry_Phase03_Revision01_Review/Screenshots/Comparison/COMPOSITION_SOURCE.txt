@@ -1,0 +1,5 @@
+﻿Generated comparison evidence.
+Left baseline source: C:\Users\吳柏逸~1\AppData\Local\Temp\AegisP03R1Baseline
+Right revision source: C:\projects\Unity\AegisRTS.FrameworkLab\docs\ArtProduction\ReviewPackages\Infantry_Phase03_Revision01_Review
+L1 concept source: C:\projects\Unity\AegisRTS.FrameworkLab\docs\ArtProduction\ReviewPackages\Infantry_Phase03_SecondaryForms_Review_v001\References\Unit_03_Infantry_L1_Concept_Final.png
+No geometry or production asset was modified by this script.

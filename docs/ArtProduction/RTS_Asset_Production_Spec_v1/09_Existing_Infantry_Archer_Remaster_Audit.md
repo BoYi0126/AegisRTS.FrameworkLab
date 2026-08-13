@@ -3,7 +3,13 @@
 - Specification Version：1.0
 - Evidence Level：檔案／Unity YAML／Blender 5.2只讀結構＋既有測試紀錄；未在本次重跑Unity或產生新render。
 
-2026-08-13 Phase 02 Revision 01 addendum：Initial `CHR_Infantry_A_v003` 的人工結果是`CHANGE REQUESTED`（toy-like head/arms/chest/waist/wrap/boots）。已建立不覆寫initial的 `CHR_Infantry_A_v003_P02R1`（1.824 m、25,106 tris、64 meshes），以局部Primary Forms reshape／rebuild修正並提供initial與L1比較。Status為`READY FOR PHASE02 REVISION REVIEW`；review、Secondary Forms、final topology／UV／texture／skin／animation／LOD／Unity integration均未通過，因此production acceptance判定不變。
+2026-08-13 Phase 03 addendum：使用者直接授權以immutable `CHR_Infantry_A_v003_P02R1`執行Secondary Forms。新 `CHR_Infantry_A_v004` 為1.824 m、33,898 tris、106 meshes，加入chest／shoulder／helmet／scarf／belt／waist／bracer／hand／leg wrap／boot／shield front-back／sword construction與六類preview Material ID。Review package狀態為`READY FOR PHASE03 REVIEW`；人工Phase 03、Unity、final topology／UV／texture／skin／animation／LOD仍未通過，因此production acceptance判定不變。
+
+2026-08-13 Phase 03 Revision 01 addendum：新建、未覆寫的 `CHR_Infantry_A_v004_P03R1` 為1.824 m、33,248 tris、98 meshes；指定修訂已提供before／after detail evidence，Unity 6000.5.7f1匯入驗證為1.824011 m、ground Y 0、98 renderers，並有Close／RTS Normal／Far capture。狀態為`READY FOR PHASE03 REVISION REVIEW`；human gate、final UV／texture／skin／animation／LOD仍未通過，production acceptance判定不變。
+
+2026-08-13 Phase 03.5 addendum：P035保持1.824011 m／33,248 tris／98 meshes／23 bones與原Secondary Forms，量化確認A-Pose是arm／shoulder視覺差異的主要來源，並修正hip／knee／torso／leg ratios及小幅head／chest／hand／boot fit。Shield 0.600×0.862 m與Sword 1.061 m均在L1明示範圍而保留。Unity A-Pose／L1Pose／RTS Normal evidence存在；狀態`READY FOR PHASE03_5 REVIEW`，production acceptance仍不變。
+
+2026-08-13 Phase 03.5 Revision 01 addendum：Reviewer確認P035 arm length是real proportion issue；新建且未覆寫的P035R1把UpperArm／Forearm由0.15494H修至0.176H／0.165H，combined Shoulder→Wrist為0.341H，Hand width為0.06065H、Head width為0.120H。Hip／Knee／Torso／Chest／Shoulder origin、Helmet、Boot、Shield 0.600×0.862 m與Sword 1.061 m保持；Unity final A-Pose／L1Pose均1.824011 m、ground 0、98 renderers。狀態`READY FOR PHASE03_5 REVISION REVIEW`，human gate與production acceptance仍pending。
 
 ## 評分定義
 
