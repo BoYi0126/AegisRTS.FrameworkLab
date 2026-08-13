@@ -970,8 +970,9 @@ namespace AegisRTS.Demo.PlayablePrototype
             Heroes.Register(id, HeroProfile.FromDefinition(definition, factionId));
             try
             {
+                PrototypeAttackTiming timing = PrototypeCombatTuning.Get(PrototypeCombatRole.Hero);
                 AttackProfile attack = new AttackProfile(factionId == PlayerFactionId ? 32d : 25d,
-                    DamageType.Physical, 2.3d, 0.8d, 0.15d);
+                    DamageType.Physical, 2.3d, timing.IntervalSeconds, timing.WindupSeconds);
                 var profile = new CombatantProfile(definition.Id.Value, factionId, definition.MaxHealth, attack,
                     new DefenseProfile(3d), tags: new[] { "unit", "hero" },
                     abilityIds: definition.AbilityIds.Select(value => value.Value));
@@ -990,9 +991,12 @@ namespace AegisRTS.Demo.PlayablePrototype
             bool ranged = HasTag(definition.Tags, "archer");
             bool cavalry = HasTag(definition.Tags, "cavalry");
             bool siege = HasTag(definition.Tags, "siege-unit");
+            PrototypeCombatRole role = siege ? PrototypeCombatRole.Siege : cavalry ? PrototypeCombatRole.Cavalry :
+                ranged ? PrototypeCombatRole.Archer : PrototypeCombatRole.Infantry;
+            PrototypeAttackTiming timing = PrototypeCombatTuning.Get(role);
             AttackProfile attack = new AttackProfile(siege ? 50d : cavalry ? 24d : ranged ? 14d : 18d,
                 DamageType.Physical, siege ? 6d : ranged ? 9d : 1.8d,
-                siege ? 1.6d : ranged ? 1.2d : 0.9d, 0.15d,
+                timing.IntervalSeconds, timing.WindupSeconds,
                 ranged ? 15d : 0d, targetTags: siege ? new[] { "structure", "unit" } : null);
             var tags = definition.Tags.Select(value => value.Value).ToList();
             if (!tags.Contains("unit")) tags.Add("unit");

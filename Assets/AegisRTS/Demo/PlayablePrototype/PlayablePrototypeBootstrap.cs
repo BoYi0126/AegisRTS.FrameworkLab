@@ -51,6 +51,7 @@ namespace AegisRTS.Demo.PlayablePrototype
         private RtsCameraController _cameraController;
         private NavMeshSurface _navigationSurface;
         private PrototypeUnityNavigationAdapter _unityNavigation;
+        private PrototypeProjectileVisualController _projectileVisuals;
         private GameObject _fortressGate;
         private GameObject _fortressStronghold;
         private PrototypeHudAdapter _hud;
@@ -92,6 +93,7 @@ namespace AegisRTS.Demo.PlayablePrototype
         public string LastUiMessage => _uiMessage;
         public bool TutorialVisible => _showWelcome;
         public PrototypeCommandTab ActiveCommandTab => _commandTab;
+        public PrototypeProjectileVisualController ProjectileVisuals => _projectileVisuals;
 
         private void Awake()
         {
@@ -245,6 +247,7 @@ namespace AegisRTS.Demo.PlayablePrototype
                 _showDebug = false;
                 _commandTab = PrototypeCommandTab.Domestic;
                 _lastSelectionRevision = _selection.Revision;
+                ComposeProjectileVisuals();
                 ComposeInput();
                 SetTutorialVisible(_showWelcome);
                 BootSucceeded = true;
@@ -380,8 +383,24 @@ namespace AegisRTS.Demo.PlayablePrototype
             healthFill.transform.localScale = new Vector3(1.2f, 0.08f, 0.08f);
             SetColor(healthFill, new Color(0.2f, 0.9f, 0.25f));
             _views.Add(record.EntityId, new UnitView(root, healthFill.transform, healthBarY,
-                artView != null ? artView.AnimatorView : null));
+                artView != null ? artView.AnimatorView : null,
+                artView != null ? artView.ProjectileSocket : null,
+                record.CombatProfile.Attack.WindupSeconds));
         }
+
+        private void ComposeProjectileVisuals()
+        {
+            var value = new GameObject("ProjectileVisuals");
+            value.transform.SetParent(_worldRoot, false);
+            _projectileVisuals = value.AddComponent<PrototypeProjectileVisualController>();
+            _projectileVisuals.Initialize(Composition.Events, ResolveViewRoot, ResolveProjectileSocket);
+        }
+
+        private Transform ResolveViewRoot(EntityId entityId) =>
+            _views.TryGetValue(entityId, out UnitView view) && view.Root != null ? view.Root.transform : null;
+
+        private Transform ResolveProjectileSocket(EntityId entityId) =>
+            _views.TryGetValue(entityId, out UnitView view) ? view.ProjectileSocket : null;
 
         private void RemoveUnitView(EntityId entityId)
         {
@@ -413,7 +432,8 @@ namespace AegisRTS.Demo.PlayablePrototype
                     movement.Velocity.X * movement.Velocity.X +
                     movement.Velocity.Y * movement.Velocity.Y +
                     movement.Velocity.Z * movement.Velocity.Z);
-                item.Value.AnimatorView?.Refresh(movement.Status == MovementStatus.Moving, worldSpeed, combat);
+                item.Value.AnimatorView?.Refresh(movement.Status == MovementStatus.Moving, worldSpeed, combat,
+                    item.Value.AttackWindupSeconds);
                 float ratio = (float)Math.Max(0d, Math.Min(1d, combat.Health / combat.MaxHealth));
                 item.Value.HealthFill.localScale = new Vector3(1.2f * ratio, 0.08f, 0.08f);
                 item.Value.HealthFill.localPosition = new Vector3(-0.6f * (1f - ratio), item.Value.HealthBarY, -0.08f);
@@ -540,6 +560,7 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         private void DisposeSession()
         {
+            if (_projectileVisuals != null) _projectileVisuals.Shutdown();
             if (Composition != null)
             {
                 Composition.EntitySpawned -= SpawnUnitView;
@@ -570,6 +591,7 @@ namespace AegisRTS.Demo.PlayablePrototype
             _unityNavigation = null;
             _fortressGate = null;
             _fortressStronghold = null;
+            _projectileVisuals = null;
             _hud = null;
             _themeDefinition = null;
             _pendingRestore = null;
@@ -1238,17 +1260,22 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         private sealed class UnitView
         {
-            public UnitView(GameObject root, Transform healthFill, float healthBarY, PrototypeUnitAnimatorView animatorView)
+            public UnitView(GameObject root, Transform healthFill, float healthBarY,
+                PrototypeUnitAnimatorView animatorView, Transform projectileSocket, double attackWindupSeconds)
             {
                 Root = root;
                 HealthFill = healthFill;
                 HealthBarY = healthBarY;
                 AnimatorView = animatorView;
+                ProjectileSocket = projectileSocket;
+                AttackWindupSeconds = attackWindupSeconds;
             }
             public GameObject Root { get; }
             public Transform HealthFill { get; }
             public float HealthBarY { get; }
             public PrototypeUnitAnimatorView AnimatorView { get; }
+            public Transform ProjectileSocket { get; }
+            public double AttackWindupSeconds { get; }
         }
     }
 }

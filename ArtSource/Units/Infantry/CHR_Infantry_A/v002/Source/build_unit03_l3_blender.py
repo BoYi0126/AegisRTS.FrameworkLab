@@ -373,9 +373,20 @@ def combat_pose(arm, frame):
     key(p['RightHand'],frame,(0,math.radians(-8),0))
 
 
+def standing_body_pose(arm, frame):
+    """Key an explicit grounded Humanoid baseline so omitted muscles cannot retarget horizontally in Unity."""
+    p=arm.pose.bones
+    for name in ('Hips','Spine','Chest','Neck','Head',
+                 'LeftUpperLeg','LeftLowerLeg','LeftFoot','LeftToes',
+                 'RightUpperLeg','RightLowerLeg','RightFoot','RightToes'):
+        key(p[name],frame,(0,0,0))
+
+
 def locomotion_pose(arm, frame, phase):
     """Author one of four grounded locomotion poses for the rigid low-poly character."""
     p=arm.pose.bones
+    for name in ('Spine','Neck','Head','LeftToes','RightToes'):
+        key(p[name],frame,(0,0,0))
     contact=math.radians(34)
     passing_knee=math.radians(42)
     trailing_knee=math.radians(24)
@@ -423,7 +434,8 @@ def locomotion_pose(arm, frame, phase):
 def build_actions(arm):
     acts=[]
     # Idle 0..89
-    a=new_action(arm,'AN_Infantry_Idle',0,89); combat_pose(arm,0); combat_pose(arm,44); combat_pose(arm,89)
+    a=new_action(arm,'AN_Infantry_Idle',0,89)
+    for frame in (0,44,89): standing_body_pose(arm,frame); combat_pose(arm,frame)
     key(arm.pose.bones['Chest'],0,(0,0,0)); key(arm.pose.bones['Chest'],44,(math.radians(1.5),0,0)); key(arm.pose.bones['Chest'],89,(0,0,0)); acts.append(a)
     # Move 0..24 - one grounded stride with heel strikes and passing poses; Root stays unkeyed.
     a=new_action(arm,'AN_Infantry_Move',0,24)
@@ -434,7 +446,9 @@ def build_actions(arm):
     locomotion_pose(arm,24,0)
     acts.append(a)
     # Attack_A 0..26, right-high to left-low slash
-    a=new_action(arm,'AN_Infantry_Attack_A',0,26); combat_pose(arm,0)
+    a=new_action(arm,'AN_Infantry_Attack_A',0,26)
+    for frame in (0,8,13,26): standing_body_pose(arm,frame)
+    combat_pose(arm,0)
     p=arm.pose.bones
     key(p['RightUpperArm'],8,(math.radians(-35),math.radians(-10),math.radians(80)))
     key(p['RightLowerArm'],8,(math.radians(-55),0,math.radians(-25)))
@@ -444,7 +458,9 @@ def build_actions(arm):
     key(p['Chest'],13,(0,0,math.radians(12)))
     combat_pose(arm,26); key(p['Chest'],26,(0,0,0)); acts.append(a)
     # Hit 0..9
-    a=new_action(arm,'AN_Infantry_Hit',0,9); combat_pose(arm,0); combat_pose(arm,9)
+    a=new_action(arm,'AN_Infantry_Hit',0,9)
+    for frame in (0,4,9): standing_body_pose(arm,frame)
+    combat_pose(arm,0); combat_pose(arm,9)
     key(arm.pose.bones['Chest'],4,(math.radians(12),0,math.radians(-8))); key(arm.pose.bones['Neck'],4,(math.radians(-8),0,0)); acts.append(a)
     # Death 0..38. Root never keyed/transformed.
     a=new_action(arm,'AN_Infantry_Death',0,38); combat_pose(arm,0)
@@ -575,6 +591,9 @@ def main():
     actions=build_actions(arm)
     # Save editable source with A-Pose as the rest state. Actions are stored in the file.
     arm.animation_data.action=None
+    clear_pose(arm)
+    bpy.context.scene.frame_set(0)
+    bpy.context.view_layer.update()
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(srcdir,'CHR_Infantry_A_v002.blend'))
 
     all_mesh=[o for o in objs0+objs1+objs2 if o]

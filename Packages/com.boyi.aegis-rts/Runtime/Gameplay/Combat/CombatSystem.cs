@@ -204,7 +204,9 @@ namespace AegisRTS.Gameplay.Combat
                 if (!_combatants.TryGetValue(actorId, out Combatant actor) || !actor.IsAlive) continue;
                 actor.EngagementOrigin = destination;
                 actor.ShouldReturnToOrigin = false;
+                bool cancelledBeforeImpact = actor.State == CombatantState.Windup && actor.WindupRemaining > 0d;
                 ClearTarget(actor, false);
+                if (cancelledBeforeImpact) actor.AttackCooldownRemaining = 0d;
                 accepted++;
             }
             return accepted;
@@ -219,7 +221,9 @@ namespace AegisRTS.Gameplay.Combat
                 if (!_combatants.TryGetValue(actorId, out Combatant actor) || !actor.IsAlive) continue;
                 actor.EngagementOrigin = actor.Position;
                 actor.ShouldReturnToOrigin = false;
+                bool cancelledBeforeImpact = actor.State == CombatantState.Windup && actor.WindupRemaining > 0d;
                 ClearTarget(actor, false);
+                if (cancelledBeforeImpact) actor.AttackCooldownRemaining = 0d;
                 accepted++;
             }
             return accepted;

@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1600587415
+--- !u!1 &1246278921
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,8 +127,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1600587417}
-  - component: {fileID: 1600587416}
+  - component: {fileID: 1246278923}
+  - component: {fileID: 1246278922}
   m_Layer: 0
   m_Name: PlayablePrototype_01
   m_TagString: Untagged
@@ -136,13 +136,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1600587416
+--- !u!114 &1246278922
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1600587415}
+  m_GameObject: {fileID: 1246278921}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 690f77ea74b276a4e94309f9d78d52da, type: 3}
@@ -153,13 +153,13 @@ MonoBehaviour:
   theme: {fileID: 4900000, guid: f2f0457529fc40438cb7e1b0fac793c4, type: 3}
   prototypeMaterial: {fileID: 2100000, guid: 1b07138a006e9a141aa539f28c8f5c8a, type: 2}
   startImmediately: 1
---- !u!4 &1600587417
+--- !u!4 &1246278923
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1600587415}
+  m_GameObject: {fileID: 1246278921}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -172,4 +172,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1600587417}
+  - {fileID: 1246278923}

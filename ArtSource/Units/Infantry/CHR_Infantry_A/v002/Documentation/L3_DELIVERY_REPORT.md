@@ -45,10 +45,10 @@ The previous delivery only contained LOD0/LOD1. The corrected build derives LOD2
 - Runtime prefab: `PF_Unit_Infantry.prefab`.
 - Presentation bridge: `PrototypeUnitAnimatorView`; gameplay damage remains authoritative in `CombatSystem`.
 - Animator `applyRootMotion=False`.
-- Unity Humanoid retarget note: the generated v002 Idle leg baseline leans forward after import. The prototype presentation bridge applies an Idle-only thigh/shin standing correction while preserving foot world rotation; Move, Attack, Hit, and Death are unaffected. This compatibility correction must be removed when a final-art Idle clip with a correct Unity stance is delivered.
+- The master source is saved at frame 0 with no active action and a cleared pose. Every animated clip explicitly keys the standing body baseline needed by Unity Humanoid retargeting, including spine, neck, head, legs, feet, and toes. This prevents the Move clip from inheriting the source A-pose as a horizontal runtime pose.
 - Gameplay movement velocity drives the presentation-only `MoveRate`; the 4.5 m/s prototype speed uses a 1.8 playback rate so the stride does not visibly moonwalk against world translation.
-- The FBX retains the Blender Z-up/-Y-forward source basis. The Unity prefab applies one deterministic -90° X visual-basis conversion, then offsets the imported renderer bounds so the feet are at gameplay Y=0. The prefab root remains at zero/identity/scale one.
-- The builder rejects the asset unless combined Unity renderer bounds are upright on Y, at least 1.65 m tall, grounded, and within the 1.95 m vertical envelope; a green Humanoid Avatar alone is no longer accepted as orientation proof.
+- The FBX import is Humanoid-retargeted into Unity Y-up space. The Unity visual root stays at identity rotation and only offsets imported renderer bounds so the feet are at gameplay Y=0. The prefab root remains at zero/identity/scale one.
+- The builder rejects the asset unless combined Unity renderer bounds are upright on Y, at least 1.65 m tall, grounded, and within the 2.10 m vertical envelope; a green Humanoid Avatar alone is no longer accepted as orientation proof.
 - Team Color is applied per material slot. The wood/metal Base slot on the shield remains unchanged while only its TeamColor panel receives #4AA3D8 or #D94A45.
 - Runtime Base material uses the supplied palette atlas and correctly imported flat Normal reference; the prototype adds one low-cost Directional Light so L2 geometry facets and armor layers remain readable.
 - The fixed RTS camera supports 2.5–40 m zoom. At 2.5–4 m it raises the focus pivot and lowers pitch to 38° for model inspection; yaw rotation remains locked.
@@ -58,7 +58,7 @@ The previous delivery only contained LOD0/LOD1. The corrected build derives LOD2
 - Blender build completed and recorded `BUILD_RESULT.json` with LOD counts and event timing.
 - Unity editor builder validation: PASS.
 - Playable-prototype Game View smoke validation: PASS; both team variants visible with anchors and LOD/team renderers.
-- Targeted PlayMode test: 1 passed, 0 failed. It verifies the Avatar, Animator, LODGroup, Move footsteps, AttackImpact, DeathSettled, and unchanged gameplay root position.
+- Targeted PlayMode movement regression: passed. It verifies the Avatar, Animator, LODGroup, Move footsteps, AttackImpact, DeathSettled, unchanged gameplay root position, and a standing Head/feet bone relationship while the real move command is active.
 - Actual-scene locomotion capture: the playable prototype issued its real move command, followed the moving infantry at 2.5 m zoom, and captured eight frames. The sequence verifies alternating contact/passing poses, forward-facing travel, visible displacement, and close-inspection framing.
 - Detail regression capture: front, side, back, and four fixed Move phases verify upright Unity bounds, L2 base colors, isolated Team Color slots, key lighting, grounded poses, vertical envelope, and no VisualRoot planar drift.
 

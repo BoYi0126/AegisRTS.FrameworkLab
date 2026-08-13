@@ -89,7 +89,15 @@ namespace AegisRTS.Gameplay.Combat
         public DamageType DamageType { get; }
         public double Range { get; }
         public double CooldownSeconds { get; }
+        /// <summary>Total time from one attack start to the next attack start.</summary>
+        public double AttackIntervalSeconds => CooldownSeconds;
+        /// <summary>Attacks per second. Zero represents an intentionally unthrottled test/profile interval.</summary>
+        public double AttacksPerSecond => CooldownSeconds > 0d ? 1d / CooldownSeconds : 0d;
         public double WindupSeconds { get; }
+        /// <summary>Post-impact time before the next attack. Movement may cancel its presentation, not its cooldown.</summary>
+        public double RecoverySeconds => Math.Max(0d, CooldownSeconds - WindupSeconds);
+        /// <summary>Universal orb-walk rule: the entire post-impact recovery animation is move-cancelable.</summary>
+        public double MoveCancelableBackswingSeconds => RecoverySeconds;
         public double ProjectileSpeed { get; }
         public double SplashRadius { get; }
         public bool UsesProjectile => ProjectileSpeed > 0d;

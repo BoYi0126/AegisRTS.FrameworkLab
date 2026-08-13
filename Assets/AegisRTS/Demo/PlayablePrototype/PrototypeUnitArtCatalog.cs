@@ -7,12 +7,17 @@ namespace AegisRTS.Demo.PlayablePrototype
     {
         public const string InfantryPrefabId = "PF_Unit_Infantry";
         public const string InfantryResourcePath = "AegisRTS/Units/Infantry/PF_Unit_Infantry";
+        public const string ArcherPrefabId = "PF_Unit_Archer";
+        public const string ArcherResourcePath = "AegisRTS/Units/Archer/PF_Unit_Archer";
 
         public static GameObject Load(string prefabId)
         {
-            return prefabId == InfantryPrefabId
-                ? Resources.Load<GameObject>(InfantryResourcePath)
-                : null;
+            switch (prefabId)
+            {
+                case InfantryPrefabId: return Resources.Load<GameObject>(InfantryResourcePath);
+                case ArcherPrefabId: return Resources.Load<GameObject>(ArcherResourcePath);
+                default: return null;
+            }
         }
 
         public static bool TryInstantiate(string prefabId, Transform parent, Color teamColor,

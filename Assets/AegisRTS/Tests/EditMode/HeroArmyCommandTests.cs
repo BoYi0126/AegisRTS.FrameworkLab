@@ -6,6 +6,7 @@ using AegisRTS.Gameplay.Armies;
 using AegisRTS.Gameplay.Combat;
 using AegisRTS.Gameplay.Formation;
 using AegisRTS.Gameplay.Heroes;
+using AegisRTS.Gameplay.Movement;
 using AegisRTS.Gameplay.Units;
 using NUnit.Framework;
 
@@ -184,6 +185,34 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void GameplayArmyMove_CancelsActiveAttackForEveryMember()
+        {
+            EntityId attacker = new EntityId(1);
+            EntityId target = new EntityId(2);
+            var navigation = new AcceptingNavigationAdapter();
+            var movement = new MovementSystem(navigation);
+            var combat = new CombatSystem();
+            movement.Register(attacker, Point(0));
+            combat.Register(attacker, new CombatantProfile("unit.archer", FactionA, 100,
+                new AttackProfile(10, DamageType.Physical, 8, 1.1, 0.38, projectileSpeed: 15)), Point(0));
+            combat.Register(target, new CombatantProfile("unit.target", FactionB, 100,
+                new AttackProfile(0, DamageType.Physical, 1, 1, 0)), Point(1));
+            var executor = new GameplayArmyOrderExecutor(movement, combat);
+
+            Assert.That(combat.IssueAttack(new AttackTargetCommand(new[] { attacker }, target)), Is.EqualTo(1));
+            combat.Tick(0.01);
+            Assert.That(combat.TryGetState(attacker, out CombatantSnapshot aiming), Is.True);
+            Assert.That(aiming.State, Is.EqualTo(CombatantState.Windup));
+
+            ArmyOrderExecutionResult result = executor.Move(new[] { attacker }, Point(5), FormationType.Line);
+
+            Assert.That(result.Accepted, Is.True);
+            Assert.That(combat.TryGetState(attacker, out CombatantSnapshot moving), Is.True);
+            Assert.That(moving.State, Is.EqualTo(CombatantState.Idle));
+            Assert.That(moving.TargetId.IsValid, Is.False);
+        }
+
+        [Test]
         public void ArmyMembership_PropagatesToExistingCombatSnapshot()
         {
             var heroes = new HeroSystem();
@@ -251,6 +280,20 @@ namespace AegisRTS.Tests.EditMode
             {
                 Calls.Add(name);
                 return Reject ? ArmyOrderExecutionResult.Failure("Rejected by test.") : ArmyOrderExecutionResult.Success(count);
+            }
+        }
+
+        private sealed class AcceptingNavigationAdapter : INavigationAdapter
+        {
+            public NavigationDestinationResult SetDestination(EntityId entityId, WorldPoint destination, int formationSlotIndex) =>
+                NavigationDestinationResult.Success(destination, 1);
+
+            public void Stop(EntityId entityId) { }
+
+            public bool TryGetSnapshot(EntityId entityId, out NavigationAgentSnapshot snapshot)
+            {
+                snapshot = default;
+                return false;
             }
         }
     }

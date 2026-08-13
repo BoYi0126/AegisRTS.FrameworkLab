@@ -189,3 +189,11 @@ Theme 只能改顯示資料，不可改 layout ownership 或 gameplay state。
 1. 先完成 executable 人工通關與小解析度 UI 驗收。
 2. 依人工結果改善 HUD interaction、selection／camera feel、NavMesh path feedback 與正常 Defeat flow。
 3. Prototype gate 全 PASS 後建立 checkpoint，再進 G01／G02 世界觀；production art 依舊延後到玩法與尺寸需求穩定。
+
+## 弓兵與投射物 Presentation 邊界
+
+`unit.archer` 的 Content `prefabId` 已綁定 `PF_Unit_Archer`，由 `PrototypeUnitArtCatalog` 解到 Resources Prefab。`PrototypeUnitArtView.ProjectileSocket` 只公開視覺發射點；`PrototypeUnitAnimatorView.ProjectileRelease()` 只累計 Animation Event 的可觀測 timing，不派發傷害。
+
+`PrototypeProjectileVisualController` 訂閱 package Runtime 的 `ProjectileLaunchedEvent`，使用 `ObjectPool<GameObject>` 租還 `PRJ_Arrow_Basic_v001` 和 impact flash。Controller 不持有或 Tick `CombatSystem`，不含 Collider，也不回寫 HP、Target 或 Position；它可以被移除而不改變戰鬥結果。這維持 Definition／Runtime／View 分離，也避免與既有 `PrototypeSystemComposition.Tick` 重複推進 Combat。
+
+正式弓兵美術可替換模型、貼圖與 Clip，但必須保持 `PF_Unit_Archer`、Animator parameters（`Speed`、`MoveRate`、`Attack`、`Hit`、`Die`、`IsDead`）、`Socket_Projectile`、`ProjectileRelease` 與箭矢 local Z+。重建與 gate 詳見 `ArtSpecs/Unit_04_弓兵_L3實作交付與驗收.md`。

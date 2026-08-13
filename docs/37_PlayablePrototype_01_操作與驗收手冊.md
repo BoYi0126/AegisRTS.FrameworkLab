@@ -174,3 +174,11 @@ Player Settings 與 runtime display adapter 都要求 `FullScreenWindow`＋主�
   - Console／Player.log：<0 unhandled exception 或錯誤摘要>
   - Issues：<重現步驟、影響、優先級>
 ```
+
+## 弓兵可玩驗收補充
+
+- 玩家與敵方各有一名 `PF_Unit_Archer`，外觀應為輕裝、弓、箭袋，不能再顯示 Capsule placeholder 或步兵盾劍。
+- 選取弓兵攻擊敵人時，箭矢應從右手附近的 `Socket_Projectile` 出現、沿飛行方向前進，抵達目標後產生短暫金色命中特效。
+- 箭矢只是 presentation；即使低 FPS 或暫時看不到箭矢，HP 與死亡結果仍以 CombatSystem 為準。
+- 拉近到 2.5 m 檢查 Idle 與 Attack 時，角色必須站立，身體不可折疊或躺倒；陣營色布片、弓與箭袋在俯視角仍需辨識。
+- 自動 smoke 現在驗證 2 名步兵與 2 名弓兵，以及弓兵 Humanoid、LOD、Team Color、Projectile Socket 與 projectile controller。

@@ -10,6 +10,7 @@ namespace AegisRTS.Demo.PlayablePrototype
     {
         private static readonly int Speed = Animator.StringToHash("Speed");
         private static readonly int MoveRate = Animator.StringToHash("MoveRate");
+        private static readonly int AttackRate = Animator.StringToHash("AttackRate");
         private static readonly int Attack = Animator.StringToHash("Attack");
         private static readonly int Hit = Animator.StringToHash("Hit");
         private static readonly int Die = Animator.StringToHash("Die");
@@ -19,36 +20,47 @@ namespace AegisRTS.Demo.PlayablePrototype
         [SerializeField] private float deathDurationSeconds = 1.3f;
         [SerializeField] private float referenceMovementSpeed = 4.5f;
         [SerializeField] private float referenceClipRate = 1.8f;
+        [SerializeField] private float attackEventTimeSeconds = 0.43f;
+        [SerializeField] private float moveCancelBlendSeconds = 0.07f;
         private CombatantState _previousState = CombatantState.Idle;
         private double _previousHealth = double.NaN;
         private bool _dead;
         private bool _moving;
+        private bool _attackPresentationActive;
 
         public Animator Animator => animator;
         public float DeathDurationSeconds => deathDurationSeconds;
         public int AttackImpactCount { get; private set; }
         public int FootstepCount { get; private set; }
         public int DeathSettledCount { get; private set; }
+        public int ProjectileReleaseCount { get; private set; }
         public int IdleStanceCorrectionCount { get; private set; }
+        public int AttackMoveCancelCount { get; private set; }
 
         private void LateUpdate()
         {
             if (animator == null || _dead || _moving || animator.IsInTransition(0)) return;
             if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) return;
+            if (_previousState != CombatantState.Windup && _previousState != CombatantState.Attacking)
+                _attackPresentationActive = false;
             CorrectIdleStance();
         }
 
-        public void Configure(Animator target, float deathDuration = 1.3f)
+        public void Configure(Animator target, float deathDuration = 1.3f,
+            float attackEventTime = 0.43f, float cancelBlendSeconds = 0.07f)
         {
             animator = target;
             deathDurationSeconds = Mathf.Max(0.1f, deathDuration);
+            attackEventTimeSeconds = Mathf.Max(0.01f, attackEventTime);
+            moveCancelBlendSeconds = Mathf.Clamp(cancelBlendSeconds, 0f, 0.25f);
             if (animator != null)
             {
                 animator.applyRootMotion = false;
             }
         }
 
-        public void Refresh(bool moving, double worldSpeed, CombatantSnapshot combat)
+        public void Refresh(bool moving, double worldSpeed, CombatantSnapshot combat,
+            double attackWindupSeconds = 0.3d)
         {
             if (animator == null || _dead) return;
             _moving = moving;
@@ -59,7 +71,22 @@ namespace AegisRTS.Demo.PlayablePrototype
             animator.SetFloat(MoveRate, rate);
 
             bool enteringAttack = combat.State == CombatantState.Windup && _previousState != CombatantState.Windup;
-            if (enteringAttack) animator.SetTrigger(Attack);
+            if (enteringAttack)
+            {
+                float playbackRate = attackEventTimeSeconds / Mathf.Max(0.01f, (float)attackWindupSeconds);
+                animator.SetFloat(AttackRate, Mathf.Clamp(playbackRate, 0.25f, 4f));
+                animator.SetTrigger(Attack);
+                _attackPresentationActive = true;
+            }
+            bool moveCancelledAttack = moving && _attackPresentationActive &&
+                                       combat.State != CombatantState.Windup && !combat.TargetId.IsValid;
+            if (moveCancelledAttack)
+            {
+                animator.ResetTrigger(Attack);
+                animator.CrossFade("Move", moveCancelBlendSeconds, 0, 0f);
+                _attackPresentationActive = false;
+                AttackMoveCancelCount++;
+            }
             if (!double.IsNaN(_previousHealth) && combat.Health < _previousHealth && combat.IsAlive)
                 animator.SetTrigger(Hit);
 
@@ -105,6 +132,7 @@ namespace AegisRTS.Demo.PlayablePrototype
 
         // Animation Events are visual timing signals only. Gameplay damage remains authoritative in CombatSystem.
         public void AttackImpact() => AttackImpactCount++;
+        public void ProjectileRelease() => ProjectileReleaseCount++;
         public void Footstep_L() => FootstepCount++;
         public void Footstep_R() => FootstepCount++;
         public void DeathSettled() => DeathSettledCount++;

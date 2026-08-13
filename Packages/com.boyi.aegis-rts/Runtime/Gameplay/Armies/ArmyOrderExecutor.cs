@@ -46,7 +46,7 @@ namespace AegisRTS.Gameplay.Armies
         { _movement = movement ?? throw new ArgumentNullException(nameof(movement)); _combat = combat ?? throw new ArgumentNullException(nameof(combat)); }
 
         public ArmyOrderExecutionResult Move(IReadOnlyList<EntityId> unitIds, WorldPoint destination, FormationType formation) =>
-            FromMovement(_movement.IssueMove(new MoveUnitsCommand(unitIds, destination, formation: formation)));
+            MoveAndCancelCombat(unitIds, destination, formation);
 
         public ArmyOrderExecutionResult Attack(IReadOnlyList<EntityId> unitIds, EntityId targetId) =>
             FromCount(_combat.IssueAttack(new AttackTargetCommand(unitIds, targetId)), "No army member could attack the target.");
@@ -55,10 +55,21 @@ namespace AegisRTS.Gameplay.Armies
             FromCount(_combat.IssueAttack(new AttackTargetCommand(unitIds, settlementId)), "No army member could attack the settlement.");
 
         public ArmyOrderExecutionResult Defend(IReadOnlyList<EntityId> unitIds, WorldPoint position, FormationType formation) =>
-            FromMovement(_movement.IssueMove(new MoveUnitsCommand(unitIds, position, formation: formation)));
+            MoveAndCancelCombat(unitIds, position, formation);
 
         public ArmyOrderExecutionResult Retreat(IReadOnlyList<EntityId> unitIds, WorldPoint destination, FormationType formation) =>
-            FromMovement(_movement.IssueMove(new MoveUnitsCommand(unitIds, destination, formation: formation)));
+            MoveAndCancelCombat(unitIds, destination, formation);
+
+        private ArmyOrderExecutionResult MoveAndCancelCombat(
+            IReadOnlyList<EntityId> unitIds,
+            WorldPoint destination,
+            FormationType formation)
+        {
+            MovementCommandResult result = _movement.IssueMove(
+                new MoveUnitsCommand(unitIds, destination, formation: formation));
+            if (result.WasAccepted) _combat.NotifyMoveOrder(unitIds, destination);
+            return FromMovement(result);
+        }
 
         private static ArmyOrderExecutionResult FromMovement(MovementCommandResult result) => result.WasAccepted
             ? ArmyOrderExecutionResult.Success(result.AcceptedActorCount)

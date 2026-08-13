@@ -63,6 +63,57 @@ namespace AegisRTS.Tests.EditMode
         }
 
         [Test]
+        public void MoveDuringWindup_CancelsAttackBeforeImpact()
+        {
+            var combat = new CombatSystem();
+            EntityId attacker = new EntityId(1);
+            EntityId target = new EntityId(2);
+            Register(combat, attacker, Blue, Point(0), Attack(30, cooldown: 1, windup: 0.3));
+            Register(combat, target, Red, Point(1), Attack(0));
+
+            combat.IssueAttack(new AttackTargetCommand(new[] { attacker }, target));
+            combat.Tick(0.01);
+            Assert.That(State(combat, attacker).State, Is.EqualTo(CombatantState.Windup));
+            Assert.That(combat.NotifyMoveOrder(new[] { attacker }, Point(5)), Is.EqualTo(1));
+            combat.Tick(1d);
+
+            Assert.That(State(combat, target).Health, Is.EqualTo(100d));
+            Assert.That(State(combat, attacker).TargetId.IsValid, Is.False);
+            Assert.That(State(combat, attacker).AttackCooldownRemaining, Is.Zero,
+                "Cancelling before impact must not consume an attack interval for an attack that never happened.");
+        }
+
+        [Test]
+        public void MoveAfterImpact_CancelsBackswingButPreservesAttackInterval()
+        {
+            var combat = new CombatSystem();
+            EntityId attacker = new EntityId(1);
+            EntityId target = new EntityId(2);
+            AttackProfile profile = Attack(20, cooldown: 1, windup: 0.3);
+            Register(combat, attacker, Blue, Point(0), profile);
+            Register(combat, target, Red, Point(1), Attack(0));
+
+            Assert.That(profile.AttacksPerSecond, Is.EqualTo(1d));
+            Assert.That(profile.RecoverySeconds, Is.EqualTo(0.7d).Within(0.0001d));
+            Assert.That(profile.MoveCancelableBackswingSeconds, Is.EqualTo(0.7d).Within(0.0001d));
+            combat.IssueAttack(new AttackTargetCommand(new[] { attacker }, target));
+            combat.Tick(0.01);
+            combat.Tick(0.3);
+            Assert.That(State(combat, target).Health, Is.EqualTo(80d));
+            double cooldownAfterImpact = State(combat, attacker).AttackCooldownRemaining;
+
+            combat.NotifyMoveOrder(new[] { attacker }, Point(5));
+            Assert.That(State(combat, attacker).State, Is.EqualTo(CombatantState.Idle));
+            Assert.That(State(combat, attacker).AttackCooldownRemaining,
+                Is.EqualTo(cooldownAfterImpact).Within(0.0001d),
+                "Move cancels backswing presentation, never the authoritative attack interval.");
+            combat.IssueAttack(new AttackTargetCommand(new[] { attacker }, target));
+            combat.Tick(0.1);
+            Assert.That(State(combat, target).Health, Is.EqualTo(80d),
+                "Orb walking must not increase attacks per second by clearing cooldown.");
+        }
+
+        [Test]
         public void SplashImpact_DamagesEnemiesInRadiusButNotAlliesOrDistantUnits()
         {
             var combat = new CombatSystem();

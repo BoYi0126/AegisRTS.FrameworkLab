@@ -14,20 +14,23 @@ namespace AegisRTS.Demo.PlayablePrototype
         [SerializeField] private Transform healthBarAnchor;
         [SerializeField] private Renderer[] teamColorRenderers = Array.Empty<Renderer>();
         [SerializeField] private PrototypeUnitAnimatorView animatorView;
+        [SerializeField] private Transform projectileSocket;
 
         public Transform SelectionAnchor => selectionAnchor;
         public Transform HealthBarAnchor => healthBarAnchor;
         public Renderer[] TeamColorRenderers => teamColorRenderers ?? Array.Empty<Renderer>();
         public Renderer PrimaryTeamColorRenderer => TeamColorRenderers.Length > 0 ? TeamColorRenderers[0] : null;
         public PrototypeUnitAnimatorView AnimatorView => animatorView;
+        public Transform ProjectileSocket => projectileSocket;
 
         public void Configure(Transform selection, Transform healthBar, Renderer[] renderers,
-            PrototypeUnitAnimatorView animation = null)
+            PrototypeUnitAnimatorView animation = null, Transform projectile = null)
         {
             selectionAnchor = selection;
             healthBarAnchor = healthBar;
             teamColorRenderers = renderers ?? Array.Empty<Renderer>();
             animatorView = animation;
+            projectileSocket = projectile;
         }
 
         public void ApplyTeamColor(Color color)

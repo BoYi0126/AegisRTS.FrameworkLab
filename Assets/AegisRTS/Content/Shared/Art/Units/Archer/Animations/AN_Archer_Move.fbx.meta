@@ -1,0 +1,600 @@
+fileFormatVersion: 2
+guid: c8f1c5df493f0034f97561de01689a5e
+ModelImporter:
+  serializedVersion: 24501
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+    searchTexturesGlobally: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: AN_Archer_Move
+      takeName: Scene
+      internalID: -623603649343465320
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events:
+      - time: 0.033333335
+        functionName: Footstep_L
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.43333334
+        functionName: Footstep_R
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 0
+  meshes:
+    lODScreenPercentages:
+    - 0.25
+    - 0.125
+    - 0.01
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    importUVs: -1
+    importVertexColors: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+    calculateBlendshapeNormalsDeltaFromImportedNormals: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human:
+    - boneName: Hips
+      humanName: Hips
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftUpperLeg
+      humanName: LeftUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightUpperLeg
+      humanName: RightUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftLowerLeg
+      humanName: LeftLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightLowerLeg
+      humanName: RightLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftFoot
+      humanName: LeftFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightFoot
+      humanName: RightFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Spine
+      humanName: Spine
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Chest
+      humanName: Chest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Neck
+      humanName: Neck
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Head
+      humanName: Head
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftShoulder
+      humanName: LeftShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightShoulder
+      humanName: RightShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftUpperArm
+      humanName: LeftUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightUpperArm
+      humanName: RightUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftLowerArm
+      humanName: LeftLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightLowerArm
+      humanName: RightLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftHand
+      humanName: LeftHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightHand
+      humanName: RightHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: UpperChest
+      humanName: UpperChest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    skeleton:
+    - name: SK_Archer_A_v001(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Armature
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Root
+      parentName: Armature
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+      scale: {x: 1, y: 0.99999994, z: 0.99999994}
+    - name: Hips
+      parentName: Root
+      position: {x: 0, y: 0.7832002, z: 0}
+      rotation: {x: 3.5527137e-15, y: -1, z: -0.00000017881393, w: -0.000000055809604}
+      scale: {x: 0.9999999, y: 1, z: 1}
+    - name: Spine
+      parentName: Hips
+      position: {x: 4.656613e-10, y: 0.17799996, z: -0.000000043190084}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 0.99999994, y: 1, z: 1}
+    - name: Chest
+      parentName: Spine
+      position: {x: -0.000000013969839, y: 0.17799999, z: -0.00000007147901}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 1.0000001, y: 1, z: 0.99999994}
+    - name: FX_Hit_Center
+      parentName: Chest
+      position: {x: -9.313226e-10, y: 0.16020012, z: 0.000000017229468}
+      rotation: {x: -0.000000040978186, y: 2.1570415e-32, z: -9.313226e-10, w: 1}
+      scale: {x: 1, y: 1.0000001, z: 1.0000001}
+    - name: SM_Archer_QuiverArrow0_LOD0
+      parentName: Chest
+      position: {x: -0.21, y: 0.4410001, z: -0.1900001}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_QuiverArrow0_LOD1
+      parentName: Chest
+      position: {x: -0.21, y: 0.4410001, z: -0.1900001}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_QuiverArrow1_LOD0
+      parentName: Chest
+      position: {x: -0.25999996, y: 0.44100013, z: -0.19000006}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_QuiverArrow1_LOD1
+      parentName: Chest
+      position: {x: -0.25999996, y: 0.44100013, z: -0.19000006}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_QuiverArrow2_LOD0
+      parentName: Chest
+      position: {x: -0.31, y: 0.4410001, z: -0.18999998}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_QuiverArrow2_LOD1
+      parentName: Chest
+      position: {x: -0.31, y: 0.4410001, z: -0.18999998}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_Quiver_LOD0
+      parentName: Chest
+      position: {x: -0.26, y: 0.06100005, z: -0.19000013}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_Quiver_LOD1
+      parentName: Chest
+      position: {x: -0.26, y: 0.06100005, z: -0.19000013}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: SM_Archer_Quiver_LOD2
+      parentName: Chest
+      position: {x: -0.26, y: 0.06100005, z: -0.19000013}
+      rotation: {x: -0.7071068, y: 6.5854455e-10, z: -0.0000000013170891, w: 0.7071067}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: UpperChest
+      parentName: Chest
+      position: {x: -0.000000006490154, y: 0.16020001, z: -0.00000002165325}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Neck
+      parentName: UpperChest
+      position: {x: -0.0000000045401976, y: 0.10680011, z: -0.000000070547685}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 1.0000001, y: 1, z: 1.0000001}
+    - name: Head
+      parentName: Neck
+      position: {x: 0.000000006519258, y: 0.08900001, z: -0.000000035390258}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1.0000006}
+    - name: Socket_Head
+      parentName: Head
+      position: {x: -0.0000000055879354, y: 0.24920014, z: -0.000000044703484}
+      rotation: {x: -0.000000040978186, y: 2.1570415e-32, z: -9.313226e-10, w: 1}
+      scale: {x: 1, y: 1.0000001, z: 1.0000001}
+    - name: LeftShoulder
+      parentName: UpperChest
+      position: {x: 0.071200006, y: 0.053400066, z: -0.00000010011718}
+      rotation: {x: 0.52773494, y: 0.49923038, z: 0.49923003, w: -0.47226506}
+      scale: {x: 1.0000005, y: 1.0000014, z: 1.0000006}
+    - name: LeftUpperArm
+      parentName: LeftShoulder
+      position: {x: 0.000000049592927, y: 0.16044702, z: 0.00000000721775}
+      rotation: {x: -0.0028687268, y: -0.22388503, z: 0.0008291602, w: 0.97461104}
+      scale: {x: 1.0000002, y: 1, z: 1.000001}
+    - name: LeftLowerArm
+      parentName: LeftUpperArm
+      position: {x: 0.000000007450581, y: 0.2748933, z: -0.00000008940697}
+      rotation: {x: -0.00000013411045, y: 0.000000029802322, z: -0.000000007450581, w: 1}
+      scale: {x: 1.0000004, y: 1.0000002, z: 1}
+    - name: LeftHand
+      parentName: LeftLowerArm
+      position: {x: 0.000000029802322, y: 0.27489337, z: -0.000000014901161}
+      rotation: {x: 0.0033952445, y: 0.0038757029, z: -0.0018691303, w: 0.999985}
+      scale: {x: 1.0000002, y: 1.0000014, z: 1.0000007}
+    - name: SM_Archer_BowString_LOD0
+      parentName: LeftHand
+      position: {x: -0.61597127, y: 0.0021316558, z: -1.1292796}
+      rotation: {x: 0.3385998, y: -0.00000003141138, z: 0.6207658, w: 0.70710677}
+      scale: {x: 0.99999994, y: 1, z: 1.0000002}
+    - name: SM_Archer_BowString_LOD1
+      parentName: LeftHand
+      position: {x: -0.61597127, y: 0.0021316558, z: -1.1292796}
+      rotation: {x: 0.3385998, y: -0.00000003141138, z: 0.6207658, w: 0.70710677}
+      scale: {x: 0.99999994, y: 1, z: 1.0000002}
+    - name: SM_Archer_BowString_LOD2
+      parentName: LeftHand
+      position: {x: -0.61597127, y: 0.0021316558, z: -1.1292796}
+      rotation: {x: 0.3385998, y: -0.00000003141138, z: 0.6207658, w: 0.70710677}
+      scale: {x: 0.99999994, y: 1, z: 1.0000002}
+    - name: SM_Archer_Bow_LOD0
+      parentName: LeftHand
+      position: {x: -0.61597127, y: 0.0021316558, z: -1.1292796}
+      rotation: {x: 0.3385998, y: -0.00000003141138, z: 0.6207658, w: 0.70710677}
+      scale: {x: 0.99999994, y: 1, z: 1.0000002}
+    - name: SM_Archer_Bow_LOD1
+      parentName: LeftHand
+      position: {x: -0.61597127, y: 0.0021316558, z: -1.1292796}
+      rotation: {x: 0.3385998, y: -0.00000003141138, z: 0.6207658, w: 0.70710677}
+      scale: {x: 0.99999994, y: 1, z: 1.0000002}
+    - name: SM_Archer_Bow_LOD2
+      parentName: LeftHand
+      position: {x: -0.61597127, y: 0.0021316558, z: -1.1292796}
+      rotation: {x: 0.3385998, y: -0.00000003141138, z: 0.6207658, w: 0.70710677}
+      scale: {x: 0.99999994, y: 1, z: 1.0000002}
+    - name: Socket_L_Hand
+      parentName: LeftHand
+      position: {x: 0.000000074505806, y: 0.11151679, z: 0.000000044703484}
+      rotation: {x: -0.000000009313226, y: 0.000000007450577, z: 0.00000004377216, w: 1}
+      scale: {x: 1, y: 1, z: 1.0000001}
+    - name: RightShoulder
+      parentName: UpperChest
+      position: {x: -0.071200006, y: 0.05340006, z: -0.000000051455572}
+      rotation: {x: 0.52773494, y: -0.49923038, z: -0.49923003, w: -0.47226506}
+      scale: {x: 1.0000007, y: 1.0000015, z: 1.0000006}
+    - name: RightUpperArm
+      parentName: RightShoulder
+      position: {x: -0.000000013504177, y: 0.16044703, z: 0.000000011175871}
+      rotation: {x: -0.0028691143, y: 0.22388503, z: -0.0008291602, w: 0.97461104}
+      scale: {x: 1, y: 1, z: 1.000001}
+    - name: RightLowerArm
+      parentName: RightUpperArm
+      position: {x: 0.000000040978193, y: 0.27489328, z: -0.000000014901161}
+      rotation: {x: -0.00000013411045, y: -0.000000029802322, z: 0.000000007450581, w: 1}
+      scale: {x: 1.0000008, y: 1.0000002, z: 1}
+    - name: RightHand
+      parentName: RightLowerArm
+      position: {x: 0.000000074505806, y: 0.27489334, z: 0.000000014901161}
+      rotation: {x: 0.0033952445, y: -0.0038757029, z: 0.0018691303, w: 0.999985}
+      scale: {x: 1, y: 1.0000012, z: 1.000001}
+    - name: Socket_Projectile
+      parentName: RightHand
+      position: {x: 0.000000059604645, y: 0.11151673, z: 0}
+      rotation: {x: -0.000000011175871, y: 0.000000007450581, z: -0.000000014901161, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Socket_R_Hand
+      parentName: RightHand
+      position: {x: 0.000000059604645, y: 0.11151673, z: 0}
+      rotation: {x: -0.000000011175871, y: 0.000000007450581, z: -0.000000014901161, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftUpperLeg
+      parentName: Hips
+      position: {x: 0.1335, y: -0.000000022584572, z: -0.000000033527613}
+      rotation: {x: 0.99974006, y: 0.016120655, z: 0.0161207, w: -0.00025993586}
+      scale: {x: 1.0000005, y: 1.0000005, z: 1.0000001}
+    - name: LeftLowerLeg
+      parentName: LeftUpperLeg
+      position: {x: 0.000000014901161, y: 0.2760435, z: -0.0000000433065}
+      rotation: {x: -0.00025993597, y: -0.016120693, z: 0.016120655, w: 0.99974006}
+      scale: {x: 1, y: 1, z: 1.0000005}
+    - name: LeftFoot
+      parentName: LeftLowerLeg
+      position: {x: -0.000000022351742, y: 0.37379995, z: -0.000000022351742}
+      rotation: {x: -0.5019271, y: 0.0000000037252903, z: 1.1687007e-10, w: 0.86491}
+      scale: {x: 1, y: 1.0000002, z: 1.0000011}
+    - name: FX_Foot_L
+      parentName: LeftFoot
+      position: {x: -0.000000044703484, y: 0.14350817, z: 0}
+      rotation: {x: -0.000000013038516, y: -0.0000000037252907, z: 0.0000000074505815, w: 1}
+      scale: {x: 0.99999994, y: 0.99999994, z: 0.9999998}
+    - name: LeftToes
+      parentName: LeftFoot
+      position: {x: -0.000000040978193, y: 0.1435082, z: -0.00000014528632}
+      rotation: {x: -0.17607574, y: -0.000000001586144, z: 0.0000000010346696, w: 0.9843766}
+      scale: {x: 0.9999999, y: 1.0000019, z: 1.0000011}
+    - name: RightUpperLeg
+      parentName: Hips
+      position: {x: -0.1335, y: -0.000000022118911, z: 0.0000000037252903}
+      rotation: {x: 0.99974006, y: -0.016120655, z: -0.0161207, w: -0.00025993586}
+      scale: {x: 1.0000005, y: 1.0000006, z: 1}
+    - name: RightLowerLeg
+      parentName: RightUpperLeg
+      position: {x: -0.000000014901161, y: 0.27604353, z: -0.00000008940697}
+      rotation: {x: -0.00025993597, y: 0.016120693, z: -0.016120655, w: 0.99974006}
+      scale: {x: 1.0000001, y: 1.0000001, z: 1.0000008}
+    - name: RightFoot
+      parentName: RightLowerLeg
+      position: {x: 0.000000011175871, y: 0.3737998, z: 0.000000044703484}
+      rotation: {x: -0.5019271, y: -0.0000000037252903, z: -1.1687007e-10, w: 0.86491}
+      scale: {x: 1, y: 1.0000007, z: 1.0000007}
+    - name: FX_Foot_R
+      parentName: RightFoot
+      position: {x: 0.000000022351742, y: 0.14350812, z: 0.00000011920929}
+      rotation: {x: -0.000000021420412, y: -0.000000003143214, z: -0.0000000037252899, w: 1}
+      scale: {x: 1.0000001, y: 1.0000001, z: 1}
+    - name: RightToes
+      parentName: RightFoot
+      position: {x: -0.0000000037252903, y: 0.1435081, z: -0.000000022351742}
+      rotation: {x: -0.17607574, y: 0.000000001586144, z: -0.0000000010346696, w: 0.9843766}
+      scale: {x: 1, y: 1.0000015, z: 1.0000008}
+    - name: GroundContact
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: HealthBarAnchor
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 2.1, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SK_Archer_A_LOD0_Base
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SK_Archer_A_LOD0_Team
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SK_Archer_A_LOD1_Base
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SK_Archer_A_LOD1_Team
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SK_Archer_A_LOD2_Base
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SK_Archer_A_LOD2_Team
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: SelectionAnchor
+      parentName: SK_Archer_A_v001(Clone)
+      position: {x: -0, y: 0.02, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: e46748274c52c22409706edf373f279d, type: 3}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 2
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

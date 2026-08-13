@@ -54,8 +54,9 @@ Create a game-ready stylized low-poly 3D archer for a Unity 6 URP top-down RTS, 
 
 ## 驗收
 
-- [ ] 弓兵、步兵轉灰階後仍可立即區分。
-- [ ] 箭矢為獨立資產，方向與 Pivot 已說明。
+- [x] 弓兵、步兵轉灰階後仍可立即區分（Prototype L3：弓／箭袋對盾／劍）。
+- [x] 箭矢為獨立資產，方向與 Pivot 已說明並由 Unity Builder 驗證。
 - [ ] `ProjectileRelease` 與弓弦放開相差不超過 1 frame。
 - [ ] 手臂、弓弦、箭袋無明顯穿模。
 
+目前可玩實作、重建方式、測試證據與正式美術替換條件見 [`Unit_04_弓兵_L3實作交付與驗收.md`](Unit_04_弓兵_L3實作交付與驗收.md)。最後兩項保留給正式弓弦動畫與人工 release review，不因 Prototype 已可運作而誤標完成。

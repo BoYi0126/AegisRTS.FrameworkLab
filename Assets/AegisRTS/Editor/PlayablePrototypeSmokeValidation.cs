@@ -114,8 +114,12 @@ namespace AegisRTS.Editor
             Require(bootstrap.BootSucceeded, bootstrap.LastUiMessage);
             bootstrap.DismissTutorialNow();
 
-            PrototypeUnitArtView[] infantry = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude);
+            PrototypeUnitArtView[] unitArt = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude);
+            PrototypeUnitArtView[] archers = unitArt.Where(value => value.GetComponentsInChildren<Renderer>(true)
+                .Any(renderer => renderer.name.IndexOf("Bow", StringComparison.OrdinalIgnoreCase) >= 0)).ToArray();
+            PrototypeUnitArtView[] infantry = unitArt.Except(archers).ToArray();
             Require(infantry.Length == 2, $"Expected 2 infantry art instances, found {infantry.Length}.");
+            Require(archers.Length == 2, $"Expected 2 archer art instances, found {archers.Length}.");
             Require(infantry.All(value => value.TeamColorRenderers.Length >= 3), "Each infantry must expose team-color renderers across all LOD levels.");
             Require(infantry.All(value => value.GetComponent<LODGroup>() == null && value.GetComponentInChildren<LODGroup>() != null),
                 "Each infantry must contain an LODGroup below its gameplay root.");
@@ -127,12 +131,21 @@ namespace AegisRTS.Editor
                                           value.AnimatorView.Animator.avatar.isHuman &&
                                           value.AnimatorView.Animator.avatar.isValid),
                 "Each infantry must use a valid Humanoid Avatar.");
+            Require(archers.All(value => value.ProjectileSocket != null),
+                "Each archer must expose Socket_Projectile.");
+            Require(archers.All(value => value.TeamColorRenderers.Length >= 3 && value.AnimatorView != null &&
+                                          value.AnimatorView.Animator.avatar != null &&
+                                          value.AnimatorView.Animator.avatar.isHuman &&
+                                          value.AnimatorView.Animator.avatar.isValid),
+                "Each archer must expose LOD team color and a valid Humanoid Animator.");
+            Require(bootstrap.ProjectileVisuals != null,
+                "The event-driven projectile presentation must be composed.");
 
             string outputDirectory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "AegisRTS.BuildValidation"));
             Directory.CreateDirectory(outputDirectory);
-            string screenshot = Path.Combine(outputDirectory, "Infantry_GameView.png");
+            string screenshot = Path.Combine(outputDirectory, "Units_GameView.png");
             ScreenCapture.CaptureScreenshot(screenshot, 1);
-            Debug.Log($"[PlayablePrototype Smoke] PASS: 2 infantry instances, LOD/team colors/anchors present. Screenshot: {screenshot}");
+            Debug.Log($"[PlayablePrototype Smoke] PASS: 2 infantry + 2 archer instances, Humanoid/LOD/team colors/anchors/projectile socket present. Screenshot: {screenshot}");
         }
 
         private static void RestoreEditorScene()

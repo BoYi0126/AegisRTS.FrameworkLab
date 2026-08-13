@@ -28,13 +28,13 @@ namespace AegisRTS.Editor
         {
             new ClipSpec("AN_Infantry_Idle", true),
             new ClipSpec("AN_Infantry_Move", true,
-                new AnimationEvent { functionName = "Footstep_L", time = 1f / 24f },
-                new AnimationEvent { functionName = "Footstep_R", time = 13f / 24f }),
+                new AnimationEvent { functionName = "Footstep_L", time = 1f / 30f },
+                new AnimationEvent { functionName = "Footstep_R", time = 13f / 30f }),
             new ClipSpec("AN_Infantry_Attack_A", false,
                 new AnimationEvent { functionName = "AttackImpact", time = 13f / 30f }),
             new ClipSpec("AN_Infantry_Hit", false),
             new ClipSpec("AN_Infantry_Death", false,
-                new AnimationEvent { functionName = "DeathSettled", time = 35f / 38f }),
+                new AnimationEvent { functionName = "DeathSettled", time = 35f / 30f }),
         };
 
         [MenuItem("Tools/AegisRTS/Art/Rebuild Infantry L3 Prefab")]
@@ -191,6 +191,12 @@ namespace AegisRTS.Editor
             AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
             controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
             controller.AddParameter("MoveRate", AnimatorControllerParameterType.Float);
+            controller.AddParameter(new AnimatorControllerParameter
+            {
+                name = "AttackRate",
+                type = AnimatorControllerParameterType.Float,
+                defaultFloat = 1f,
+            });
             controller.AddParameter("Attack", AnimatorControllerParameterType.Trigger);
             controller.AddParameter("Hit", AnimatorControllerParameterType.Trigger);
             controller.AddParameter("Die", AnimatorControllerParameterType.Trigger);
@@ -202,6 +208,8 @@ namespace AegisRTS.Editor
             move.speedParameterActive = true;
             move.speedParameter = "MoveRate";
             AnimatorState attack = machine.AddState("Attack"); attack.motion = clips["AN_Infantry_Attack_A"];
+            attack.speedParameterActive = true;
+            attack.speedParameter = "AttackRate";
             AnimatorState hit = machine.AddState("Hit"); hit.motion = clips["AN_Infantry_Hit"];
             AnimatorState death = machine.AddState("Death"); death.motion = clips["AN_Infantry_Death"];
             machine.defaultState = idle;
@@ -256,10 +264,9 @@ namespace AegisRTS.Editor
             {
                 GameObject visual = UnityEngine.Object.Instantiate(source, root.transform, false);
                 visual.name = "VisualRoot";
-                // Blender source is authored Z-up/-Y-forward. The exported FBX retains that source basis,
-                // so convert the complete visual hierarchy once at the prefab boundary to Unity Y-up/Z-forward.
                 visual.transform.localPosition = Vector3.zero;
-                visual.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                // Blender's FBX export axes are converted to Unity Y-up by the importer.
+                visual.transform.localRotation = Quaternion.identity;
                 visual.transform.localScale = Vector3.one;
 
                 Animator animator = visual.GetComponent<Animator>() ?? visual.AddComponent<Animator>();
@@ -268,7 +275,7 @@ namespace AegisRTS.Editor
                 animator.applyRootMotion = false;
                 animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
                 var animatorView = visual.AddComponent<PrototypeUnitAnimatorView>();
-                animatorView.Configure(animator, (float)clips["AN_Infantry_Death"].length);
+                animatorView.Configure(animator, (float)clips["AN_Infantry_Death"].length, 13f / 30f, 0.07f);
 
                 Renderer[] renderers = visual.GetComponentsInChildren<Renderer>(true);
                 ConfigureMaterials(renderers, baseMaterial, teamMaterial);
@@ -345,7 +352,7 @@ namespace AegisRTS.Editor
             if (bounds.size.y < 1.65f || bounds.size.y <= bounds.size.z)
                 throw new InvalidOperationException(
                     $"[Infantry L3] Invalid Unity orientation: bounds={bounds.size}. Character height must be on Y, not Z.");
-            if (bounds.min.y < -0.08f || bounds.max.y > 1.95f)
+            if (bounds.min.y < -0.08f || bounds.max.y > 2.10f)
                 throw new InvalidOperationException(
                     $"[Infantry L3] Invalid vertical bounds: minY={bounds.min.y:F3}, maxY={bounds.max.y:F3}.");
         }

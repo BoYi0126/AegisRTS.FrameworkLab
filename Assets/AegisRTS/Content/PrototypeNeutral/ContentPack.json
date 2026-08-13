@@ -12,7 +12,7 @@
   ],
   "units": [
     { "id": "unit.infantry", "displayName": "Infantry", "maxHealth": 130, "movementSpeed": 4.5, "prefabId": "PF_Unit_Infantry", "costs": [{"resourceId":"resource.material","amount":20}], "recruitmentSeconds": 0.4, "populationCost": 1, "abilityIds": [], "tags": ["unit","infantry"] },
-    { "id": "unit.archer", "displayName": "Archer", "maxHealth": 90, "movementSpeed": 4.2, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.material","amount":15},{"resourceId":"resource.supply","amount":5}], "recruitmentSeconds": 0.4, "populationCost": 1, "abilityIds": [], "tags": ["unit","archer"] },
+    { "id": "unit.archer", "displayName": "Archer", "maxHealth": 90, "movementSpeed": 4.2, "prefabId": "PF_Unit_Archer", "costs": [{"resourceId":"resource.material","amount":15},{"resourceId":"resource.supply","amount":5}], "recruitmentSeconds": 0.4, "populationCost": 1, "abilityIds": [], "tags": ["unit","archer"] },
     { "id": "unit.cavalry", "displayName": "Cavalry", "maxHealth": 160, "movementSpeed": 7, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.material","amount":25},{"resourceId":"resource.supply","amount":10}], "recruitmentSeconds": 0.5, "populationCost": 2, "abilityIds": [], "tags": ["unit","cavalry"] },
     { "id": "unit.siege", "displayName": "Siege Unit", "maxHealth": 240, "movementSpeed": 2.8, "prefabId": "PF_Unit_Placeholder", "costs": [{"resourceId":"resource.supply","amount":30}], "recruitmentSeconds": 0.6, "populationCost": 2, "prerequisiteTechnologyIds": ["technology.siege"], "abilityIds": [], "tags": ["unit","siege-unit"] }
   ],

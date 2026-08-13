@@ -5,27 +5,27 @@
     {
       "path": "Animations/AN_Infantry_Attack_A.fbx",
       "bytes": 592396,
-      "sha256": "de69f77bc0ae110dd74eb7db48e4632d4c011056ccc681e3df82fcac393de4ed"
+      "sha256": "82dd9bc2a910d636c01c86e879fc441b8537f3243c08320955cdc359a7939a7f"
     },
     {
       "path": "Animations/AN_Infantry_Death.fbx",
-      "bytes": 602460,
-      "sha256": "327bf80950c02069adc406cce995f3931444277a86441a40f8ebfa7c4eeb86a9"
+      "bytes": 602444,
+      "sha256": "2d3ece1ddb0146df024ab25c9233f6fad8e9e77cf15562df14aa1eb9f27bb777"
     },
     {
       "path": "Animations/AN_Infantry_Hit.fbx",
       "bytes": 548924,
-      "sha256": "cfc60900b0bcfd013876b6076295e7712a1629f914d1b9eaeffceb86d9f2d75a"
+      "sha256": "6e95690f721dc0848033b1b03b01bbba7940127e6ef18c1b5ad01a5ccc44e127"
     },
     {
       "path": "Animations/AN_Infantry_Idle.fbx",
-      "bytes": 682188,
-      "sha256": "3c3cca76de8b50badc6993a417b86ba2cec27a45fb724597cc3b4a2af573890c"
+      "bytes": 677516,
+      "sha256": "97f47f14f0526df149c167787329aecf661029aaf0cc24f7b822a74f002018a1"
     },
     {
       "path": "Animations/AN_Infantry_Move.fbx",
       "bytes": 586732,
-      "sha256": "2b0092f9b3a24fef6b462420252d7be333bbb0dec9b2ca37a73eeb5a56d6f744"
+      "sha256": "ec1b94b55a5113a435ac31eac417e96dc83a66a369f2afe9b6329af45c650500"
     },
     {
       "path": "ASSET_MANIFEST.md",
@@ -44,8 +44,8 @@
     },
     {
       "path": "Documentation/L3_DELIVERY_REPORT.md",
-      "bytes": 4743,
-      "sha256": "fb9ca1f4b2c2069b5d49c860f75e71d90ca38d9bab9ba5f6f94d3c6b74fd4770"
+      "bytes": 4745,
+      "sha256": "6318f6fd9f57cd68664c0bfc8a0a4d8ea26b48de25d1980dc0aa2430c78536f4"
     },
     {
       "path": "Documentation/PROMPT.txt",
@@ -79,8 +79,8 @@
     },
     {
       "path": "Models/SK_Infantry_A_v002.fbx",
-      "bytes": 1286652,
-      "sha256": "685ac7a9e6ef1ae38aa9532f289c29d9e9c25e08d88b80a5fe5e237d559373c3"
+      "bytes": 1282204,
+      "sha256": "16b698acc8797c80e0153d51916a9825d26453ccff6a7289c46f5ef99f846468"
     },
     {
       "path": "README.md",
@@ -99,8 +99,8 @@
     },
     {
       "path": "Source/build_unit03_l3_blender.py",
-      "bytes": 26529,
-      "sha256": "5e7a86d1d1cf8fedd7781a962b6f9290c233e4d7047a98cd868dc6cf9927e7c1"
+      "bytes": 27266,
+      "sha256": "0c39245ec9b83106a3ce531facfd69b37693149febc53c19d64be24f4aeec053"
     },
     {
       "path": "Source/BUILD_WINDOWS.bat",
@@ -109,8 +109,8 @@
     },
     {
       "path": "Source/CHR_Infantry_A_v002.blend",
-      "bytes": 233238,
-      "sha256": "e663ef033274b3ab7f1e8647c7420053d4a1944acb01b79ef9261bff1f8f2f44"
+      "bytes": 231897,
+      "sha256": "5d9d93f9559d2a1608fb4b57a7bc0ac284c4f3ed99ba826f0a5e98e1d5f51632"
     },
     {
       "path": "Textures/T_Infantry_A_BaseColor_1K.png",

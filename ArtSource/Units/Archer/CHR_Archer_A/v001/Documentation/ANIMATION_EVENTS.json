@@ -1,0 +1,9 @@
+{
+  "fps": 30,
+  "events": [
+    { "clip": "AN_Archer_Move", "event": "Footstep_L", "frame": 1 },
+    { "clip": "AN_Archer_Move", "event": "Footstep_R", "frame": 13 },
+    { "clip": "AN_Archer_Attack_Ranged", "event": "ProjectileRelease", "frame": 22 },
+    { "clip": "AN_Archer_Death", "event": "DeathSettled", "frame": 35 }
+  ]
+}

@@ -4,12 +4,131 @@
 
 ## Current Status
 
-- Current Phase：PlayablePrototype_01 已切換為 `fortified-city` 要塞城市規則；第一個玩家攻城垂直切片（主堡直募、固定城牆、可修城門、主堡壓制後佔領）為 `Completed`，玩家守城與隨機武將模式尚未完成。
+- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；玩家守城、隨機武將模式與正式美術仍未完成。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 177/177、PlayMode 36/36；clean package validation（前一筆 package runtime）EditMode 6/6、PlayMode 3/3；Windows Development Build PASS（BuildReport 186,829,217 bytes；輸出 332 files／187,185,803 bytes），`.exe` 實際以 1920×1080 `FullScreenWindow` 啟動 10 秒且 process responding、Player log error scan 0 hits；Idle 站立與 Move→Idle targeted PlayMode 各 1/1；solution build 0 warnings／0 errors。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：由專案擁有者啟動最新 Windows Player，命令步兵移動後停止，從正面與側面確認雙腿位於身體下方且不再坐倒／躺下；並確認預設 3 倍滾輪速度與 `+`、`-` 倍率手感。通過後再回到玩家守城／AI 正式攻城／維修成本，或另立 Infantry L2.1 正式美術任務。
+- Highest Priority：由專案擁有者在最新 Windows Player 實際操作弓兵 Attack-Move，確認 0.38 秒出手承諾與移動切換手感；再依主觀結果微調集中式 cadence 表，之後建議依 Batch A 製作指揮官或城門並回到玩家守城／AI 正式攻城／維修成本。
 - Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam，不是產品功能缺口。
+
+## 2026-08-13 — 步兵 Move 姿勢修正與全角色 Attack-Move／取消後搖
+
+- Status：Completed（步兵移動保持直立、弓兵與所有 prototype combat roles 套用相同 Attack-Move 語意、數值規格、domain／presentation／army tests、完整回歸與 Windows build 均完成；最終平衡仍須玩家手感測試）
+- Goal：修正步兵 Move 時整個 Humanoid 橫躺；讓弓兵與其他角色在收到移動命令時可取消尚未出手的攻擊，或在出手後取消剩餘動畫後搖，同時保持完整攻擊冷卻，支援不額外增加 DPS 的拉打操作。
+- Baseline：
+  - Branch／HEAD：`main`／`fd4b91461c301496ac2cd1b170dccb888855c09f`；開始本項時 worktree 已包含尚未提交的 Unit 04 弓兵 L3 整合，該既有範圍保留且一併回歸，沒有覆寫或拆除。
+  - 步兵舊的實際移動 capture 顯示整個角色旋轉成水平；原測試只確認 Animator state／位移／事件，沒有檢查 Head 與雙腳的世界座標關係，因此產生 false pass。
+  - `CombatSystem.NotifyMoveOrder` 已會清除攻擊目標，但 Animator Attack state 只能在約 95% clip 長度後退出，所以 gameplay 已接受 Move、畫面仍等待攻擊動畫完成。
+  - Prototype 的 Hero／Infantry／Archer／Cavalry／Siege cadence 分散硬編碼於 composition，只有 cooldown／windup，沒有公開 APS、recovery、可取消後搖或 animation blend 規格。
+- Scope In：
+  - 修正 Infantry Blender master／五個 clips 的站立 baseline 與 Unity visual basis；重建 `.blend`、FBX、Animator Controller、Prefab、manifest。
+  - 建立所有 prototype combat roles 的集中式攻速／前搖／後搖／取消 blend；讓 Animator event 與 authoritative windup 對齊。
+  - 實作個別 Move 與軍團 Move／Defend／Retreat 的前搖取消、出手後 presentation backswing 取消、cooldown 保留；Player／AI 共用既有 command path。
+  - 新增 domain、army、PlayMode animation cancel 與實際 Humanoid standing regression tests；更新 Framework API、L3 report、正式 Attack-Move 規格與本進度紀錄。
+- Scope Out／Deferred：
+  - 不改 damage、range、projectile speed、命中演算法、交戰模式、世界觀資料或最終競技平衡；不製作騎兵／攻城／英雄正式 Attack clips。
+  - 不加入移動中同時射擊；目前是攻擊出手後立即移動、冷卻完成後再攻擊的 stop-and-go orb walking。
+  - 正式 Content Pack cadence schema、攻速 buff／debuff、網路同步與高頻長時間 DPS performance 測試留待後續產品階段。
+- Major Files／Assets：
+  - `ArtSource/Units/Infantry/CHR_Infantry_A/v002/Source/build_unit03_l3_blender.py`、重新產生的 `.blend`、Master／五個 FBX、`Documentation/L3_DELIVERY_REPORT.md` 與 `MANIFEST.json`。
+  - Unity Infantry FBX、`AC_Infantry.controller`、`PF_Unit_Infantry.prefab`、`InfantryL3PrefabBuilder.cs`；Archer controller／prefab 與 `ArcherL3PrefabBuilder.cs` 增加 `AttackRate` 安全預設。
+  - `PrototypeCombatTuning.cs`、`PrototypeSystemComposition.cs`、`PrototypeUnitAnimatorView.cs`、`PlayablePrototypeBootstrap.cs`。
+  - Package `CombatModels.cs`、`ArmyOrderExecutor.cs`；tests：`CombatAbilityTests.cs`、`HeroArmyCommandTests.cs`、`PlayablePrototypePlayModeTests.cs`。
+  - 新增 `docs/45_Attack_Cadence_OrbWalking_攻速與取消後搖規範.md`，同步更新 `docs/26_Framework_API_目標介面.md`。
+- Behavior Before／After：
+  - Before：Infantry Move 會以水平姿勢沿地面滑動；After：source master 清除 active action／pose，所有 clips 明確 key 站立 body baseline，Unity visual root 使用 identity，實際 Move capture 與 bone assertion 均保持直立。
+  - Before：弓兵收到 Move 後雖然 gameplay target 被清除，仍要等待 Attack clip 幾乎播完；After：出手前 Move 不生成箭、不消耗未成立攻擊的 cooldown，重新 Attack 會重跑完整 windup；出手後 Move 保留已發射箭與 cooldown，Animator 以 0.06 秒 cross-fade 立即進 Move。
+  - Before：不同角色數值散落且 clip event 未依 gameplay attack point 縮放；After：`AttackRate` 對齊 clip event 與 authoritative windup，所有 prototype role 從單一 tuning table 取得 cadence。
+- Architecture／API／Data：
+  - `CombatSystem` 保持 authoritative gameplay truth；View 只根據 Combat／Movement snapshot 觸發或取消動畫，不套用傷害、不建立 authoritative projectile、不清除 cooldown。
+  - `AttackProfile` 新增唯讀衍生 API：`AttackIntervalSeconds`、`AttacksPerSecond`、`RecoverySeconds`、`MoveCancelableBackswingSeconds`；constructor 與既有 serialized data 未改，無 migration。
+  - `GameplayArmyOrderExecutor` 在 movement accepted 後通知 Combat，確保 army Move／Defend／Retreat 與單位 Move 相同；Prototype army executor 原已有相同 seam，Player／AI 仍共用 Command／Army flow。
+  - Prototype cadence：Hero 0.80／0.25／0.55 s，Infantry 0.95／0.30／0.65 s，Archer 1.10／0.38／0.72 s，Cavalry 1.25／0.40／0.85 s，Siege 2.20／1.05／1.15 s（順序為 interval／windup／recovery；詳細 APS／blend 見 docs/45）。
+- Tests／Validation：
+  - Blender 5.2 Infantry rebuild：PASS；LOD 4,376／1,512／542 triangles、5 clips、Move 0–24、AttackImpact frame 13；重新產生來源與 FBX。
+  - Infantry／Archer Unity Builder：PASS；valid Humanoid、5 clips、Animator／Prefab contracts；`AttackRate` default=1。
+  - Combat domain targeted：2/2 PASS；驗證 Move during windup 零傷害且退回未成立攻擊的 cooldown，以及 impact 後 Move 保留 cooldown／無額外攻擊。
+  - Army targeted EditMode：1/1 PASS；`GameplayArmyOrderExecutor.Move` 清除每個 member 的 active attack。
+  - Archer Attack-Move targeted PlayMode：1/1 PASS；驗證 0.38 秒 release 對齊、出手前取消不發射、出手後取消切 Move；Infantry actual movement standing targeted：1/1 PASS，並人工檢查 `Move_00.png`、`Move_02.png` 為直立。
+  - Full EditMode：180/180 PASS，0 failed／skipped／inconclusive；出手前 cooldown 語意修正後再次 180/180 PASS（`Logs/OrbWalkFullEditModeAcceptance.xml`）。
+  - Full PlayMode 初次：38/40，兩項直接 Prefab event 測試因新增 `AttackRate` default=0 失敗；修正後 40/40。之後把 animation events 從錯誤的 clip-length 除數改為正式 30 FPS frame time，完整輪先後暴露測試等待窗不足（38/40、39/40）；擴充等待窗但保留 0.25 秒前不得放箭的精確 assertion 後，最終 40/40 PASS（`Logs/OrbWalkFullPlayModeAcceptance.xml`）。未將任何失敗輪誤記為通過。
+  - `dotnet restore`＋solution build：PASS，0 warnings／0 errors；`git diff --check`：PASS（僅 line-ending warnings）；Infantry manifest：26 files、0 missing／mismatch。
+  - Gameplay cancel 語意最終修正後 Full PlayMode 再次 40/40 PASS（`Logs/OrbWalkFullPlayModeFinalAcceptance.xml`）。
+  - Windows Development Build：PASS，BuildReport 187,670,429 bytes（`Logs/OrbWalkWindowsBuildAcceptance.log`）；Player 啟動 10 秒仍 responding，1920×1080 native fullscreen，log exception／crash／error scan 0 hits。
+- Acceptance：
+  - `[PASS]` Infantry 實際 Move 不再橫躺；Head 高於雙腳、Y 為主要高度軸、root motion 保持關閉。
+  - `[PASS]` 出手前 Move 取消攻擊且不產生 melee damage／projectile；出手後 Move 只取消 visual backswing。
+  - `[PASS]` 出手前取消退回未成立攻擊的 cooldown 但重新攻擊須重跑完整 windup；出手後取消不清除 cooldown，因此理論 APS 不被 Attack-Move 提高；個別與 army order 使用一致語意。
+  - `[PASS]` Hero／Infantry／Archer／Cavalry／Siege cadence 與 cancel 參數有單一程式來源及詳細文件。
+  - `[PASS]` 完整 EditMode／PlayMode、builders、solution、manifest、Windows build／launch 通過。
+  - `[DEFERRED]` 使用者在實際 Player 對弓兵 0.38 秒前搖、0.06 秒切換與各角色節奏做主觀手感調整；正式平衡不以 automated test 代替。
+- Completed：步兵 source／runtime 姿勢修復、集中 cadence、AttackRate event alignment、個別／軍團移動取消、冷卻保護、規格／API／L3 文件、tests、build 與 launch smoke。
+- Not Completed／Deferred：正式各兵種動畫與最終平衡、Content Pack cadence schema、攻速狀態效果、網路同步、玩家守城與隨機武將功能。
+- Known Issues／Risks：
+  - 目前「所有角色」共用 gameplay cancel contract；只有 Infantry／Archer 有正式連接的 L3 Attack clips，Hero／Cavalry／Siege 仍使用原型外觀，需在交付正式 clip 時設定正確 event time。
+  - Animator cancel 是 presentation cross-fade；很短時間內密集 alternate Attack／Move 的最終視覺流暢度仍需真人操作判斷，但 domain cooldown／damage 已由 tests 鎖定。
+  - Worktree 同時包含前一項尚未 commit 的 Archer L3 大型交付與本項修改，以及既有未追蹤 `AegisRTS_Codex_3D_Asset_Production_Spec_Task.md`；提交前需由專案擁有者確認是否一起納入。
+- Git：`main`／HEAD `fd4b91461c301496ac2cd1b170dccb888855c09f`；尚未 commit／push；最終 `git status --short` 58 entries（包含 prior Archer L3、此次 Infantry／Attack-Move、Unity build/import settings 與既有 untracked spec）。
+- Next（依序）：
+  1. 在最新 Windows Player 操作弓兵 Attack→Move→Attack，主觀確認攻擊前搖與切換速度；只從 `PrototypeCombatTuning` 微調並同步 docs/45／tests。
+  2. 確認 55 個 worktree entries 的提交邊界；若接受將 Archer L3 與本修正合併交付，再 commit／push，勿遺漏 FBX／Prefab／`.meta`／docs。
+  3. 為下一個正式 L3 角色建立 clip event frame 與 authoritative windup 對齊驗收，不複製散落 cadence 數字。
+  4. 回到玩家守城／AI 正式攻城／城門維修成本，或依 Batch A 製作指揮官／城門美術。
+
+## 2026-08-13 — Unit 04 弓兵 Prototype L3 與箭矢整合
+
+- Status：Completed（可玩 Prototype、可重建來源、Unity 資產、事件驅動箭矢、完整測試、畫面檢查與 Windows Build 均完成；正式弓弦動畫與 production art release review 為 Deferred）
+- Goal：依步兵的來源／Runtime 分流方式，讓 `unit.archer` 從 Capsule placeholder 升級為可辨識、可移動、可攻擊的 Humanoid 弓兵，並以獨立箭矢呈現既有 authoritative ranged combat event。
+- Baseline：
+  - Branch／HEAD：`main`／`fd4b91461c301496ac2cd1b170dccb888855c09f`；開始時 worktree clean。
+  - `unit.archer.prefabId` 原為 `PF_Unit_Placeholder`；場景弓兵是 Capsule，沒有 Animator、LOD、Team Color、弓／箭袋、發射 socket 或箭矢畫面。
+  - Package `CombatSystem` 已正確發布 `ProjectileLaunchedEvent` 並 authoritative 計算命中／傷害；Prototype composition 只記錄通知，既有 `UnityCombatDriver` 同時 Tick Combat，不能直接加入場景，否則會與 composition 重複推進 simulation。
+- Scope In：
+  - world-neutral 低模弓兵來源包、三段 LOD、Humanoid、五個 In Place clips、Team Color、獨立箭矢、Unity import／Prefab builder、ContentPack 綁定、pooled flight／impact presentation、automated tests、近距離 capture、規格／操作／架構文件。
+- Scope Out／Deferred：
+  - 最終世界觀造型、production PBR 貼圖、正式弓弦 deform／release animation、音效、弓兵數值重平衡、修改 Combat damage timing、homing projectile gameplay、玩家守城／隨機武將模式。
+- Major Files／Assets：
+  - `ArtSource/Units/Archer/CHR_Archer_A/v001`：18 files／4,776,751 bytes；含 Blender 5.2 rebuild script、`.blend`、Master／5 clips／arrow FBX、prompt、版本／授權紀錄、BUILD_RESULT 與 SHA-256 manifest。
+  - `Assets/AegisRTS/Content/Shared/Art/Units/Archer`：34 files／4,811,615 bytes；含 FBX／meta、三個 runtime materials、`AC_Archer.controller`、`PF_Unit_Archer.prefab`、`PRJ_Arrow_Basic_v001.prefab`。
+  - 新增 `ArcherL3PrefabBuilder.cs`、`PrototypeProjectileVisualController.cs`；更新 Art Catalog／View／Animator、Bootstrap、ContentPack、Smoke Validation 與 PlayMode tests。
+  - 新增 `docs/ArtSpecs/Unit_04_弓兵_L3實作交付與驗收.md`，同步更新 Unit 04、Batch gap、操作手冊與架構維護文件。
+- Behavior Before／After：
+  - Before：弓兵與其他未製作兵種都是 Capsule；遠程攻擊雖有 gameplay event／damage，但 Prototype 只顯示文字通知，沒有飛行物或 impact。
+  - After：玩家與敵方弓兵載入同一 `PF_Unit_Archer`，以 runtime Team Color 區分；Idle／Move／Attack_Ranged／Hit／Death 由 authoritative snapshots 驅動且 Root Motion Off。每個 `ProjectileLaunchedEvent` 從弓兵 socket 租用 Z+ 箭矢，以小幅拋物線飛向目標，抵達後歸還 pool 並租用短暫 impact flash。
+  - 第一輪近距離 capture 發現 Attack clip 下半身因未 key Humanoid muscles 而折疊；來源腳本加入明確 grounded full-body baseline，重新生成／匯入後，Idle 與 4 個 Attack samples 均站立。測試也改用 Humanoid 頭腳骨骼，避免弓的 renderer bounds 掩蓋姿勢錯誤。
+- Architecture：
+  - `CombatSystem` 保持唯一 gameplay truth；`PrototypeProjectileVisualController` 只訂閱 event，不 Tick Combat、不含 Collider、不套用 damage、不回寫 domain state。
+  - 箭矢與 impact 使用 Core `ObjectPool<GameObject>`；Gameplay／package Runtime 未新增 Unity dependency，Player／AI 仍共用 Command／Combat pipeline。
+  - `PrototypeUnitArtView` 只新增可選 `ProjectileSocket` presentation anchor；正式美術可在保持 Prefab ID／Animator parameters／socket／event／Z+ contract 下替換，不需要改 gameplay code。
+- API／Data：
+  - Demo public API 新增 `PrototypeUnitArtCatalog.ArcherPrefabId／ArcherResourcePath`、`PrototypeUnitArtView.ProjectileSocket`、`PrototypeUnitAnimatorView.ProjectileReleaseCount／ProjectileRelease()`、`PlayablePrototypeBootstrap.ProjectileVisuals` 與 projectile diagnostics counters。
+  - Content data：`unit.archer.prefabId` 由 `PF_Unit_Placeholder` 改為 `PF_Unit_Archer`；save schema、package public API、combat stats 與 scenario JSON 無變更。
+- Tests／Validation：
+  - Blender 5.2 rebuild：PASS；1.78 m、LOD0／1／2 = 3,344／1,280／542 triangles、5 clips、release frame 22 @30 FPS、0.82 m arrow。
+  - Unity `ArcherL3PrefabBuilder.BuildAndValidate` 最終重跑：PASS；Humanoid `isHuman=True`／`isValid=True`、5 clips、LOD／equipment／arrow size／Z+／center pivot／no collider gates 全通過。
+  - Archer targeted PlayMode：2/2 PASS；Archer close-inspection：1/1 PASS。capture 共 7 張，人工檢查修正版 Idle／Attack 不折疊。
+  - FrameworkLab EditMode：177/177 PASS，0 failed／skipped／inconclusive。
+  - FrameworkLab PlayMode：初跑 37/39；2 failures 是舊測試把所有 UnitArt 都當步兵。測試改為依 Bow／Shield 分類後重跑 39/39 PASS。
+  - Windows Development Build：PASS，BuildReport 187,657,769 bytes；輸出 `C:\projects\Unity\AegisRTS.BuildValidation\PlayablePrototype_01.exe`。啟動 10 秒：process responding，Player log `NullReferenceException／MissingReferenceException／Unhandled Exception／Crash／error CS` = 0 hits。
+  - `dotnet build AegisRTS.FrameworkLab.slnx`：PASS，0 warnings／0 errors；`git diff --check`：PASS。
+- Acceptance：
+  - `[PASS]` `unit.archer` 使用獨立 `PF_Unit_Archer`，玩家／敵方各一名，且可與盾劍步兵辨識。
+  - `[PASS]` Humanoid、Root Motion Off、Idle／Move／Attack_Ranged／Hit／Death、`ProjectileRelease`、三段 LOD、Team Color 與 anchors。
+  - `[PASS]` 箭矢是獨立 0.82 m、local Z+、center-pivot、無 Collider Prefab，flight／impact pool 可回收且不影響 gameplay damage。
+  - `[PASS]` 初版 Attack 折疊已由畫面檢查抓出、修正並加 regression；完整 tests／build／launch 通過。
+  - `[DEFERRED]` `ProjectileRelease` 與正式弓弦放開相差不超過一 frame、手臂／弓弦／箭袋 production clipping review；本版沒有可變形弓弦，不誤標正式美術通過。
+- Completed：可玩的弓兵 vertical slice、來源重建、Unity integration、content binding、projectile presentation、debug counters、automated validation、visual review 與文件。
+- Not Completed／Deferred：final art／textures、弓弦骨架動畫、音效、目標設備長時間 profiling、專案擁有者主觀手感驗收。
+- Known Issues／Risks：
+  - 角色身體衍生自步兵 Prototype；原始來源權利未確認前不可當成 production release asset。
+  - 弓弦目前是 rigid visual，攻擊姿勢足以表達 Prototype 射擊但不具正式拉弦細節；近距離可能看出手部／弓弦簡化。
+  - 視覺箭矢使用 event 發射當下／目前 view 目的地，不追蹤飛行中的目標；這不影響 authoritative 命中，但高速移動目標可能看到視覺落點差異。
+- Git：結束時仍在 `main`，未 commit／未 push；本筆紀錄加入後為 20 個 status entries，僅含本任務 archer source／runtime／code／tests／docs。Unity build 造成的 Scene fileID、URP prefilter、Connect 與 ProjectSettings 序列化副作用已移除；TestResults XML 未納入 repository。
+- Next（排序）：
+  1. 專案擁有者在 Windows Player 實際下達弓兵攻擊，確認箭速、弧度、impact、陣營辨識與近距離穿模手感。
+  2. 若手感通過，依 Batch A 優先製作指揮官或城門 Prototype L1→L3；不需要先做地圖美術。
+  3. 另立 production archer art 任務時，補正式弓弦 deform／release、貼圖與來源權利 review，但維持既有 Runtime contract。
+  4. 系統面回到玩家守城、AI 正式攻城與維修成本，或依最新產品優先級選擇。
 
 ## 2026-08-13 — 步兵停止後 Idle 站立姿勢修正
 

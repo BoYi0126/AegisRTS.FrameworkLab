@@ -246,7 +246,8 @@ if (combat.TryGetState(entityId, out CombatantSnapshot state))
 
 - `CombatSystem`：Pure C# authoritative combat state；處理 attack、projectile、damage、status、ability cooldown 與 death。
 - `ICombatQuery`：提供 `TryGetState`、sorted `Snapshot` 與 `GetDebugSummary`，供 UI／AI／tests 使用。
-- `AttackProfile`：定義 damage type、range、cooldown、windup、projectile speed、splash radius 與 target tags。
+- `AttackProfile`：定義 damage type、range、cooldown、windup、projectile speed、splash radius 與 target tags；並公開唯讀衍生值 `AttackIntervalSeconds`、`AttacksPerSecond`、`RecoverySeconds`、`MoveCancelableBackswingSeconds`。
+- 非排隊 Move 在出手前取消傷害／發射並退回未成立攻擊的 cooldown，在出手後只取消 presentation backswing 且保留 `AttackCooldownRemaining`；完整規格見 `45_Attack_Cadence_OrbWalking_攻速與取消後搖規範.md`。
 - `DefenseProfile`：定義 armor 與 physical／magical resistance；True damage 不套用 defense／resistance。
 - `CombatantProfile`：把 definition identity、faction、army、HP、attack、defense、tags、abilities 組成 runtime spawn configuration。
 - `UnitEngagementMode`：`HoldGround`=0.5、`Normal`=1.0、`Aggressive`=1.5 倍 attack range；`Retaliate` 不主動索敵，只在受擊後鎖定攻擊者。
@@ -306,7 +307,7 @@ commandBus.Dispatch(new AssignArmyCommanderCommand(armyId, replacementHeroId));
 
 - Commands：`CreateArmyCommand`、`MergeArmiesCommand`、`SplitArmyCommand`、`AssignArmyCommanderCommand`、`MoveArmyCommand`、`AttackArmyCommand`、`AttackSettlementArmyCommand`、`DefendArmyCommand`、`RetreatArmyCommand`。
 - `ArmyCommandRouter`：為每種 command 同時註冊 validator 與 handler，Player／AI／Scenario／Test 共用相同 flow。
-- `IArmyOrderExecutor`：隔離 Army order state 與執行 backend；`GameplayArmyOrderExecutor` 接到既有 Movement／Combat。
+- `IArmyOrderExecutor`：隔離 Army order state 與執行 backend；`GameplayArmyOrderExecutor` 接到既有 Movement／Combat，成功的 Move／Defend／Retreat 同步通知 Combat 取消前搖或 presentation backswing。
 - Events：`ArmyCreatedEvent`、`ArmiesMergedEvent`、`ArmySplitEvent`、`ArmyCommanderAssignedEvent`、`ArmyOrderIssuedEvent`。
 
 ## Phase 07 Faction / Settlement / Territory API

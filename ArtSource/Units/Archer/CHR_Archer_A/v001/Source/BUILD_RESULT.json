@@ -1,0 +1,31 @@
+{
+  "tool": "Blender",
+  "blender_version": "5.2.0 LTS",
+  "fps": 30,
+  "source_derivative": "CHR_Infantry_A_v001 body geometry via accepted Infantry v002 pipeline",
+  "release_status": "Prototype only - source rights and final animation quality unverified",
+  "lod_triangles": {
+    "LOD0": 3344,
+    "LOD1": 1280,
+    "LOD2": 542
+  },
+  "rest_pose": "A-Pose",
+  "clips": [
+    "Idle",
+    "Move",
+    "Attack_Ranged",
+    "Hit",
+    "Death"
+  ],
+  "projectile_release": {
+    "frame": 22,
+    "time_seconds": 0.7333333333333333
+  },
+  "projectile": {
+    "length_m": 0.82,
+    "forward": "Unity local Z+",
+    "pivot": "center"
+  },
+  "root_motion": "Off / Root bone never keyed",
+  "prompt": "Create a game-ready stylized low-poly 3D archer for a Unity 6 URP top-down RTS. Preserve the repository's accepted prototype body proportions and Humanoid contract, remove the infantry shield and sword, use light armor, add a clearly curved 1.15-1.35 m bow, a readable back quiver, and a separate 0.82 m Z-forward arrow. Deliver Idle, Move, Attack_Ranged, Hit, and Death as in-place clips with Root Motion off. Attack_Ranged must expose ProjectileRelease; projectile flight is a separate gameplay visual. Use one shared model with runtime team color, no baked blue/red duplicates, no existing IP, logos, or watermarks."
+}

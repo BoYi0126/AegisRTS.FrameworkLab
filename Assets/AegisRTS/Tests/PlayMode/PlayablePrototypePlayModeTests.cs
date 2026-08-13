@@ -36,7 +36,7 @@ namespace AegisRTS.Tests.PlayMode
         {
             ContentPack pack = new ContentPackJsonLoader().Load(Read("ContentPack.json"));
             ContentValidationResult validation = new ContentPackValidator().Validate(pack,
-                new ContentAssetCatalog(new[] { "PF_Unit_Infantry", "PF_Unit_Placeholder", "PF_Hero_Placeholder", "PF_Structure_Placeholder", "PF_Settlement_Placeholder" }));
+                new ContentAssetCatalog(new[] { "PF_Unit_Infantry", "PF_Unit_Archer", "PF_Unit_Placeholder", "PF_Hero_Placeholder", "PF_Structure_Placeholder", "PF_Settlement_Placeholder" }));
             Assert.That(validation.IsValid, Is.True, string.Join("\n", validation.Issues));
             Assert.That(pack.Rules.SettlementArchetypeId, Is.EqualTo("fortified-city"));
             Assert.That(pack.Rules.DestructibleWalls, Is.False);
@@ -46,6 +46,13 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(pack.DefenseStructures.Any(value => value.Id.Value == "structure.stronghold-core"), Is.True);
             Assert.That(pack.Units.Single(value => value.Id.Value == "unit.infantry").PrefabId,
                 Is.EqualTo(PrototypeUnitArtCatalog.InfantryPrefabId));
+            Assert.That(pack.Units.Single(value => value.Id.Value == "unit.archer").PrefabId,
+                Is.EqualTo(PrototypeUnitArtCatalog.ArcherPrefabId));
+            PrototypeAttackTiming infantryTiming = PrototypeCombatTuning.Get(PrototypeCombatRole.Infantry);
+            PrototypeAttackTiming archerTiming = PrototypeCombatTuning.Get(PrototypeCombatRole.Archer);
+            Assert.That(infantryTiming.AttacksPerSecond, Is.EqualTo(1d / 0.95d).Within(0.0001d));
+            Assert.That(archerTiming.WindupSeconds, Is.EqualTo(0.38d));
+            Assert.That(archerTiming.MoveCancelableBackswingSeconds, Is.EqualTo(0.72d).Within(0.0001d));
             using (PrototypeSystemComposition value = Create())
             {
                 Assert.That(value.ContentPackId, Is.EqualTo("prototype.neutral"));
@@ -259,12 +266,19 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(bootstrap.UsesUnityNavMesh, Is.True, "The playable scene must inject the Unity NavMesh product adapter.");
             Assert.That(bootstrap.Composition, Is.Not.Null);
             Assert.That(bootstrap.ViewCount, Is.EqualTo(bootstrap.Composition.Registry.Count));
-            PrototypeUnitArtView[] infantryArt = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude);
+            PrototypeUnitArtView[] allUnitArt = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude);
+            PrototypeUnitArtView[] infantryArt = allUnitArt.Where(value => value.GetComponentsInChildren<Renderer>(true)
+                .Any(renderer => renderer.name.Contains("Shield"))).ToArray();
+            PrototypeUnitArtView[] archerArt = allUnitArt.Where(value => value.GetComponentsInChildren<Renderer>(true)
+                .Any(renderer => renderer.name.Contains("Bow"))).ToArray();
             Assert.That(infantryArt, Has.Length.EqualTo(2), "Player and enemy infantry must use the imported art prefab.");
+            Assert.That(archerArt, Has.Length.EqualTo(2), "Player and enemy archers must use the imported art prefab.");
             Assert.That(infantryArt.All(value => value.TeamColorRenderers.Length >= 2), Is.True);
             Assert.That(infantryArt.All(value => value.HealthBarAnchor != null && value.SelectionAnchor != null), Is.True);
             Assert.That(infantryArt.All(value => value.AnimatorView != null && value.AnimatorView.Animator != null), Is.True,
                 "L3 infantry must expose a configured Animator presentation bridge.");
+            Assert.That(archerArt.All(value => value.AnimatorView != null && value.ProjectileSocket != null), Is.True,
+                "L3 archers must expose an Animator bridge and projectile socket.");
             Assert.That(bootstrap.HudQuery, Is.Not.Null);
             Assert.That(bootstrap.HudCommandSink, Is.Not.Null);
             Assert.That(bootstrap.Selection.RegisteredCount, Is.EqualTo(bootstrap.ViewCount + 4),
@@ -396,7 +410,7 @@ namespace AegisRTS.Tests.PlayMode
                 Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
 
                 art.AnimatorView.PlayDeath();
-                yield return new WaitForSeconds(1.25f);
+                yield return new WaitForSeconds(1.7f);
                 Assert.That(art.AnimatorView.DeathSettledCount, Is.GreaterThan(0));
                 Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
             }
@@ -404,6 +418,203 @@ namespace AegisRTS.Tests.PlayMode
             {
                 UnityEngine.Object.Destroy(instance);
             }
+        }
+
+        [UnityTest]
+        public IEnumerator ArcherL3_PrefabAvatarEquipmentEventsAndArrowContractAreValid()
+        {
+            GameObject prefab = PrototypeUnitArtCatalog.Load(PrototypeUnitArtCatalog.ArcherPrefabId);
+            GameObject arrowPrefab = Resources.Load<GameObject>(PrototypeProjectileVisualController.ArrowResourcePath);
+            Assert.That(prefab, Is.Not.Null);
+            Assert.That(arrowPrefab, Is.Not.Null);
+            GameObject instance = UnityEngine.Object.Instantiate(prefab);
+            GameObject arrow = UnityEngine.Object.Instantiate(arrowPrefab);
+            try
+            {
+                PrototypeUnitArtView art = instance.GetComponent<PrototypeUnitArtView>();
+                Assert.That(art, Is.Not.Null);
+                Assert.That(art.ProjectileSocket, Is.Not.Null);
+                Assert.That(art.AnimatorView, Is.Not.Null);
+                Animator animator = art.AnimatorView.Animator;
+                Assert.That(animator.avatar != null && animator.avatar.isHuman && animator.avatar.isValid, Is.True);
+                Assert.That(animator.applyRootMotion, Is.False);
+                Assert.That(instance.GetComponentInChildren<LODGroup>(), Is.Not.Null);
+                Renderer[] renderers = instance.GetComponentsInChildren<Renderer>(true);
+                Assert.That(renderers.Any(value => value.name.Contains("Bow")), Is.True);
+                Assert.That(renderers.Any(value => value.name.Contains("Quiver")), Is.True);
+                Assert.That(renderers.Any(value => value.name.Contains("Shield") || value.name.Contains("Sword")), Is.False);
+
+                Vector3 rootPosition = instance.transform.position;
+                yield return null;
+                AssertHumanoidStanding(animator, "Archer initial Idle pose");
+                animator.SetFloat("MoveRate", 1.8f);
+                animator.SetFloat("Speed", 1f);
+                yield return new WaitForSeconds(0.8f);
+                Assert.That(art.AnimatorView.FootstepCount, Is.GreaterThan(0));
+                animator.SetFloat("Speed", 0f);
+                animator.SetTrigger("Attack");
+                yield return new WaitForSeconds(0.95f);
+                Assert.That(art.AnimatorView.ProjectileReleaseCount, Is.GreaterThan(0));
+                Assert.That(Vector3.Distance(instance.transform.position, rootPosition), Is.LessThan(0.001f));
+
+                Assert.That(arrow.GetComponentInChildren<Collider>(), Is.Null);
+                Bounds arrowBounds = arrow.GetComponentsInChildren<Renderer>()[0].bounds;
+                foreach (Renderer renderer in arrow.GetComponentsInChildren<Renderer>().Skip(1)) arrowBounds.Encapsulate(renderer.bounds);
+                Assert.That(arrowBounds.size.z, Is.InRange(0.75f, 0.90f));
+                Assert.That(arrowBounds.size.z, Is.GreaterThan(arrowBounds.size.x));
+                Assert.That(arrowBounds.size.z, Is.GreaterThan(arrowBounds.size.y));
+            }
+            finally
+            {
+                UnityEngine.Object.Destroy(instance);
+                UnityEngine.Object.Destroy(arrow);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator ArcherL3_ProjectileEventUsesArrowPoolAndProducesImpactWithoutApplyingGameplay()
+        {
+            SceneManager.LoadScene("PlayablePrototype_01", LoadSceneMode.Single);
+            yield return null;
+            yield return null;
+            PlayablePrototypeBootstrap bootstrap = UnityEngine.Object.FindAnyObjectByType<PlayablePrototypeBootstrap>();
+            Assert.That(bootstrap, Is.Not.Null);
+            bootstrap.DismissTutorialNow();
+            Assert.That(bootstrap.ProjectileVisuals, Is.Not.Null);
+            PrototypeEntityRecord source = bootstrap.Composition.Registry.Snapshot()
+                .First(value => value.DefinitionId == "unit.archer" && value.FactionId == PrototypeSystemComposition.PlayerFactionId);
+            PrototypeEntityRecord target = bootstrap.Composition.Registry.Snapshot()
+                .First(value => value.FactionId == PrototypeSystemComposition.EnemyFactionId);
+            Assert.That(source.PrefabId, Is.EqualTo(PrototypeUnitArtCatalog.ArcherPrefabId));
+
+            bootstrap.Composition.Events.Publish(new ProjectileLaunchedEvent(source.EntityId, target.EntityId,
+                source.SpawnPosition, target.SpawnPosition, 200d));
+            yield return null;
+            Assert.That(bootstrap.ProjectileVisuals.ProjectileVisualCount, Is.EqualTo(1));
+            Assert.That(bootstrap.ProjectileVisuals.ActiveProjectileCount, Is.EqualTo(1));
+            GameObject visual = GameObject.Find($"Arrow_{source.EntityId}_{target.EntityId}");
+            Assert.That(visual, Is.Not.Null);
+            Assert.That(visual.GetComponentInChildren<Collider>(), Is.Null);
+            yield return new WaitForSeconds(0.25f);
+            Assert.That(bootstrap.ProjectileVisuals.ActiveProjectileCount, Is.EqualTo(0));
+            Assert.That(bootstrap.ProjectileVisuals.PooledProjectileCount, Is.EqualTo(1));
+            Assert.That(bootstrap.ProjectileVisuals.ImpactVisualCount, Is.EqualTo(1));
+            Assert.That(bootstrap.ProjectileVisuals.ProjectileObjectCreatedCount, Is.EqualTo(1));
+        }
+
+        [UnityTest]
+        public IEnumerator ArcherL3_CloseInspectionMaintainsStandingSilhouetteAndTeamReadability()
+        {
+            SceneManager.LoadScene("PlayablePrototype_01", LoadSceneMode.Single);
+            yield return null;
+            yield return null;
+            PlayablePrototypeBootstrap bootstrap = UnityEngine.Object.FindAnyObjectByType<PlayablePrototypeBootstrap>();
+            Assert.That(bootstrap, Is.Not.Null);
+            bootstrap.DismissTutorialNow();
+            PrototypeUnitArtView art = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude)
+                .First(value => value.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.name.Contains("Bow")) &&
+                                value.GetComponentInParent<UnitySelectableView>().Affiliation == SelectionAffiliation.Friendly);
+            UnitySelectableView selectable = art.GetComponentInParent<UnitySelectableView>();
+            Transform root = selectable.transform;
+            root.rotation = Quaternion.LookRotation(Vector3.back, Vector3.up);
+            Animator animator = art.AnimatorView.Animator;
+            animator.speed = 0f;
+            animator.Play("Idle", 0, 0.25f);
+            animator.Update(0f);
+            yield return null;
+            AssertHumanoidStanding(animator, "Archer Idle close inspection");
+            Bounds idleBounds = CalculateBounds(art.GetComponentsInChildren<Renderer>(true));
+            Assert.That(idleBounds.size.y, Is.InRange(1.65f, 2.15f));
+            Assert.That(idleBounds.min.y, Is.GreaterThan(root.position.y - 0.12f));
+            Assert.That(art.TeamColorRenderers.Length, Is.GreaterThanOrEqualTo(3));
+
+            float[] samples = { 0f, 0.35f, 0.62f, 0.85f };
+            foreach (float sample in samples)
+            {
+                animator.Play("Attack", 0, sample);
+                animator.Update(0f);
+                yield return null;
+                AssertHumanoidStanding(animator, $"Archer Attack {sample:P0}");
+                Bounds attackBounds = CalculateBounds(art.GetComponentsInChildren<Renderer>(true));
+                Assert.That(attackBounds.size.y, Is.GreaterThan(1.45f), $"Attack {sample:P0} collapsed the archer.");
+                Assert.That(attackBounds.min.y, Is.GreaterThan(root.position.y - 0.12f),
+                    $"Attack {sample:P0} penetrated the ground.");
+            }
+
+            RtsCameraController cameraController = Camera.main.GetComponent<RtsCameraController>();
+            cameraController.Model.Focus(root.position.x, root.position.z);
+            cameraController.Model.ZoomBy(-100d);
+            cameraController.ProcessInput(Vector2.zero, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f),
+                Vector2.zero, false, 0f, 0f);
+            Assert.That(cameraController.Model.Zoom, Is.EqualTo(2.5d));
+
+            if (!string.Equals(Environment.GetEnvironmentVariable("AEGIS_CAPTURE_ARCHER_DETAIL"), "1", StringComparison.Ordinal))
+                yield break;
+            foreach (UnitySelectableView other in UnityEngine.Object.FindObjectsByType<UnitySelectableView>(FindObjectsInactive.Exclude))
+            {
+                if (other == selectable) continue;
+                foreach (Renderer renderer in other.GetComponentsInChildren<Renderer>()) renderer.enabled = false;
+            }
+            foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>())
+                if (renderer.name.StartsWith("Health_", StringComparison.Ordinal)) renderer.enabled = false;
+            string directory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..",
+                "AegisRTS.BuildValidation", "ArcherDetailReview"));
+            Directory.CreateDirectory(directory);
+            animator.Play("Idle", 0, 0.25f);
+            animator.Update(0f);
+            Vector3[] directions = { Vector3.back, Vector3.right, Vector3.forward };
+            string[] names = { "Front", "Side", "Back" };
+            for (int index = 0; index < directions.Length; index++)
+            {
+                root.rotation = Quaternion.LookRotation(directions[index], Vector3.up);
+                yield return null;
+                CaptureCamera(Camera.main, Path.Combine(directory, $"ArcherDetail_{names[index]}.png"));
+            }
+            root.rotation = Quaternion.LookRotation(Vector3.back, Vector3.up);
+            for (int index = 0; index < samples.Length; index++)
+            {
+                animator.Play("Attack", 0, samples[index]);
+                animator.Update(0f);
+                yield return null;
+                CaptureCamera(Camera.main, Path.Combine(directory, $"ArcherAttackPose_{index:00}.png"));
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator ArcherAttack_MoveCancelsPreImpactOrBackswingWithoutChangingCooldown()
+        {
+            GameObject prefab = PrototypeUnitArtCatalog.Load(PrototypeUnitArtCatalog.ArcherPrefabId);
+            GameObject instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                PrototypeUnitAnimatorView view = instance.GetComponent<PrototypeUnitArtView>().AnimatorView;
+                Animator animator = view.Animator;
+                EntityId actor = new EntityId(1);
+                EntityId target = new EntityId(2);
+                view.Refresh(false, 0d, AnimationCombat(actor, target, CombatantState.Idle, 0d), 0.38d);
+                view.Refresh(false, 0d, AnimationCombat(actor, target, CombatantState.Windup, 1.10d), 0.38d);
+                yield return new WaitForSeconds(0.25f);
+                Assert.That(view.ProjectileReleaseCount, Is.Zero,
+                    "The visual must not release before the authoritative 0.38 second attack point.");
+                yield return new WaitForSeconds(0.3f);
+                Assert.That(view.ProjectileReleaseCount, Is.GreaterThan(0),
+                    "The sped-up visual release must remain aligned to the authoritative 0.38 second attack point.");
+
+                view.Refresh(true, 4.2d, AnimationCombat(actor, EntityId.Invalid, CombatantState.Idle, 0.68d), 0.38d);
+                yield return new WaitForSeconds(0.1f);
+                Assert.That(view.AttackMoveCancelCount, Is.EqualTo(1));
+                Assert.That(animator.IsInTransition(0) || animator.GetCurrentAnimatorStateInfo(0).IsName("Move"), Is.True);
+
+                int releaseBeforeCancelledWindup = view.ProjectileReleaseCount;
+                view.Refresh(false, 0d, AnimationCombat(actor, target, CombatantState.Windup, 1.10d), 0.38d);
+                yield return new WaitForSeconds(0.08f);
+                view.Refresh(true, 4.2d, AnimationCombat(actor, EntityId.Invalid, CombatantState.Idle, 1.02d), 0.38d);
+                yield return new WaitForSeconds(0.35f);
+                Assert.That(view.ProjectileReleaseCount, Is.EqualTo(releaseBeforeCancelledWindup),
+                    "Moving before the attack point must cancel the unreleased shot.");
+                Assert.That(view.AttackMoveCancelCount, Is.EqualTo(2));
+            }
+            finally { UnityEngine.Object.Destroy(instance); }
         }
 
         [UnityTest]
@@ -418,7 +629,8 @@ namespace AegisRTS.Tests.PlayMode
             bootstrap.DismissTutorialNow();
 
             PrototypeUnitArtView art = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude)
-                .First(value => value.GetComponentInParent<UnitySelectableView>().transform.position.x < 0f);
+                .First(value => value.GetComponentInParent<UnitySelectableView>().transform.position.x < 0f &&
+                                value.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.name.Contains("Shield")));
             UnitySelectableView selectable = art.GetComponentInParent<UnitySelectableView>();
             Transform root = selectable.transform;
             Vector3 start = root.position;
@@ -466,6 +678,7 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(Vector3.Dot(root.forward, displacement.normalized), Is.GreaterThan(0.98f),
                 "The infantry gameplay root must face its actual travel direction.");
             Assert.That(art.AnimatorView.Animator.GetFloat("Speed"), Is.GreaterThan(0.5f));
+            AssertHumanoidStanding(art.AnimatorView.Animator, "Infantry actual Move pose");
         }
 
         [UnityTest]
@@ -480,7 +693,8 @@ namespace AegisRTS.Tests.PlayMode
             bootstrap.DismissTutorialNow();
 
             PrototypeUnitArtView art = UnityEngine.Object.FindObjectsByType<PrototypeUnitArtView>(FindObjectsInactive.Exclude)
-                .First(value => value.GetComponentInParent<UnitySelectableView>().Affiliation == SelectionAffiliation.Friendly);
+                .First(value => value.GetComponentInParent<UnitySelectableView>().Affiliation == SelectionAffiliation.Friendly &&
+                                value.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.name.Contains("Shield")));
             UnitySelectableView selectable = art.GetComponentInParent<UnitySelectableView>();
             Transform root = selectable.transform;
             root.rotation = Quaternion.LookRotation(Vector3.back, Vector3.up);
@@ -926,6 +1140,26 @@ namespace AegisRTS.Tests.PlayMode
             Assert.That(planarLean, Is.LessThan(0.25f),
                 $"{context}: head-to-feet planar lean {planarLean:F3} m indicates a seated/lying pose.");
         }
+
+        private static CombatantSnapshot AnimationCombat(EntityId actor, EntityId target,
+            CombatantState state, double cooldown) => new CombatantSnapshot(
+            actor,
+            PrototypeSystemComposition.PlayerFactionId,
+            EntityId.Invalid,
+            state,
+            target,
+            new WorldPoint(0d, 0d, 0d),
+            100d,
+            100d,
+            cooldown,
+            1d,
+            new Dictionary<string, double>(),
+            new List<StatusEffectSnapshot>(),
+            UnitEngagementMode.Normal,
+            target.IsValid ? EngagementTargetReason.ManualOrder : EngagementTargetReason.None,
+            new WorldPoint(0d, 0d, 0d),
+            9d,
+            false);
 
         private static void Tick(PrototypeSystemComposition value, double seconds)
         {

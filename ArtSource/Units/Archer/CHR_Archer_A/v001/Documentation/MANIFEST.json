@@ -1,0 +1,91 @@
+{
+  "package": "Unit_04_Archer_Prototype_L3_v001",
+  "generated_by": "Source/build_unit04_archer_blender.py",
+  "files": [
+    {
+      "path": "Animations/AN_Archer_Attack_Ranged.fbx",
+      "bytes": 634924,
+      "sha256": "5e8a9a44c8efafba9e48e770ea79c97f0e92da3e65ab1dcddf7e7276ecd9efe3"
+    },
+    {
+      "path": "Animations/AN_Archer_Death.fbx",
+      "bytes": 652124,
+      "sha256": "ce37fda86c6c3473ac8a15894688bb14eaf76974a1b4ce70ef1cb3de3e8d9d6a"
+    },
+    {
+      "path": "Animations/AN_Archer_Hit.fbx",
+      "bytes": 582396,
+      "sha256": "788dd082883e672cbf57f5ef130fc7d2e0381b7a57aae83ee8fd59e60d391f42"
+    },
+    {
+      "path": "Animations/AN_Archer_Idle.fbx",
+      "bytes": 746924,
+      "sha256": "9f2369a5e26109501ba6e32f0eaec80593adb6c9aee08945f910a6d99e537833"
+    },
+    {
+      "path": "Animations/AN_Archer_Move.fbx",
+      "bytes": 631532,
+      "sha256": "b10e55ebcd22a210f438524998486ed3f340336ba8890a7712ff68c120b2ce30"
+    },
+    {
+      "path": "Documentation/ANIMATION_EVENTS.json",
+      "bytes": 332,
+      "sha256": "80350435cea4ba19de8300945debf103803f552e6b33be3b1b603da457feab16"
+    },
+    {
+      "path": "Documentation/GENERATION_AND_LICENSE_RECORD.md",
+      "bytes": 642,
+      "sha256": "199d78654a82d643c17db3b3daaff026d643a1e7abfcd265ddc89c9bf0d6df3b"
+    },
+    {
+      "path": "Documentation/L3_DELIVERY_REPORT.md",
+      "bytes": 925,
+      "sha256": "e4628c7100dce3ae84df3fda14d17e0aa9aca3b45aaa56c2989eea5bf89be6a0"
+    },
+    {
+      "path": "Documentation/PROMPT.txt",
+      "bytes": 619,
+      "sha256": "118a2dedc62fde073940a92fd8bd443cacadf050cf3383a59d9b599d1178e308"
+    },
+    {
+      "path": "Documentation/STATUS.md",
+      "bytes": 206,
+      "sha256": "7919d67f9b2f6bc171c0f61597eb4d6f8c50457c3327259e092c6cb3c1f5c092"
+    },
+    {
+      "path": "Documentation/UNITY_IMPORT_SETTINGS.md",
+      "bytes": 395,
+      "sha256": "c851de6d20eec9c55e55e828c9cd67ff53cdebdb6b120e8c597f0fc628a7b3c9"
+    },
+    {
+      "path": "Models/PRJ_Arrow_Basic_v001.fbx",
+      "bytes": 29116,
+      "sha256": "63940b05ba5a71800411f84eed675bd2a4b831383337e6155a39d4c5cb9ff834"
+    },
+    {
+      "path": "Models/SK_Archer_A_v001.fbx",
+      "bytes": 1262332,
+      "sha256": "e25214fbd6ad246755221c606cb66c92de3a129b79f186d906c86993e15f6722"
+    },
+    {
+      "path": "README.md",
+      "bytes": 562,
+      "sha256": "29381b506e9e1064d3cdaa794c17198752bde6121b382922e5f7ff374c477577"
+    },
+    {
+      "path": "Source/BUILD_RESULT.json",
+      "bytes": 1347,
+      "sha256": "0293ea688d33c88f5f422b383b79a25d86c5d9316ddde64b6b5f5295a9fe8139"
+    },
+    {
+      "path": "Source/build_unit04_archer_blender.py",
+      "bytes": 15870,
+      "sha256": "457f4ee194b49a350105f0fbe40822895b70b70e8ddfcd4d1de19f3b6a4f6c0f"
+    },
+    {
+      "path": "Source/CHR_Archer_A_v001.blend",
+      "bytes": 213470,
+      "sha256": "4af8919a7db2f9945b486efe9da1edde1794c41bd9360f154c90702377cb3589"
+    }
+  ]
+}
