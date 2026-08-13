@@ -4,12 +4,60 @@
 
 ## Current Status
 
-- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；依Phase 03.5 Revision 02任務已從受保護的P035R1建立`CHR_Infantry_A_v004_P035R2`，只修正盾牌attachment／grip／strap、review rotation與左臂review pose，盾牌Top／Center／Bottom已從0.5094H／0.2730H／0.0366H收斂至0.7016H／0.4643H／0.2271H；狀態為`READY FOR PHASE03_5 REVISION02 REVIEW`，18項Gate仍待人工決定，未進Phase 04，也不是Production Ready。
+- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；依Phase 03.5 Revision 03任務已保留P035R2並建立`CHR_Infantry_A_v004_P035R3`，以正式`RightHand → Socket_R_Hand → WPN_SwordRoot_R → 7 sword parts`層級修正劍未跟手問題；98 meshes／16,858 vertices／33,248 triangles／1.824011 m與所有mesh fingerprints／world bounds不變，新增1個non-deforming socket bone後為24 bones。Blender、FBX clean reimport、Unity Humanoid／hierarchy與±15° follow均已驗證；狀態為`READY FOR PHASE03_5 REVISION03 REVIEW`，仍待人工決定，未進Phase 04，也不是Production Ready。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。2026-08-13 P035R2另完成Unity 6000.5.7f1 isolated A-Pose／L1Pose review import、C# compile、scene／prefab build與6張raw capture（含同角度P035R1 baseline），batchmode return code 0；未執行EditMode／PlayMode／Windows build且未修改正式Runtime Prefab，歷史runtime結果不代表P035R2通過。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。2026-08-13 P035R3另完成FrameworkLab EditMode 180/180、Unity 6000.5.7f1 C# compile、A-Pose／L1 Humanoid valid、review scene／prefab、hierarchy與GPU capture，batchmode return code 0；未執行PlayMode／Windows build且未修改正式Runtime Prefab，歷史runtime結果不代表P035R3已獲人工PASS。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：Art／Design／Technical Art審核`docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision02_Shield_Alignment_Review/05_Review_Checklist.md`、P035R1 vs P035R2 shield focus、grip／strap close-up、final L1 overlay與Unity L1Pose RTS Normal；明確批准前不得建立PRE-UV GEOMETRY LOCK、進Phase 04或替換Runtime Prefab。
+- Highest Priority：Art／Design／Technical Art審核`docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision03_Sword_Attachment_Review/`的Revision Report、hierarchy、A-Pose／L1 grip、RightHand ±15° follow、FBX reimport與Unity Humanoid證據；明確批准前不得建立PRE-UV GEOMETRY + ATTACHMENT LOCK、進Phase 04或替換Runtime Prefab。
 - Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam。新 production 規格的 20k–35k LOD0、LOD3／Impostor、packed team mask 與多 influence deformation 是 `PROPOSED` 量產 gate，不是目前低模 Prototype 已實作的 runtime baseline。
+
+## 2026-08-13 — Infantry Phase 03.5 Revision 03 Sword Attachment v004_P035R3
+
+- Status：`READY FOR PHASE03_5 REVISION03 REVIEW`；機器驗證與review package已完成，人工Art／Technical Art決定仍pending；沒有自行宣告PASS、PRE-UV lock、Phase 04或Production Ready。
+- Goal：執行`mission/Infantry_Remaster_Phase03_5_Revision03_Sword_Attachment_Task.md`，保留P035R2，建立真正的RightHand／weapon socket／SwordRoot transform chain，確保七個劍部件在Blender、FBX與Unity跟隨右手，同時鎖定角色、盾牌與劍geometry／size，輸出P035R3與review ZIP。
+- Baseline：
+  - Branch／HEAD：`main`／`f37edbb73abdf955c3c0d4118be70d7c67a79748`；開始時只有使用者提供的Revision03 task為untracked，沒有覆寫既有修改。
+  - Task：1,663 lines、20,693 bytes、SHA-256`898E6762E786D8301F597009AD140AE88C1712ADAF8E8B033CA031EDF7E7BE6A`。
+  - Protected input：`CHR_Infantry_A_v004_P035R2.blend` 412,402 bytes、SHA-256`D8DCD84D888204D65385A94CF15B0C07BEA227236D47EA5EC3D54992999E551D`；build script設exact-hash gate且沒有修改該檔。
+  - P035R2 actual defect：`Sword`、`Sword_Grip`、`Sword_Guard`、`Sword_Pommel`、`GEO_Infantry_Sword_GripContact`、`GEO_Infantry_Sword_BladeSpine`、`GEO_Infantry_Sword_GripWraps`均是Armature普通object child；`AttachmentBone=RightHand`只是metadata，沒有transform inheritance；socket與SwordRoot皆不存在。
+- Scope：
+  - In：必要規格／runtime contract audit、七個Sword visual parts inventory、`Socket_R_Hand`與`WPN_SwordRoot_R`、preserve-world reparent、A-Pose／L1 grip、RightHand ±15°／raise／lower evidence、geometry／scale／topology lock、A-Pose／L1 FBX export與clean reimport、Unity Humanoid／hierarchy／prefab／captures、reports／manifests／ZIP。
+  - Out／Deferred：Body／arm／head／shield／sword geometry或size修改、shield transform、Phase 04、final UV／texture／shader／team mask、final skinning、gameplay animation polish、AttackImpact變更、LOD、runtime prefab replacement、generic Equipment system、commit／push／reset。
+- Changed Files／Assets：
+  - `ArtSource/Units/Infantry/CHR_Infantry_A/v004/Source/CHR_Infantry_A_v004_P035R3.blend`：412,646 bytes、SHA-256`03DED168297B95C88E0289C3A91A34B1EB6CB640509A1D39816B2D1C12A40D46`；新增deterministic build／render／FBX export／audit／FBX reimport／evidence compose／ZIP finalize tools。
+  - `Assets/AegisRTS/Editor/InfantryPhase035Revision03ReviewBuilder.cs`與`Assets/AegisRTS/Review/InfantryPhase035Revision03/`：兩份FBX、materials、A-Pose／L1 prefabs、review scene與Unity `.meta`；正式`PF_Unit_Infantry`未改。
+  - `docs/ArtProduction/ReviewPackages/Infantry_Phase03_5_Revision03_Sword_Attachment_Review/`：50 files、20 PNG、7 top-level reports、source Blend、2 FBX、measurements與Blender／FBX／Unity manifests；ZIP 5,654,125 bytes、SHA-256`5F82D40731644431AB156EFEE59F18EC9D1080F8FD0CC1A56CB017EA096C8951`。
+- Behavior Before／After：
+  - Before：右臂／RightHand review pose改變時，Sword保持Armature/world位置並離開手掌；七個parts雖有RightHand custom property，實際parent contract無效。
+  - After：`RightHand → Socket_R_Hand (use_deform=false) → WPN_SwordRoot_R → 7 existing sword meshes`；repository正式socket名是`Socket_R_Hand`，它是task內`WeaponSocket_R`的既有等價契約，沒有新增同義socket。
+  - Grip anchor／SwordRoot world origin為`(0.827978,-0.049995,1.044123)m`；grip center相對hand center為`(0.000062,-0.049994,-0.010220)m`；RightHand ±15°時SwordRoot translation delta皆0.013258m且orientation matrix同步改變。
+  - Preserved：character height 1.824011m；98 meshes、16,858 vertices、33,248 triangles；sword bounds 0.345361×0.105496×1.061217m；all 98 mesh fingerprints與world bounds一致；topology 0 non-manifold／0 boundary／0 loose／0 zero-area；盾牌與所有非attachment geometry／transform未改。
+- Architecture／API／Data：
+  - Architecture：只改DCC source、FBX與isolated Editor review View assets；Definition／Runtime／Command／UI／gameplay authority與dependency direction全未改，沒有God Manager或Infantry-only runtime special case。
+  - API：沿用Production Spec與legacy Infantry L3既有`Socket_R_Hand`；沒有新增public C# API、Animator parameter、event或`WeaponSocket_R`同義名稱。Runtime search確認現有prototype只有可重用ProjectileSocket path，尚無generic melee Equipment／AttachWeapon API，本revision不越權建立。
+  - Data：source Blend新增scene metadata與1個non-deforming helper bone，骨數23→24；`WPN_SwordRoot_R`為exported transform。Unity Humanoid HumanDescription明確映射既有23個human bones，額外socket不參與human mapping。L1 FBX只供review，將比較姿勢烘為該FBX rest skeleton，不是gameplay clip；source neutral仍是A-Pose。
+- Tests／Validation：
+  - Blender 5.2.0 deterministic build：input exact SHA gate PASS；98 meshes／16,858 vertices／33,248 triangles／24 bones／1.824011m；source output reopen hash等於build result；geometry fingerprints、world bounds、hierarchy、unit scale與topology gates PASS。
+  - Blender RightHand follow：neutral／+15°／-15° matrices與translation已記錄，up／down delta 0.013258m；A-Pose、L1、neutral、up、down、3Q與before／after evidence產生並目視檢查。
+  - FBX clean reimport：A-Pose與L1各1 armature／98 meshes／16,858 vertices／33,248 triangles／24 bones；兩者皆保留`RightHand → Socket_R_Hand → WPN_SwordRoot_R → 7 parts`，validation 2/2 PASS。Final FBX SHA分別`2D198FDEDAB7F722885B17F4DE332E004AA8A82F2E70A6751E1F4B8BF5C7020F`與`970A66F1ABA47E841CD445F24D88C3799128E18D282C81832C99B0AB799136B0`。
+  - Unity 6000.5.7f1 GPU batch：C# compile PASS；A-Pose／L1 Avatar均`isValid && isHuman`；height 1.824011m、98 renderers；兩prefab hierarchy與7 child／unit scale PASS；scene／prefabs儲存；7 final captures（A-Pose、L1 Close／RTS、grip、±15° follow）產生並目視檢查；log有`READY: Humanoid=True/True, hierarchy=True/True`與batchmode return code 0。最初`-nographics`因renderer不支援constant buffers產生blank captures，已由GPU batch結果取代且未宣稱通過。
+  - FrameworkLab Unity EditMode：180/180 passed、0 failed、0 skipped，1.211s；PlayMode／Windows build`NOT RUN`，因本revision沒有runtime／gameplay change，未把歷史結果冒充本次執行。
+  - Review ZIP：folder 50 files／ZIP 50 file entries、20 screenshots sampled-color nonblank gate、required 31/31、archive-vs-disk hash mismatch 0；`git diff --check` PASS。
+- Acceptance：
+  - P035R2 preserved、P035R3 versioned source、七個parts inventory／single SwordRoot、real RightHand socket chain、preserve world transform、grip contact、A-Pose／L1／follow evidence、geometry／scale locks、FBX reimport、Unity Humanoid／hierarchy、runtime audit、folder／ZIP：`PASS`（machine-delivery）。
+  - Reviewer PASS、PRE-UV GEOMETRY + ATTACHMENT LOCK、Phase 04 authorization：`REVIEW PENDING / NOT AUTHORIZED`；agent未自行宣告。
+- Completed：required reading；baseline/hash lock；source audit；24th non-deforming socket bone；SwordRoot與7-part reparent；geometry/topology/follow audits；A-Pose／L1 FBX與clean reimport；Unity HumanDescription、prefabs、scene、GPU captures；reports、manifests、evidence composites、package與ZIP parity/hash verification；DevelopmentProgress更新。
+- Not Completed／Deferred：人工Revision03 decision；PRE-UV lock；Phase04；final UV／texture／skin／deformation／animation clearance；WeaponTip／VFX；LOD／performance；team-color production material；generic equipment/runtime swap；formal runtime prefab replacement；PlayMode／Windows build；commit／push。
+- Known Issues／Risks：
+  - P035R3仍是Phase03.5 static-form source；L1 FBX是baked rest-pose review artifact，不可當gameplay animation。
+  - L1 blade靠近右大腿是既定review pose的clearance風險；socket／grip正確，最終animation collision polish留Phase06／08。
+  - FBX不round-trip Blender`use_deform` flag，故source Blend與Bone Manifest為non-deforming狀態的authoritative evidence；Unity兩Avatar有效Humanoid提供downstream gate。
+  - GPU batch在本機可產生final evidence；`-nographics` blank-frame限制只影響截圖方式，不影響FBX／Avatar／hierarchy validation。
+- Git：branch`main`、HEAD`f37edbb73abdf955c3c0d4118be70d7c67a79748`；更新DevelopmentProgress前`git status --porcelain=v1 --untracked-files=all`為87 entries（0 modified／87 untracked），全為本任務source／review／package與使用者task；本紀錄更新後預期再有`DevelopmentProgress.md` 1 modified。未commit、未push、未reset；既有task未刪除。
+- Next（依序）：
+  1. Art／Design／Technical Art依`00_Revision_Report.md`、hierarchy、P035R2 vs P035R3 close、Blender／Unity grip與±15° follow證據做人工Revision03決定。
+  2. 若change requested，從P035R3建立新的focused version，不覆寫P035R2／P035R3；若批准，才由人類授權PRE-UV GEOMETRY + ATTACHMENT LOCK與下一Phase。
+  3. Phase06／08再處理final skinning、animation clearance、weapon tip／VFX、generic equipment/runtime prefab、LOD／performance與production materials；未授權前不開始Phase04。
 
 ## 2026-08-13 — Infantry Phase 03.5 Revision 02 Shield Alignment v004_P035R2
 

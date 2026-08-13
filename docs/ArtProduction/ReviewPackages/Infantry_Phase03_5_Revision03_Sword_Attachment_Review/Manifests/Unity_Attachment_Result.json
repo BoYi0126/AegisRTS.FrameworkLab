@@ -1,0 +1,19 @@
+{
+  "status": "READY FOR PHASE03_5 REVISION03 REVIEW",
+  "unity_version": "6000.5.7f1",
+  "scene": "Assets/AegisRTS/Review/InfantryPhase035Revision03/SCN_Infantry_P035R3_Review.unity",
+  "apose_prefab": "Assets/AegisRTS/Review/InfantryPhase035Revision03/PF_Unit_Infantry_P035R3_Review.prefab",
+  "l1pose_prefab": "Assets/AegisRTS/Review/InfantryPhase035Revision03/PF_Unit_Infantry_P035R3_L1Pose_Review.prefab",
+  "apose_humanoid_valid": true,
+  "l1pose_humanoid_valid": true,
+  "apose_height_m": 1.824011,
+  "l1pose_height_m": 1.858801,
+  "apose_renderers": 98,
+  "l1pose_renderers": 98,
+  "hierarchy": "RightHand/Socket_R_Hand/WPN_SwordRoot_R/[7 sword parts]",
+  "apose_hierarchy_valid": true,
+  "l1pose_hierarchy_valid": true,
+  "right_hand_follow_test_degrees": [15, -15],
+  "runtime_prefab_replaced": false,
+  "captures": ["Unity_Apose_Close.png", "Unity_SwordGrip_Close.png", "Unity_L1Pose_Close.png", "Unity_L1Pose_RTS_Normal.png", "Unity_L1Pose_SwordGrip_Close.png", "Unity_SwordFollow_TestUp.png", "Unity_SwordFollow_TestDown.png"]
+}

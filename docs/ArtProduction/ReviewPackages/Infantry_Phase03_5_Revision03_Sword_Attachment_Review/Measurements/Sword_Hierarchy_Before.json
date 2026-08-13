@@ -1,0 +1,331 @@
+[
+  {
+    "name": "GEO_Infantry_Sword_GripContact",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "name": "Sword",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "name": "Sword_Grip",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "name": "Sword_Guard",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "name": "Sword_Pommel",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "name": "GEO_Infantry_Sword_BladeSpine",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "name": "GEO_Infantry_Sword_GripWraps",
+    "parent": "Armature",
+    "parent_type": "OBJECT",
+    "parent_bone": "",
+    "local_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "local_rotation_euler_rad": [
+      0.0,
+      -0.0,
+      0.0
+    ],
+    "local_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "world_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  }
+]

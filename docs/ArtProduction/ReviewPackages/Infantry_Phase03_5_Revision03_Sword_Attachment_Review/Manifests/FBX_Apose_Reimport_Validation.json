@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "fbx": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\docs\\ArtProduction\\ReviewPackages\\Infantry_Phase03_5_Revision03_Sword_Attachment_Review\\FBX\\SK_Infantry_A_v004_P035R3_Apose_Review.fbx",
+  "fbx_sha256": "2D198FDEDAB7F722885B17F4DE332E004AA8A82F2E70A6751E1F4B8BF5C7020F",
+  "bytes": 784156,
+  "blender_reimport_version": "5.2.0 LTS",
+  "armatures": 1,
+  "meshes": 98,
+  "vertices": 16858,
+  "triangles": 33248,
+  "bones": 24,
+  "right_hand_exists": true,
+  "socket_exists": true,
+  "socket_parent": "RightHand",
+  "socket_deform_note": "FBX does not preserve Blender use_deform; source manifest is authoritative",
+  "sword_root_parent": "Armature",
+  "sword_root_parent_type": "BONE",
+  "sword_root_parent_bone": "Socket_R_Hand",
+  "sword_parts": [
+    {
+      "name": "GEO_Infantry_Sword_GripContact",
+      "parent": "WPN_SwordRoot_R"
+    },
+    {
+      "name": "Sword",
+      "parent": "WPN_SwordRoot_R"
+    },
+    {
+      "name": "Sword_Grip",
+      "parent": "WPN_SwordRoot_R"
+    },
+    {
+      "name": "Sword_Guard",
+      "parent": "WPN_SwordRoot_R"
+    },
+    {
+      "name": "Sword_Pommel",
+      "parent": "WPN_SwordRoot_R"
+    },
+    {
+      "name": "GEO_Infantry_Sword_BladeSpine",
+      "parent": "WPN_SwordRoot_R"
+    },
+    {
+      "name": "GEO_Infantry_Sword_GripWraps",
+      "parent": "WPN_SwordRoot_R"
+    }
+  ],
+  "attachment_survives_export_reimport": true
+}

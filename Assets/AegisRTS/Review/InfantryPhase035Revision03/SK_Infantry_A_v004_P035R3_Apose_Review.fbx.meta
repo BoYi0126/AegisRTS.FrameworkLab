@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: c056764c825828c4d8a5c758f1667da4
+ModelImporter:
+  serializedVersion: 24501
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+    searchTexturesGlobally: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    importUVs: -1
+    importVertexColors: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+    calculateBlendshapeNormalsDeltaFromImportedNormals: 0
+  referencedClips: []
+  importAnimation: 0
+  humanDescription:
+    serializedVersion: 3
+    human:
+    - boneName: Hips
+      humanName: Hips
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Spine
+      humanName: Spine
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Chest
+      humanName: Chest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: UpperChest
+      humanName: UpperChest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Neck
+      humanName: Neck
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Head
+      humanName: Head
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftShoulder
+      humanName: LeftShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftUpperArm
+      humanName: LeftUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftLowerArm
+      humanName: LeftLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftHand
+      humanName: LeftHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightShoulder
+      humanName: RightShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightUpperArm
+      humanName: RightUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightLowerArm
+      humanName: RightLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightHand
+      humanName: RightHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftUpperLeg
+      humanName: LeftUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftLowerLeg
+      humanName: LeftLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftFoot
+      humanName: LeftFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: LeftToes
+      humanName: LeftToes
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightUpperLeg
+      humanName: RightUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightLowerLeg
+      humanName: RightLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightFoot
+      humanName: RightFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: RightToes
+      humanName: RightToes
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    skeleton:
+    - name: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      parentName: 
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Body_Base
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BootSole_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BootSole_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Boot_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Boot_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Bracer_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Bracer_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Calf_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Calf_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ChestArmor
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ChestArmor_Center
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ChestArmor_Lamellar_1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ChestArmor_Lamellar_2
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ChestArmor_Lamellar_3
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ChestArmor_Lamellar_4
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Elbow_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.505, y: -0.002, z: 1.245}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Elbow_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0.505, y: -0.002, z: 1.245}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Forearm_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Forearm_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Belt_Clasp
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Bracer_Rim_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.64, y: -0.035, z: 1.16}
+      rotation: {x: -0, y: -0.70710677, z: 0, w: 0.7071068}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Bracer_Rim_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0.64, y: -0.035, z: 1.16}
+      rotation: {x: -0, y: -0.70710677, z: 0, w: 0.7071068}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Bracer_Strap_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Bracer_Strap_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ChestArmor_RaisedDivisions
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ChestArmor_SideReturns
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ChestArmor_UpperSupport
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Helmet_BrowBand
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Helmet_RearGuard
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_KneeClothBoundary_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.15, y: 0, z: 0.59}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_KneeClothBoundary_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0.15, y: 0, z: 0.59}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_LegWrap_TuckedEnd_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_LegWrap_TuckedEnd_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_PlumeMount_Ring
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0.012, z: 1.742}
+      rotation: {x: 0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Plume_Division
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Scarf_BroadDrape_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Scarf_RearTaper_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_BackMajorBrace_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_BackSecondaryBrace_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_BossBase
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.59, y: -0.225, z: 0.84}
+      rotation: {x: 0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_ForearmStrap_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_HandGrip_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_TeamPanel
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Shield_WoodPanelSeams
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ShoulderAnchor_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ShoulderAnchor_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ShoulderOuterEdge_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ShoulderOuterEdge_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ShoulderUnderPlate_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_ShoulderUnderPlate_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_WaistCloth_Front_P03R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Waist_AttachmentTabs
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Hand_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Hand_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Head
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: -0.015, z: 1.585}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Helmet
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Helmet_Plume_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Helmet_Rim
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Helmet_TopMount
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: -0.004, z: 1.742}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Knee_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.15, y: 0.004, z: 0.63}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Knee_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0.15, y: 0.004, z: 0.63}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LegWrap_L_1_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LegWrap_L_2_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LegWrap_R_1_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LegWrap_R_2_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Neck
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Pelvis
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Scarf
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Shield
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Shield_Boss
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.59, y: -0.22, z: 0.84}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Shield_Reinforcement_H
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Shield_Reinforcement_V
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Shield_Rim
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ShoulderArmor_L_1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ShoulderArmor_L_2
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ShoulderArmor_L_3
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ShoulderArmor_R_1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ShoulderArmor_R_2
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: ShoulderArmor_R_3
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Thigh_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Thigh_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Thumb_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: 0.788, y: -0.083000004, z: 1.0619999}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Thumb_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0.788, y: -0.083000004, z: 1.0619999}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: UpperArm_L
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: UpperArm_R
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: WaistArmor_Belt
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: WaistArmor_L_Main_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: WaistArmor_L_Overlap_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: WaistArmor_R_Main_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: WaistArmor_R_Overlap_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: WaistCloth_Rear_P02R1
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Root
+      parentName: SK_Infantry_A_v004_P035R3_Apose_Review(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Hips
+      parentName: Root
+      position: {x: -0, y: 0.65, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Spine
+      parentName: Hips
+      position: {x: -0, y: 0.3382079, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Chest
+      parentName: Spine
+      position: {x: -0, y: 0.18300146, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: UpperChest
+      parentName: Chest
+      position: {x: -0, y: 0.16470134, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Neck
+      parentName: UpperChest
+      position: {x: -0, y: 0.109800816, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Head
+      parentName: Neck
+      position: {x: -0, y: 0.09150076, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftShoulder
+      parentName: UpperChest
+      position: {x: 0.07320058, y: 0.054900408, z: 0}
+      rotation: {x: 0.5277349, y: 0.49923024, z: 0.49923012, w: -0.47226518}
+      scale: {x: 0.9999998, y: 0.9999997, z: 0.99999994}
+    - name: LeftUpperArm
+      parentName: LeftShoulder
+      position: {x: 0.0000000023283064, y: 0.16495529, z: -0.00000004284084}
+      rotation: {x: -0.21508649, y: -0.2182029, z: 0.062151525, w: 0.949875}
+      scale: {x: 0.99999994, y: 0.9999999, z: 1.0000001}
+    - name: LeftLowerArm
+      parentName: LeftUpperArm
+      position: {x: 0.00000005646839, y: 0.32102594, z: -0.00000005786228}
+      rotation: {x: -0.00000010237744, y: -0.00000014901161, z: 0.000000058609576, w: 1}
+      scale: {x: 1, y: 0.99999994, z: 0.9999999}
+    - name: LeftHand
+      parentName: LeftLowerArm
+      position: {x: 0.00000006811301, y: 0.3009619, z: 0.00000009295852}
+      rotation: {x: 0.0033955325, y: 0.0038760314, z: -0.0018692344, w: 0.999985}
+      scale: {x: 0.9999998, y: 1, z: 0.99999994}
+    - name: RightShoulder
+      parentName: UpperChest
+      position: {x: -0.07320058, y: 0.054900408, z: 0}
+      rotation: {x: 0.5611903, y: 0.46130297, z: -0.53087854, w: 0.43638644}
+      scale: {x: 0.9999998, y: 0.9999997, z: 0.99999994}
+    - name: RightUpperArm
+      parentName: RightShoulder
+      position: {x: -0.0000000023283064, y: 0.16495529, z: -0.00000004284084}
+      rotation: {x: -0.12888414, y: 0.22186232, z: -0.037242528, w: 0.9658049}
+      scale: {x: 0.99999994, y: 0.9999999, z: 1.0000001}
+    - name: RightLowerArm
+      parentName: RightUpperArm
+      position: {x: -0.00000005646839, y: 0.32102594, z: -0.00000005786228}
+      rotation: {x: -0.00000010237744, y: 0.00000014901161, z: -0.000000058609576, w: 1}
+      scale: {x: 1, y: 0.99999994, z: 0.9999999}
+    - name: RightHand
+      parentName: RightLowerArm
+      position: {x: -0.00000006811301, y: 0.3009619, z: 0.00000009295852}
+      rotation: {x: 0.0033955325, y: -0.0038760314, z: 0.0018692344, w: 0.999985}
+      scale: {x: 0.9999998, y: 1, z: 0.99999994}
+    - name: Socket_R_Hand
+      parentName: RightHand
+      position: {x: -0.039608017, y: 0.057687115, z: -0.031790126}
+      rotation: {x: 0.0000001287218, y: -0.00000014901163, z: 0.00000003595627, w: 1}
+      scale: {x: 0.99999994, y: 1, z: 0.9999999}
+    - name: WPN_SwordRoot_R
+      parentName: Socket_R_Hand
+      position: {x: 0.000000014901161, y: 0.00000008940697, z: -0.00000023841858}
+      rotation: {x: 0.33859926, y: -0.000000042267867, z: -0.62076604, w: 0.7071068}
+      scale: {x: 1.0000002, y: 1.0000002, z: 1.0000001}
+    - name: GEO_Infantry_Sword_BladeSpine
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Sword_GripContact
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: GEO_Infantry_Sword_GripWraps
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Sword
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Sword_Grip
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Sword_Guard
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Sword_Pommel
+      parentName: WPN_SwordRoot_R
+      position: {x: 0.8279783, y: 0.04999447, z: -1.0441234}
+      rotation: {x: 0, y: 0, z: 2.2204459e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftUpperLeg
+      parentName: Hips
+      position: {x: 0.1372511, y: 0, z: 0}
+      rotation: {x: 0.99945045, y: 0.02343596, z: 0.023435904, w: -0.0005495886}
+      scale: {x: 1.0000011, y: 1.0000001, z: 0.99999994}
+    - name: LeftLowerLeg
+      parentName: LeftUpperLeg
+      position: {x: 0.000000005585805, y: 0.19521451, z: 1.618173e-10}
+      rotation: {x: -0.00054954557, y: -0.023435906, z: 0.023435924, w: 0.99945045}
+      scale: {x: 0.9999999, y: 0.9999998, z: 0.9999998}
+    - name: LeftFoot
+      parentName: LeftLowerLeg
+      position: {x: -0.0000000010345829, y: 0.3177488, z: 2.2551405e-16}
+      rotation: {x: -0.5019269, y: 0.00000002927906, z: 0.00000001263368, w: 0.86491007}
+      scale: {x: 1, y: 0.99999994, z: 0.99999994}
+    - name: LeftToes
+      parentName: LeftFoot
+      position: {x: 1.831868e-15, y: 0.14754052, z: -0.0000000027287914}
+      rotation: {x: -0.17607601, y: -9.958074e-15, z: 1.8473569e-16, w: 0.9843766}
+      scale: {x: 1, y: 1.0000001, z: 1.0000001}
+    - name: RightUpperLeg
+      parentName: Hips
+      position: {x: -0.1372511, y: 0, z: 0}
+      rotation: {x: 0.99945045, y: -0.02343596, z: -0.023435904, w: -0.0005495886}
+      scale: {x: 1.0000011, y: 1.0000001, z: 0.99999994}
+    - name: RightLowerLeg
+      parentName: RightUpperLeg
+      position: {x: -0.000000005585805, y: 0.19521451, z: 1.618173e-10}
+      rotation: {x: -0.00054954557, y: 0.023435906, z: -0.023435924, w: 0.99945045}
+      scale: {x: 0.9999999, y: 0.9999998, z: 0.9999998}
+    - name: RightFoot
+      parentName: RightLowerLeg
+      position: {x: 0.0000000010345829, y: 0.3177488, z: 2.2551405e-16}
+      rotation: {x: -0.5019269, y: -0.00000002927906, z: -0.00000001263368, w: 0.86491007}
+      scale: {x: 1, y: 0.99999994, z: 0.99999994}
+    - name: RightToes
+      parentName: RightFoot
+      position: {x: -1.831868e-15, y: 0.14754052, z: -0.0000000027287914}
+      rotation: {x: -0.17607601, y: 9.958074e-15, z: -1.8473569e-16, w: 0.9843766}
+      scale: {x: 1, y: 1.0000001, z: 1.0000001}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
