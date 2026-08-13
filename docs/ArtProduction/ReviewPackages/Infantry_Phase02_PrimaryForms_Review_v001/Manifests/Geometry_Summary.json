@@ -1,0 +1,54 @@
+{
+  "status": "READY FOR REVIEW",
+  "source_status": "WIP_MODEL",
+  "asset_id": "unit.infantry",
+  "source_version": "CHR_Infantry_A_v003",
+  "opened_file": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v003\\Source\\CHR_Infantry_A_v003.blend",
+  "opened_file_sha256": "5F7C799C3B57A64B6E289A38FF2AA6E5509247C547FD4B2DE0EC47FF63AA4DBE",
+  "blender_version": "5.2.0 LTS",
+  "saved_by_review_script": false,
+  "bounds_m": {
+    "min": [
+      -0.8899999856948853,
+      -0.28599995374679565,
+      0.0
+    ],
+    "max": [
+      1.0283448696136475,
+      0.16300000250339508,
+      1.8300000429153442
+    ],
+    "dimensions": [
+      1.9183448553085327,
+      0.44899994134902954,
+      1.8300000429153442
+    ],
+    "height_z": 1.8300000429153442
+  },
+  "mesh_count": 72,
+  "vertices": 14211,
+  "triangles": 28138,
+  "material_count": 6,
+  "armature_count": 1,
+  "bone_count": 23,
+  "actions": 0,
+  "collections": [
+    "CHR_Infantry_A_v003",
+    "GEO_ARMOR",
+    "GEO_BODY",
+    "GEO_WEAPON",
+    "REVIEW",
+    "RIG"
+  ],
+  "topology": {
+    "non_manifold_edges": 0,
+    "boundary_edges": 0,
+    "loose_edges": 0,
+    "zero_area_faces": 0
+  },
+  "notes": [
+    "Face normals were recalculated by the deterministic build script.",
+    "Binding is a static A-pose / planned rigid-attachment review setup, not final skinning.",
+    "No UV, texture, animation, LOD or Unity runtime acceptance is implied."
+  ]
+}

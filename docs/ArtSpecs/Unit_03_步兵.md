@@ -2,6 +2,8 @@
 
 > L1／L2 外觀與共通摘要使用本文件；現有 v001 升級骨架、蒙皮、動畫與 LOD2 時，必須改用 [`Unit_03_步兵_L3骨架動畫交付規格.md`](Unit_03_步兵_L3骨架動畫交付規格.md)。
 
+> Remaster update（2026-08-13）：`mission/Infantry_Phase01_Production_L2_Remaster_Target.md` 已建立 v003 的 asset-specific Production L2 visual／construction target，並由 `docs/ArtProduction/Infantry_Remaster/Phase01_Production_L2_v001/` 完成一致性稽核；目前仍待使用者批准，Phase 02 尚未開始。批准後，v003 production LOD0 採 20K–30K（preferred 24K–27K）；本文件下方 2.5K–6K 僅是 v002 Prototype／legacy budget，不能覆蓋新版目標。
+
 目前狀態：`CHR_Infantry_A_v002` 已完成 Prototype L3 Unity 整合與技術驗收。L3 保留 L2 的 4,376 triangles、UV、BaseColor／Normal／ORM 與既有外觀，不把動畫版重新設計成較粗略角色；Unity 端另有 Y-up 站立 bounds、材質槽級 Team Color、近距離三方向與 Move 四姿勢檢查。原 v001 商用來源權利、比 L2 更接近 L1 概念圖的正式雕模／貼圖，以及最終動畫美術審查仍是 Release gate。
 
 ## 任務摘要

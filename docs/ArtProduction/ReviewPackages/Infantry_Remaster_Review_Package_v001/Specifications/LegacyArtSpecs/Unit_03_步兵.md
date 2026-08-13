@@ -1,0 +1,64 @@
+# 單位美術規格：步兵
+
+> L1／L2 外觀與共通摘要使用本文件；現有 v001 升級骨架、蒙皮、動畫與 LOD2 時，必須改用 [`Unit_03_步兵_L3骨架動畫交付規格.md`](Unit_03_步兵_L3骨架動畫交付規格.md)。
+
+目前狀態：`CHR_Infantry_A_v002` 已完成 Prototype L3 Unity 整合與技術驗收。L3 保留 L2 的 4,376 triangles、UV、BaseColor／Normal／ORM 與既有外觀，不把動畫版重新設計成較粗略角色；Unity 端另有 Y-up 站立 bounds、材質槽級 Team Color、近距離三方向與 Move 四姿勢檢查。原 v001 商用來源權利、比 L2 更接近 L1 概念圖的正式雕模／貼圖，以及最終動畫美術審查仍是 Release gate。
+
+## 任務摘要
+
+製作目前原型最優先的基礎近戰步兵。它必須是最容易量產、效能穩定、遠距辨識清楚的普通單位，使用盾與短兵器建立厚實輪廓。
+
+## 技術條件
+
+- Asset ID：`unit.infantry`。
+- 建議檔名：`CHR_Infantry_A_v001`。
+- 1 Unity Unit = 1 公尺；Y-up、Z-forward；腳底中心 Pivot；Scale 1。
+- 身高 `1.75–1.85 m`，寬 `0.60–0.72 m`，深 `0.45–0.65 m`。
+- 遊戲足跡與目前 Agent：半徑 `0.38 m`、高度 `2.0 m`。
+- `HealthBarAnchor` Y=`2.10 m`；`SelectionAnchor` Y=`0.02 m`，選取圈直徑約 `0.9 m`。
+
+## 外觀與輪廓
+
+- 5–5.5 頭身；普通成年士兵，不做英雄比例。
+- 左手中型盾，寬 `0.55–0.65 m`、高 `0.75–0.95 m`。
+- 右手短劍／刀，長 `0.9–1.1 m`。第一版不要同時做盾、槍、劍三套混合輪廓。
+- 頭盔、胸甲、盾是三個主要形狀；小配件最多 3 件。
+- 盾面與肩布承載陣營色，從前、後、側面均至少有一處可見。
+- 可另提供無盾長槍 Variant，但須作為獨立 Variant，不可讓基礎步兵辨識失焦。
+
+## 材質與預算
+
+- 中性布衣、簡化札甲、木盾或包皮盾、暗鐵武器。
+- 15–25% 可見面積為隊伍色。
+- 最多 2 材質槽；1024×1024 atlas。
+- LOD0 2,500–6,000 triangles；LOD1 1,000–2,500；LOD2 250–700。
+- 盾牌內側不做高密度細節；遠距不可見部位簡化。
+
+## 骨架與動畫
+
+- Unity Humanoid；Root Motion 關閉。
+- Idle 2–4 s、Move 0.8–1.0 s、Attack_A 0.7–1.0 s、Hit 0.25–0.4 s、Death 1.0–1.4 s。
+- Attack_A 使用由右上向左下的明確斬擊，`AttackImpact` 在武器通過身體前方時觸發。
+- Idle 中盾牌不得遮住整個身體；Move 不可讓盾穿腿。
+- 必要 Socket：雙手、武器、盾、受擊中心、血條、選取。
+
+## RTS 可讀性
+
+- 960×540、31 m 距離時，盾牌至少形成角色寬度 25% 的可見輪廓。
+- 與弓兵並排時，即使轉灰階也能由盾與較厚甲片分辨。
+- 不依賴劍刃細節；劍厚度可略誇張，最薄處至少 `0.06 m`。
+
+## 可直接給 AI 的提示詞
+
+```text
+Create a production-ready stylized low-poly 3D basic melee infantry unit for a Unity 6 URP top-down RTS. Ancient East-Asian-inspired but world-neutral, not a historical or copyrighted character. Scale: 1 unit = 1 meter, Y-up, Z-forward, foot-center pivot. Height 1.75–1.85 m, width 0.60–0.72 m. Give the soldier simplified medium armor, a 0.55–0.65 m wide and 0.75–0.95 m tall shield in the left hand, and a 0.9–1.1 m sword in the right hand. Use a robust compact silhouette, 5–5.5 heads tall, slightly oversized helmet, hands, shield and weapon. Team-color areas cover 15–25%, visible from front, side and back: #4AA3D8 friendly, #D94A45 enemy. Must remain identifiable at 960x540 with a 55-degree camera at 31 m. Maximum 2 material slots, 1024 atlas, 2.5k–6k LOD0 triangles. No text, logo, watermark, firearm, photorealism, root motion, or existing IP.
+```
+
+## 驗收
+
+- [x] 尺寸可直接替換目前 0.8 m 寬、1.6 m 高的 Capsule Placeholder，不影響半徑 0.38 Agent；Unity combined renderer bounds 以 Y 為直立主軸並落在 gameplay ground。
+- [x] 盾與短兵器輪廓在最遠 Zoom 可辨識；2.5 m／38° inspection framing 可檢查頭盔、臉、胸甲、盾、劍與四肢。
+- [x] 兩個材質槽以內，隊伍色可替換；只有 `TeamColor` slot 會被染色，Base 木／鐵材質不變。
+- [x] Root Motion 關閉；Move 四個 phase 的站立 bounds 與 planar drift 已自動驗證。
+- [ ] 專業動畫師人工確認 foot-lock、重量感、盾／腿穿插與最終節奏。
+- [ ] 若目標是 L1 概念圖等級，另做 L2.1 正式雕模／重拓樸／手繪貼圖；這不是靠加骨架或 Unity 材質能補回的幾何細節。

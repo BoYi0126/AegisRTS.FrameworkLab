@@ -1,0 +1,78 @@
+{
+  "LOD0_blue": {
+    "triangles": 4376,
+    "bounds_min_m": [
+      -0.65,
+      0.0,
+      -0.205
+    ],
+    "bounds_max_m": [
+      0.5845,
+      1.83,
+      0.295
+    ],
+    "extents_m": [
+      1.2345,
+      1.83,
+      0.5
+    ],
+    "geometry_parts": 106
+  },
+  "LOD0_red": {
+    "triangles": 4376,
+    "bounds_min_m": [
+      -0.65,
+      0.0,
+      -0.205
+    ],
+    "bounds_max_m": [
+      0.5845,
+      1.83,
+      0.295
+    ],
+    "extents_m": [
+      1.2345,
+      1.83,
+      0.5
+    ],
+    "geometry_parts": 106
+  },
+  "LOD1_blue": {
+    "triangles": 1512,
+    "bounds_min_m": [
+      -0.65,
+      0.0,
+      -0.195
+    ],
+    "bounds_max_m": [
+      0.5845,
+      1.83,
+      0.295
+    ],
+    "extents_m": [
+      1.2345,
+      1.83,
+      0.49
+    ],
+    "geometry_parts": 52
+  },
+  "LOD1_red": {
+    "triangles": 1512,
+    "bounds_min_m": [
+      -0.65,
+      0.0,
+      -0.195
+    ],
+    "bounds_max_m": [
+      0.5845,
+      1.83,
+      0.295
+    ],
+    "extents_m": [
+      1.2345,
+      1.83,
+      0.49
+    ],
+    "geometry_parts": 52
+  }
+}

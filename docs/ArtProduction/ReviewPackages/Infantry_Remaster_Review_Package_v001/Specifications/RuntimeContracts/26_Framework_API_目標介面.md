@@ -1,0 +1,578 @@
+# Framework API 目標介面
+
+目標使用體驗：CreateFaction、CreateSettlement、SpawnUnit、CreateArmy、IssueCommand、Recruit、Build、Research、StartSiege、CaptureSettlement、AddResource、StartScenario、Save、Load。
+
+核心 API 必須同時可由 Player、AI、Scenario、Test 使用，不能只靠 Inspector 操作。
+
+## 目標操作對照
+
+| 目標操作 | 公開入口 | 邊界 |
+| --- | --- | --- |
+| CreateFaction | `FactionSystem.Register` | Composition setup |
+| CreateSettlement | `SettlementSystem.Register` | Composition setup |
+| SpawnUnit | `IUnitSpawnSink.SpawnUnit`，並由 composition 註冊到需要的 gameplay systems | Spawn adapter |
+| CreateArmy | `CreateArmyCommand`＋`ArmyCommandRouter` | CommandBus |
+| IssueCommand | `CommandBus.Dispatch<TCommand>` | CommandBus |
+| Recruit | `RecruitUnitCommand`＋`RecruitmentCommandRouter` | CommandBus |
+| Build | `ConstructBuildingCommand`＋`BuildingCommandRouter` | CommandBus |
+| Research | `ResearchTechnologyCommand`＋`TechnologyCommandRouter` | CommandBus |
+| StartSiege | `StartSiegeCommand`＋`SiegeCommandRouter` | CommandBus |
+| CaptureSettlement | `CaptureSettlementCommand`＋`SettlementCommandRouter`；攻城流程使用 `CaptureSiegeCommand` | CommandBus |
+| AddResource | `EconomySystem.AddResource` | Economy owner mutation |
+| StartScenario | `StartScenarioCommand`＋`ScenarioCommandRouter` | CommandBus |
+| Save／Load | `GameStateCoordinator.Save`／`Load` | Persistence boundary |
+
+Framework 不提供同時持有 Combat、Economy、AI、Persistence 與 Presentation 狀態的全域 façade。產品可在 composition root 建立便利入口，但必須委派到上表契約，且不得複製 domain state 或繞過 validator。Package 內的 `FrameworkApiContractTests` 會鎖定這些公開入口。
+
+## Phase 01 Core API
+
+`AegisRTS.Core` 是 Pure C# assembly，`noEngineReferences` 啟用且不引用 Gameplay 或 Presentation。所有時間步進與訊息派送均由呼叫端明確驅動，不依賴 MonoBehaviour lifecycle。
+
+### Entity
+
+```csharp
+var ids = new EntityIdGenerator();
+EntityId entityId = ids.Next();
+```
+
+- `EntityId`：可比較、可序列化為 `ulong` 的 runtime entity identity；`0` 為 `Invalid`。
+- `EntityIdGenerator`：產生非零、單調遞增且可重設的 deterministic ID sequence。
+
+### Time / Random
+
+```csharp
+var clock = new GameClock();
+clock.SetSpeed(2d);
+clock.Advance(unscaledDeltaSeconds);
+
+IRandomSource random = new SeededRandom(seed);
+int index = random.NextInt(maxExclusive);
+```
+
+- `GameClock`：追蹤 scaled／unscaled time，支援 `Pause`、`Resume`、正數 `Speed` 與 `Reset`。
+- `SeededRandom`：固定 PCG 演算法；相同 seed 與呼叫順序必須得到相同結果，不依賴 `System.Random` runtime implementation。
+
+### Command
+
+```csharp
+using var validator = commandBus.RegisterValidator<MyCommand>(Validate);
+using var handler = commandBus.RegisterHandler<MyCommand>(Handle);
+CommandDispatchResult result = commandBus.Dispatch(command);
+```
+
+- Command 實作 `ICommand`。
+- 每個 command type 最多一個 handler，可有多個依註冊順序執行的 validator。
+- 任一 validator 拒絕時不執行 handler，原因由 `CommandDispatchResult.Error` 回傳。
+- Player、AI、Scenario 與 Test 應呼叫同一個 `Dispatch` flow。
+- 註冊回傳 `IDisposable`，dispose 後取消該 handler 或 validator。
+
+### Event
+
+```csharp
+using var subscription = eventBus.Subscribe<MyEvent>(OnEvent);
+eventBus.Publish(eventData);
+```
+
+- Event 實作 `IEvent`，代表已經發生的事實。
+- `EventBus` 依註冊順序同步發布給 exact event type 的 subscriber。
+- 發布使用 subscriber snapshot，因此 callback 內 unsubscribe 不會破壞當次迭代。
+
+### State Machine
+
+```csharp
+var machine = new StateMachine<MyContext>(context);
+machine.Start(initialState);
+machine.Tick(deltaSeconds);
+machine.TransitionTo(nextState);
+machine.Stop();
+```
+
+- State 實作 `IState<TContext>` 的 `Enter`、`Tick`、`Exit` lifecycle。
+- Transition 保證 previous `Exit` 在 next `Enter` 之前發生。
+
+### Diagnostics / Debug
+
+- `IDiagnosticSink`：Core diagnostics adapter boundary。
+- `DiagnosticBuffer`：thread-safe bounded history，滿載時移除最舊紀錄。
+- `NullDiagnosticSink`：未配置 diagnostics 時的 no-op implementation。
+- `GameClock`、`SeededRandom`、`CommandBus`、`EventBus`、`StateMachine` 提供 `GetDebugSummary()`；Bus 與 State Machine 可將生命週期事件送至 `IDiagnosticSink`。
+
+Command Bus、Event Bus、State Machine 與 Entity ID Generator 預設由單一 simulation thread 擁有；`DiagnosticBuffer` 可安全接受多執行緒寫入。
+
+## Phase 02 Data-Driven / Content Pack API
+
+Gameplay definition 與 Content Pack API 同樣是 Pure C#，不持有 `GameObject` 或其他 Unity runtime object。
+
+### Deserialize / Validate / Activate
+
+```csharp
+ContentPack pack = jsonLoader.Load(json);
+ContentPackLoadResult result = contentPackService.Load(pack, assetCatalog);
+
+if (result.Succeeded)
+{
+    UnitDefinition unit = result.Catalog.GetRequired<UnitDefinition>(unitId);
+}
+```
+
+- `ContentPackJsonLoader.Load`：將 JSON authoring data 轉成 immutable definitions；格式錯誤拋出 `ContentPackFormatException`。
+- `ContentPackValidator.Validate`：一次回傳所有 duplicate ID、missing reference、invalid stat／cost、technology cycle、missing prefab／tag 問題。
+- `IContentAssetCatalog`：由 Unity 或 Test adapter 提供 prefab ID existence check，Gameplay 不直接依賴 AssetDatabase 或 GameObject。
+- `ContentPackService.Load`：驗證成功才 atomically 切換 `ActiveCatalog`；失敗時保留前一個 catalog。
+- `ContentCatalog.TryGet<TDefinition>`／`GetRequired<TDefinition>`：以 `DefinitionId` 進行 exact typed query。
+
+### Definition 與規則
+
+- `DefinitionId`：trim、lowercase 並限制穩定字元；reference 不使用 display name。
+- `ContentTag`：content-neutral classification；使用前必須由 pack 宣告。
+- `ResourceDefinition`、`UnitDefinition`、`HeroDefinition`、`AbilityDefinition`、`BuildingDefinition`、`TechnologyDefinition`、`SettlementDefinition`：載入後為 read-only。
+- `ResourceCost`：以 Resource Definition ID 表達成本。
+- `GameRuleSet`：提供 Morale、Supply、Hero Capture／Death、Population、Fog of War、Destructible Walls switches。
+
+`ContentPackService`、`ContentCatalog` 與 `ContentValidationResult` 提供 `GetDebugSummary()` 或可直接取得 validation issues，供 Debug／Validation tools 顯示。
+
+## Phase 03 RTS Input / Selection / Camera API
+
+Phase 03 把 command intent 留在 Gameplay，把可測試的 selection／camera state 留在 Presentation model，再由 Unity adapter 處理 Input System、Physics raycast、screen projection 與 GameObject visual。
+
+### Shared unit commands
+
+```csharp
+ICommand command = new MoveUnitsCommand(
+    selectedIds,
+    new WorldPoint(x, y, z),
+    queue: shiftPressed);
+
+commandBus.Dispatch((MoveUnitsCommand)command);
+```
+
+- `WorldPoint`：不依賴 `UnityEngine.Vector3` 的 immutable world position。
+- `UnitCommand.ActorIds`：建構時複製、去重並驗證非空的 actor IDs；外部修改原集合不影響 command。
+- `MoveUnitsCommand`、`AttackTargetCommand`、`FollowTargetCommand`、`InteractTargetCommand`、`StopUnitsCommand`、`HoldUnitsCommand`：Player／AI／Scenario／Test 共用的 intent types。
+- `Queue` 只表達是否排入既有 command queue；實際移動、尋路與 formation execution 由後續 Phase 實作。
+
+### Selection
+
+```csharp
+selection.Register(descriptor);
+selection.SelectMany(idsInsideDragBox, SelectionModifier.Replace);
+selection.AssignControlGroup(1);
+selection.RecallControlGroup(1);
+```
+
+- `SelectableDescriptor`：只含 `EntityId`、definition ID、`SelectableKind` 與 `SelectionAffiliation`，不持有 GameObject。
+- `SelectionService`：提供 register／unregister、single／multi selection、replace／add／toggle／remove、same-definition selection 與 `0–9` control groups。
+- `ISelectionQuery`：讓 camera、UI 與其他 read-side adapter 查詢 selection，不暴露修改權限。
+- `SelectionChangedEvent`：selection 實際變更時才透過可選的 `EventBus` 發布 immutable snapshot。
+- `ContextCommandResolver`：Ground→Move、Enemy→Attack、Friendly→Follow、Settlement→Interact；neutral non-settlement 不產生未定義命令。
+- `SelectionService.Revision`：只有 selected ID set 實際改變時遞增，供 HUD 在 selection change 時更新而不覆蓋玩家後續手動頁籤選擇。
+- `SelectionCommandContextResolver`：將 descriptors 投影成 `Domestic`、`UnitSettings`、`Siege` 或 `None`；混合建築／兵種選取由 UnitSettings 優先。
+- `UnityRtsInputAdapter` 只把 Friendly Unit／Hero 當作 Move／Stop／Hold／context command actors；Structure／Settlement 保留可選取能力但不送入兵種指令。
+
+### Camera / Unity adapters
+
+- `RtsCameraRigModel`：提供 `Pan`、`Focus`、`ZoomBy`，所有 pivot／zoom 都限制在建構時設定的 bounds。
+- `RtsCameraController`：套用 WASD、edge pan、middle drag、wheel zoom 與 focus-selected 到 Unity Camera transform；wheel 預設為基準 `×3`，公開 `ZoomSensitivity`／`ZoomSensitivitySummary` 與 `IncreaseZoomSensitivity`／`DecreaseZoomSensitivity`，在 `×1～×6` 內調整而不改變 `RtsCameraRigModel` 的 zoom bounds。
+- `UnitySelectableView`：Entity descriptor 與 scene renderer 的 bridge；selection highlight 使用 `MaterialPropertyBlock`，不複製 shared material。
+- `UnityRtsInputAdapter`：將 Input System actions、drag rectangle 與 raycast 轉成 Selection API 或共用 Gameplay commands。
+- `RtsSandboxBootstrap`：僅作 composition root 與 debug acceptance visualization，不是全域 God Manager。
+
+## Phase 04 Movement / Navigation / Formation API
+
+Phase 04 維持 `Move Command → MovementSystem → INavigationAdapter → Unity View`。Gameplay 決定 order、formation 與狀態轉移；Unity adapter 只回答路徑與驅動 View。
+
+### Formation
+
+```csharp
+IReadOnlyList<FormationSlot> slots = FormationPlanner.Plan(
+    destination,
+    actorCount,
+    FormationType.Box,
+    spacing: 1.8,
+    forwardX,
+    forwardZ);
+```
+
+- `FormationType.Line`：單列並以 destination heading 的 right vector 展開。
+- `FormationType.Box`：使用接近方形的 rows／columns；不把 group actors 送往同一點。
+- slot index 與 actor assignment 依排序後的 `EntityId` 穩定產生。
+
+### Movement system
+
+```csharp
+movement.Register(entityId, initialPosition);
+MovementCommandResult result = movement.IssueMove(command);
+movement.Tick(deltaSeconds);
+
+if (movement.TryGetState(entityId, out MovementStateSnapshot state))
+{
+    // state.Status / Destination / Velocity / RepathCount / StuckSeconds
+}
+```
+
+- `MovementSystem.IssueMove`：replace 或 queue order，為每個 actor 配置 formation slot，再交由 navigation adapter 驗證。
+- `IssueStop`／`IssueHold`：清除 queue 並停止 navigation；下一個 Move 可解除 hold。
+- `Tick`：同步 position／velocity／remaining distance，判斷 arrival、partial／invalid path、低速 stuck，最多自動 repath 3 次。
+- `MovementStatus`：`Idle`、`Moving`、`Arrived`、`Unreachable`、`Stuck`、`Holding`。
+- `Snapshot` 與 `GetDebugSummary()`：提供 deterministic read/debug view，不暴露可修改的 runtime record。
+
+### Navigation adapter
+
+- `INavigationAdapter.SetDestination`：回傳 accepted、resolved destination、path corner count 或 rejection reason。
+- `INavigationAdapter.TryGetSnapshot`：回傳 position、velocity、remaining distance、path state 與是否位於 navigation surface。
+- `NavMeshMovementAdapter`：使用 `NavMesh.SamplePosition`、`NavMesh.CalculatePath` 與 `NavMeshAgent.SetPath`；只接受完整 path。
+- `UnityMovementDriver`：從 Unity frame loop 呼叫 `MovementSystem.Tick`，不加入 gameplay decision。
+
+## Phase 05 Unit Combat / Ability API
+
+```csharp
+var events = new EventBus();
+var combat = new CombatSystem(events);
+
+combat.Register(entityId, combatantProfile, initialPosition);
+combat.RegisterAbility(abilityProfile);
+combat.IssueAttack(new AttackTargetCommand(actorIds, targetId));
+combat.SetEngagementMode(new SetUnitEngagementModeCommand(actorIds, UnitEngagementMode.Aggressive));
+combat.IssueAbility(new UseAbilityCommand(casterId, abilityId, targetId, targetPoint));
+combat.Tick(deltaSeconds);
+
+if (combat.TryGetState(entityId, out CombatantSnapshot state))
+{
+    // state.Health / State / TargetId / AttackCooldownRemaining / MovementSpeedMultiplier
+}
+```
+
+### Combat simulation
+
+- `CombatSystem`：Pure C# authoritative combat state；處理 attack、projectile、damage、status、ability cooldown 與 death。
+- `ICombatQuery`：提供 `TryGetState`、sorted `Snapshot` 與 `GetDebugSummary`，供 UI／AI／tests 使用。
+- `AttackProfile`：定義 damage type、range、cooldown、windup、projectile speed、splash radius 與 target tags；並公開唯讀衍生值 `AttackIntervalSeconds`、`AttacksPerSecond`、`RecoverySeconds`、`MoveCancelableBackswingSeconds`。
+- 非排隊 Move 在出手前取消傷害／發射並退回未成立攻擊的 cooldown，在出手後只取消 presentation backswing 且保留 `AttackCooldownRemaining`；完整規格見 `45_Attack_Cadence_OrbWalking_攻速與取消後搖規範.md`。
+- `DefenseProfile`：定義 armor 與 physical／magical resistance；True damage 不套用 defense／resistance。
+- `CombatantProfile`：把 definition identity、faction、army、HP、attack、defense、tags、abilities 組成 runtime spawn configuration。
+- `UnitEngagementMode`：`HoldGround`=0.5、`Normal`=1.0、`Aggressive`=1.5 倍 attack range；`Retaliate` 不主動索敵，只在受擊後鎖定攻擊者。
+- `CombatantSnapshot` 額外公開 `EngagementMode`、`TargetReason`、`EngagementOrigin`、`DefenseRange` 與 `ShouldReturnToOrigin`。
+- `CombatMovementCoordinator` 只把 Combat 的追擊／返回 intent 投影成 Movement order，不保存第二份 authoritative state。
+
+### Ability and status
+
+- `UseAbilityCommand`：Unity-independent ability intent；可帶 caster、ability、unit target、point 與 direction。
+- `AbilityProfile`：定義 Self／Unit／Point／Area／Direction／Settlement 與 Active／Passive／Aura／Triggered／Toggle 分類。
+- `StatusEffectProfile`：支援 Buff／Debuff／Stun／Slow／Root／Shield／DamageOverTime。
+- 手動 command 只接受 Active／Toggle；Passive／Aura／Triggered 的觸發策略由擁有該規則的後續系統呼叫 combat API。
+
+### Events and Unity presentation
+
+- `DamageAppliedEvent`、`ProjectileLaunchedEvent`、`StatusAppliedEvent`、`UnitDiedEvent`、`AbilityUsedEvent` 是 immutable simulation events。
+- `UnityCombatDriver` 負責 frame tick、transform position bridge 與 event-driven projectile visual。
+- `UnityCombatView` 只渲染 snapshot（血條、受傷顏色、死亡外觀），不持有 authoritative HP 或傷害規則。
+
+## Phase 06 Hero / Army / Command API
+
+```csharp
+var heroes = new HeroSystem();
+heroes.Register(heroUnitId, HeroProfile.FromDefinition(heroDefinition, factionId));
+
+var armies = new ArmySystem(
+    heroes,
+    ArmyRuleOptions.From(gameRuleSet),
+    new GameplayArmyOrderExecutor(movement, combat),
+    new CombatArmyMembershipSink(combat),
+    events);
+
+armies.RegisterMember(heroUnitId, factionId);
+armies.RegisterMember(infantryId, factionId);
+
+using var router = new ArmyCommandRouter(commandBus, armies);
+commandBus.Dispatch(new CreateArmyCommand(armyId, factionId, memberIds, heroUnitId));
+commandBus.Dispatch(new SplitArmyCommand(armyId, newArmyId, splitMemberIds));
+commandBus.Dispatch(new MergeArmiesCommand(armyId, newArmyId));
+commandBus.Dispatch(new AssignArmyCommanderCommand(armyId, replacementHeroId));
+```
+
+### Hero component
+
+- `HeroSystem`／`IHeroQuery`：管理 unit entity 上的 Hero／Leadership／Ability component 與 ArmyId，不建立 HeroCombatSystem。
+- `HeroProfile.FromDefinition`：從 `HeroDefinition` 建立 runtime component；Faction 是 runtime ownership，不寫入 content definition。
+- Commander 必須是 army member、已註冊 hero，且與 army 同 faction。
+
+### Army composition and rules
+
+- `ArmySystem`／`IArmyQuery`：建立、拆分、合併 army，查詢 immutable snapshot 與 unit membership。
+- `ArmyRuleOptions.From(GameRuleSet)`：啟用或停用 Morale／Supply；disabled rule 不接受數值調整。
+- `AdjustMorale`／`AdjustSupply`：只在對應 rule enabled 時更新，結果限制於 0–100。
+- `IArmyMembershipSink`：Army composition 更新的 adapter boundary；`CombatArmyMembershipSink` 讓 Combat snapshot 反映最新 ArmyId。
+
+### Commands and orders
+
+- Commands：`CreateArmyCommand`、`MergeArmiesCommand`、`SplitArmyCommand`、`AssignArmyCommanderCommand`、`MoveArmyCommand`、`AttackArmyCommand`、`AttackSettlementArmyCommand`、`DefendArmyCommand`、`RetreatArmyCommand`。
+- `ArmyCommandRouter`：為每種 command 同時註冊 validator 與 handler，Player／AI／Scenario／Test 共用相同 flow。
+- `IArmyOrderExecutor`：隔離 Army order state 與執行 backend；`GameplayArmyOrderExecutor` 接到既有 Movement／Combat，成功的 Move／Defend／Retreat 同步通知 Combat 取消前搖或 presentation backswing。
+- Events：`ArmyCreatedEvent`、`ArmiesMergedEvent`、`ArmySplitEvent`、`ArmyCommanderAssignedEvent`、`ArmyOrderIssuedEvent`。
+
+## Phase 07 Faction / Settlement / Territory API
+
+```csharp
+var factions = new FactionSystem(events);
+factions.Register(factionA, new FactionProfile("faction.a", "ai.defend"));
+factions.Register(factionB, new FactionProfile("faction.b", "ai.attack"));
+factions.SetDiplomacy(factionA, factionB, DiplomacyStatus.War);
+
+var territories = new TerritorySystem(factions, events);
+territories.RegisterNode(territoryId,
+    new TerritoryNodeProfile("territory.border", value: 25, settlementId), factionA);
+
+var settlements = new SettlementSystem(factions, territories, events);
+settlements.Register(settlementId, SettlementProfile.FromDefinition(definition), factionA);
+
+using var router = new SettlementCommandRouter(commandBus, settlements);
+commandBus.Dispatch(new CaptureSettlementCommand(
+    settlementId,
+    factionB,
+    CaptureCondition.DefendersCleared,
+    capturingArmyId));
+```
+
+### Faction
+
+- `FactionSystem`／`IFactionQuery`：resources、technology、settlement／territory／army ownership indices、diplomacy 與 AI profile。
+- `SetDiplomacy` 對兩個 factions 對稱更新並發布 `DiplomacyChangedEvent`。
+- `FactionArmyEventBridge`：將 Army lifecycle events 投影到 Faction army index。
+
+### Settlement and capture
+
+- `SettlementSystem`／`ISettlementQuery`：owner、population、garrison、resources、buildings、recruitment、defense 與 capture state。
+- `CaptureRule`：支援 `ClearDefenders`、`CaptureZone`、`DestroyCore`、`KillCommander`、`Mixed`。
+- `CaptureSettlementCommand`：提供 completed condition flags 與 optional capturing army；validator 確認 rule、owner、faction 與 army ownership。
+- `SettlementCommandRouter`：在 mutation 前由 CommandBus validator 拒絕 incomplete capture。
+- Events：`SettlementOwnerChangedEvent`、`TerritoryOwnerChangedEvent`。
+
+### Territory and army validation
+
+- `TerritorySystem`／`ITerritoryQuery`：node／connection graph、owner、settlement mapping、visibility 與 value。
+- `Connect` 建立雙向 connection；snapshot connection IDs 依 EntityId 排序。
+- `SettlementArmyTargetValidator`：注入 `ArmySystem` 後，AttackSettlement 只接受存在、非己方、外交關係為 Hostile／War 的目標。
+
+## Phase 08 Economy / Recruitment / Building / Technology API
+
+```csharp
+var economy = new EconomySystem(gameRules.PopulationEnabled, events, stateBridge);
+economy.RegisterAccount(settlementId, startingResources, populationUsed, populationCapacity);
+
+var technologies = new TechnologySystem(pack.Technologies, economy, modifiers, stateBridge, events);
+var buildings = new BuildingSystem(pack.Buildings, economy, technologies, stateBridge, events);
+var recruitment = new RecruitmentSystem(pack.Units, economy, buildings, technologies, spawnSink, events);
+
+commandBus.Dispatch(new ConstructBuildingCommand(settlementId, factionId, buildingId));
+commandBus.Dispatch(new ResearchTechnologyCommand(settlementId, factionId, technologyId));
+commandBus.Dispatch(new RecruitUnitCommand(settlementId, factionId, unitId));
+
+economy.Tick(deltaSeconds);
+buildings.Tick(deltaSeconds);
+technologies.Tick(deltaSeconds);
+recruitment.Tick(deltaSeconds);
+```
+
+- `ResourceWallet`：以 `DefinitionId` 查詢、存入、檢查與原子扣除任意資源，不包含 Gold／Food 等固定欄位。
+- `EconomySystem`：管理 economy accounts、resource production 與 optional population reservation，提供 immutable snapshot。
+- `BuildingSystem`：驗證資源與 building／technology prerequisites，完成後套用 production／population effects。
+- `TechnologySystem`：驗證 DAG prerequisites，完成後記錄 Faction research state 並套用 `TechnologyModifierRegistry`。
+- `RecruitmentSystem`：依序執行 request→validate→cost／population reserve→queue→timer→`IUnitSpawnSink`。
+- `BuildingCommandRouter`、`TechnologyCommandRouter`、`RecruitmentCommandRouter`：將上述三種 request 接到共用 CommandBus validation／handler flow。
+- Events：`ResourceProducedEvent`、`BuildingCompletedEvent`、`TechnologyCompletedEvent`、`UnitRecruitedEvent`。
+- `GameplayEconomyStateBridge`：把 resource delta、building completion、technology completion 同步到 Phase 07 read model。
+
+## Phase 09 Siege / 城池攻防 API
+
+```csharp
+var sieges = new SiegeSystem(
+    new CombatSiegeAttackerQuery(combat),
+    navigationSink,
+    new SettlementSiegeCaptureSink(settlements),
+    customSiegeRule,
+    events);
+
+sieges.Register(siegeId, new SiegeProfile(
+    settlementId, attackerFactionId, defenderFactionId, SiegeMode.Assault));
+sieges.RegisterStructure(siegeId, gateId,
+    DefenseStructureProfile.FromDefinition(gateDefinition, defenderFactionId));
+
+using var router = new SiegeCommandRouter(commandBus, sieges);
+commandBus.Dispatch(new StartSiegeCommand(siegeId));
+commandBus.Dispatch(new AttackDefenseStructureCommand(siegeId, attackerUnitId, gateId));
+commandBus.Dispatch(new RepairDefenseStructureCommand(siegeId, defenderEngineerId, gateId, amount: 45));
+commandBus.Dispatch(new EnterSiegeAreaCommand(siegeId, SiegeArea.InnerArea));
+commandBus.Dispatch(new EnterSiegeAreaCommand(siegeId, SiegeArea.CaptureObjective));
+commandBus.Dispatch(new CaptureSiegeCommand(siegeId));
+```
+
+- `SiegeSystem`／`ISiegeQuery`：管理 siege lifecycle、areas、structures、capture conditions、waves、timer 與 winner snapshot。
+- `CombatSiegeAttackerQuery`：將一般 Unit 的 immutable `AttackProfile`／tags 接到攻城流程；不存在特殊 SiegeUnit runtime class。
+- `ISiegeNavigationSink`：Gate 開啟或 Wall／Gate 摧毀時通知 navigation backend 刷新通道與新路徑。
+- `ISiegeCaptureSink`／`SettlementSiegeCaptureSink`：將 capture objective 結果送入既有 Settlement owner transaction。
+- `ISiegeRule`：可替換 area entry 與 capture eligibility，不讓世界觀或 scenario 規則硬寫在 system。
+- `DefenseStructureProfile.Repairable`：由 Content tag `repairable` 建立；只有結構 owner／守方可修復。Gate 從 0 HP 修回正值時恢復 Closed 並發布 breach sealed event。
+- Commands：Start、AttackDefenseStructure、RepairDefenseStructure、SetGateState、EnterSiegeArea、ReportSiegeCondition、CompleteSiegeWave、CaptureSiege。
+- Events：SiegeStarted、DefenseStructureDamaged／Destroyed／Repaired、GateStateChanged、BreachCreated／Sealed、SiegeAreaEntered、SiegeCompleted。
+- `SiegeCombatEventBridge`：將 `UnitDiedEvent` 投影成 DefendersCleared／CommanderKilled capture conditions。
+
+## Phase 10 Utility AI API
+
+```csharp
+var ai = new AiSystem(new UtilityAiPlanner(), events);
+ai.Register(
+    factionId,
+    AiProfile.FromDefinition(aiProfileDefinition),
+    worldQuery,
+    actionExecutor);
+
+ai.Tick(deltaSeconds);
+
+if (ai.TryGetState(factionId, out AiAgentSnapshot state))
+{
+    // state.Goal / Layer / Action / Scores / TargetId
+    // state.Strength / Threat / Route / StalledDecisionCount
+}
+```
+
+- `AiSystem`：管理多個 Faction agents、decision cadence、Utility 選擇、progress／stall tracking 與 debug snapshots。
+- `UtilityAiPlanner.Score`：對所有 action 產生排序後的 immutable `AiActionScore`；同分以 action enum 穩定決定。
+- `IAiWorldQuery.Observe`：將 Economy／Recruitment／Army／Territory／Siege 等 read models 聚合成黑板。
+- `IAiActionExecutor.Execute`：composition boundary；把選中 action 轉成既有 Recruit／Army／Siege commands。
+- `AiStrategicMapAnalyzer.SelectEnemySettlement`：以 territory value 選擇敵方 settlement。
+- `AiStrategicMapAnalyzer.FindRoute`：在 Territory graph 上以 deterministic BFS 產生 route。
+- `AiProfileDefinition`／`AiProfile`：aggression、defense／economy bias、risk、siege preference、decision interval、desired army size。
+- `AiDecisionMadeEvent`：提供 goal、layer、action、score 與 made-progress 給 Debug UI、telemetry 或 replay diagnostics。
+- 連續未進展達 `MaximumStalledDecisions` 時選擇 Recover；Wait 可表達正在等待 recruitment／production，不需 busy loop。
+
+## Phase 11 GameMode / Scenario / Objective API
+
+```csharp
+ScenarioDefinition definition = new ScenarioJsonLoader().Load(jsonText);
+var scenarios = new ScenarioSystem(events);
+using var router = new ScenarioCommandRouter(commandBus, scenarios);
+
+commandBus.Dispatch(new StartScenarioCommand(definition));
+commandBus.Dispatch(new AddScenarioFactCommand("settlements.captured", 1));
+scenarios.Update(deltaSeconds);
+
+if (scenarios.TryGetSnapshot(out ScenarioSnapshot state))
+{
+    // state.Status / ElapsedSeconds / Objectives / Facts
+}
+```
+
+- `GameModeDefinition`：mode、rules、allowed systems、required-objective victory 與 failure defeat policy。
+- `ScenarioDefinition`：start setup、objectives、triggers 與 actions 的 immutable authoring root。
+- `ScenarioJsonLoader.Load`：JSON 轉 definition，拒絕未知 enum、重複 ID、未知 objective reference 與無 target 的 fact／signal action。
+- `ScenarioSystem.Start／Update／SetFact／AddFact`：單一 active scenario runtime；trigger/action cascade 有 deterministic order 與 safety limit。
+- `ScenarioCommandRouter`：StartScenario／SetScenarioFact／AddScenarioFact 共用 CommandBus validation／handler flow。
+- `IsSystemAllowed`：composition root 查詢 GameMode 是否允許指定 system ID。
+- Events：`ScenarioStartedEvent`、`ObjectiveStatusChangedEvent`、`ScenarioActionExecutedEvent`、`ScenarioCompletedEvent`。
+- `ScenarioActionType.EmitSignal`：把 data-authored setup／劇情 hook 交給外部 adapter；adapter 再派送既有 Gameplay commands。
+
+## Phase 12 UI / UX API
+
+```csharp
+var hud = new RtsHudViewModel(hudQuery, hudCommandSink, events);
+HudSnapshot snapshot = hud.Snapshot;
+
+var presenter = gameObject.AddComponent<RtsHudPresenter>();
+presenter.Configure(hud, themes, "ui.neutral");
+presenter.SwitchTheme("ui.fantasy");
+
+hud.Execute(new HudCommand("unit.move", targetId));
+```
+
+- `IHudQuery.Query`：composition layer 聚合 Selection、Economy、Army、Settlement、Territory 與 Scenario read models。
+- `IHudCommandSink.Dispatch`：把 UI intent 轉送到既有 CommandBus；ViewModel／Presenter 不直接 mutation。
+- `HudInvalidatedEvent`：authoritative state event bridge 通知 ViewModel 下一次讀取時 refresh。
+- `HudNotificationEvent`：Info／Success／Warning／Error notification input，ViewModel 依 capacity 保存。
+- `HudThemeJsonLoader`／`HudThemeDefinition`：載入 validated visual tokens。
+- `RtsHudPresenter.LayoutSignature`：驗證 Theme 替換不改 layout responsibility。
+
+## Phase 13 Save / Replay / Debug API
+
+```csharp
+var saves = new GameStateSaveService("1.0.0", frameworkVersion, contentVersion);
+var coordinator = new GameStateCoordinator(saves);
+
+string json = coordinator.Save(captureSource, saves.CreateMetadata(scenarioId));
+SaveEnvelope loaded = coordinator.Load(json, restoreSink);
+
+var recorder = new ReplayRecorder(loaded, seed);
+recorder.Record(tick, "unit.move", payloadJson);
+var player = new ReplayPlayer(recorder.Build(), replayCommandSink);
+player.AdvanceTo(targetTick);
+```
+
+- `GameStateDocument`：完整 typed pure-data save root。
+- `GameStateSaveService.Serialize／Deserialize`：metadata compatibility、SHA-256 validation 與 JSON envelope。
+- `Fingerprint`：比較 save/load 前後核心 state，不依賴 Unity scene／view。
+- `IGameStateCaptureSource`／`IGameStateRestoreSink`：composition-owned system aggregation／restore boundary。
+- `ISaveStore`：Memory／File slot storage，與 state serialization 分離。
+- `SeededRandom.CaptureState／Restore`、`GameClock.CaptureState／Restore`：deterministic continuation。
+- `ReplayRecorder`／`ReplayPlayer`：InitialState＋Seed＋ordered Tick commands。
+- `DebugConsole`／`IDebugCommandExecutor`：development command parsing／delegation；預設 disabled。
+
+## Phase 14 Performance API
+
+```csharp
+var metrics = new PerformanceMetricsCollector(300);
+metrics.Record(new PerformanceSample(frameMs, simulationMs, aiMs, navigationMs,
+    unitCount, projectileCount, gcBytes, memoryBytes));
+
+var scheduler = new TickScheduler();
+scheduler.Register("simulation", 30, TickSimulation);
+scheduler.Register("ai", 5, TickAi);
+
+var spatial = new SpatialHash<EntityId>(cellSize: 8, sortComparer: entityComparer);
+IReadOnlyList<EntityId> nearby = spatial.Query(center, radius);
+
+var projectiles = new ObjectPool<ProjectileView>(factory, maximumRetained: 256);
+```
+
+- `PerformanceMetricsCollector.Snapshot`：FPS／average／P95／subsystem timings／peaks。
+- `PerformanceBudgetEvaluator`：以 benchmark-supplied budget 產生可讀 violations。
+- `TickScheduler`：不同 system cadence 與 spiral-of-death catch-up protection。
+- `ObjectPool<T>`：generic rent／return、lifecycle hooks、bounded retention 與 created／active counters。
+- `SpatialHash<T>`：local radius broad-phase，避免為每個 unit 掃描全世界 entity。
+- `SimulationLodPolicy.Evaluate`：依距離輸出 simulation／render tier。
+- `PerformanceStressHarness.Run`：100～1000 exploratory scale report，供 CI／hardware benchmark adapter 使用。
+
+## Phase 15 Vertical Slice API
+
+```csharp
+ContentPack pack = new ContentPackJsonLoader().Load(contentJson);
+VerticalSliceDefinition scenario = new VerticalSliceJsonLoader().Load(scenarioJson);
+
+using var simulation = new VerticalSliceSimulation(pack, scenario);
+var loop = new VerticalSliceLoop(simulation);
+loop.Begin();
+loop.RunToCompletion();
+
+var session = new GameSessionController(backend);
+session.NewGame();
+session.Pause();
+session.OpenSettings();
+session.ApplySettings(new GameSettings(0.8, 24, true));
+session.Resume();
+```
+
+- `VerticalSliceJsonLoader`：載入 world-neutral semantic bindings。
+- `VerticalSliceValidator.Validate`：驗證 2 resources、4 required roles、2 heroes、buildings、三個地點、gate、AI profile 與 Content Pack references。
+- `VerticalSliceLoop.Tick／RunToCompletion`：deterministic stage progression；Waiting 不跳階，Defeated 立即終止。
+- `VerticalSliceSimulation`：共用 composition，透過既有 domain API 完成收入、招募、軍團、戰鬥、AI 反攻、攻城與佔領。
+- `GameSessionController`：以 `IGameSessionBackend` 隔離 New／Load／Restart 的 scene／persistence 實作。
+
+## Phase 16 Package API
+
+```json
+"com.boyi.aegis-rts": "https://github.com/BoYi0126/AegisRTS.FrameworkLab.git?path=/Packages/com.boyi.aegis-rts#main"
+```
+
+- Package ID：`com.boyi.aegis-rts`；目前 SemVer：`1.0.0`；最低 Unity manifest version：`6000.0`。
+- Runtime assemblies：`AegisRTS.Core`、`AegisRTS.Gameplay`、`AegisRTS.Presentation`、`AegisRTS.Persistence`。
+- Editor assembly：`AegisRTS.Tools`，提供 `Tools/AegisRTS/Validate Content Pack...`。
+- Samples：Basic RTS、Basic Combat、Basic Siege；經 Package Manager import 後可直接開啟對應 scene。
+- Consumer content 透過 `ContentPackJsonLoader`／`ContentPackValidator` 建立，不需修改 package Runtime。

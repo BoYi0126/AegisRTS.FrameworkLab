@@ -1,0 +1,703 @@
+{
+  "status": "WIP_MODEL",
+  "asset_id": "unit.infantry",
+  "source_version": "CHR_Infantry_A_v003",
+  "blender_version": "5.2.0 LTS",
+  "input_v002": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v002\\Source\\CHR_Infantry_A_v002.blend",
+  "input_v002_sha256": "5D9D93F9559D2A1608FB4B57A7BC0AC284C4F3ED99BA826F0A5E98E1D5F51632",
+  "output_blend": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v003\\Source\\CHR_Infantry_A_v003.blend",
+  "output_blend_sha256": "5F7C799C3B57A64B6E289A38FF2AA6E5509247C547FD4B2DE0EC47FF63AA4DBE",
+  "character_bounds_m": {
+    "min": [
+      -0.8899999856948853,
+      -0.28599995374679565,
+      0.0
+    ],
+    "max": [
+      1.0283448696136475,
+      0.16300000250339508,
+      1.8300000429153442
+    ],
+    "height_z": 1.8300000429153442
+  },
+  "mesh_count": 72,
+  "vertices": 14211,
+  "triangles": 28138,
+  "materials": [
+    "MAT_v003_Review_Skin",
+    "MAT_v003_Review_Cloth",
+    "MAT_v003_Review_Armor",
+    "MAT_v003_Review_Leather",
+    "MAT_v003_Review_Wood",
+    "MAT_v003_Review_Steel"
+  ],
+  "material_count": 6,
+  "armature": "Armature",
+  "bone_count": 23,
+  "category_triangles": {
+    "Body_Head_Limbs": 9964,
+    "Armor_Cloth": 15260,
+    "Shield": 2372,
+    "Sword": 542
+  },
+  "objects": [
+    {
+      "name": "Body_Base",
+      "vertices": 226,
+      "triangles": 448,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "BootSole_L",
+      "vertices": 74,
+      "triangles": 144,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "BootSole_R",
+      "vertices": 74,
+      "triangles": 144,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Boot_L",
+      "vertices": 122,
+      "triangles": 240,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Boot_R",
+      "vertices": 122,
+      "triangles": 240,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Bracer_L",
+      "vertices": 86,
+      "triangles": 168,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Bracer_R",
+      "vertices": 86,
+      "triangles": 168,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Calf_L",
+      "vertices": 106,
+      "triangles": 208,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Calf_R",
+      "vertices": 106,
+      "triangles": 208,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ChestArmor",
+      "vertices": 182,
+      "triangles": 360,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ChestArmor_Center",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ChestArmor_Lamellar_1",
+      "vertices": 432,
+      "triangles": 860,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ChestArmor_Lamellar_2",
+      "vertices": 432,
+      "triangles": 860,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ChestArmor_Lamellar_3",
+      "vertices": 432,
+      "triangles": 860,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ChestArmor_Lamellar_4",
+      "vertices": 432,
+      "triangles": 860,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Elbow_L",
+      "vertices": 314,
+      "triangles": 624,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Elbow_R",
+      "vertices": 314,
+      "triangles": 624,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Face_Brow_L",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Face_Brow_R",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Face_Cheek_L",
+      "vertices": 222,
+      "triangles": 440,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Face_Cheek_R",
+      "vertices": 222,
+      "triangles": 440,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Face_Chin",
+      "vertices": 222,
+      "triangles": 440,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Face_Nose",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Forearm_L",
+      "vertices": 98,
+      "triangles": 192,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Forearm_R",
+      "vertices": 98,
+      "triangles": 192,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Hand_L",
+      "vertices": 62,
+      "triangles": 120,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Hand_R",
+      "vertices": 62,
+      "triangles": 120,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Head",
+      "vertices": 758,
+      "triangles": 1512,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Helmet",
+      "vertices": 398,
+      "triangles": 792,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Helmet_Plume",
+      "vertices": 82,
+      "triangles": 160,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Helmet_Rim",
+      "vertices": 110,
+      "triangles": 216,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Helmet_TopMount",
+      "vertices": 366,
+      "triangles": 728,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Knee_L",
+      "vertices": 314,
+      "triangles": 624,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Knee_R",
+      "vertices": 314,
+      "triangles": 624,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_L_1",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_L_2",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_L_3",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_L_4",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_R_1",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_R_2",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_R_3",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "LegWrap_R_4",
+      "vertices": 142,
+      "triangles": 280,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Neck",
+      "vertices": 74,
+      "triangles": 144,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Pelvis",
+      "vertices": 114,
+      "triangles": 224,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Scarf",
+      "vertices": 86,
+      "triangles": 168,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Scarf_Drape",
+      "vertices": 74,
+      "triangles": 144,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Shield",
+      "vertices": 152,
+      "triangles": 300,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Shield_Boss",
+      "vertices": 546,
+      "triangles": 1088,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Shield_Reinforcement_H",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Shield_Reinforcement_V",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Shield_Rim",
+      "vertices": 304,
+      "triangles": 608,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ShoulderArmor_L_1",
+      "vertices": 464,
+      "triangles": 924,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ShoulderArmor_L_2",
+      "vertices": 464,
+      "triangles": 924,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ShoulderArmor_L_3",
+      "vertices": 464,
+      "triangles": 924,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ShoulderArmor_R_1",
+      "vertices": 464,
+      "triangles": 924,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ShoulderArmor_R_2",
+      "vertices": 464,
+      "triangles": 924,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "ShoulderArmor_R_3",
+      "vertices": 464,
+      "triangles": 924,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Sword",
+      "vertices": 73,
+      "triangles": 142,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Sword_Grip",
+      "vertices": 62,
+      "triangles": 120,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Sword_Guard",
+      "vertices": 82,
+      "triangles": 160,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Sword_Pommel",
+      "vertices": 62,
+      "triangles": 120,
+      "collection": "GEO_WEAPON",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Thigh_L",
+      "vertices": 106,
+      "triangles": 208,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Thigh_R",
+      "vertices": 106,
+      "triangles": 208,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Thumb_L",
+      "vertices": 164,
+      "triangles": 324,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "Thumb_R",
+      "vertices": 164,
+      "triangles": 324,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "UpperArm_L",
+      "vertices": 98,
+      "triangles": 192,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "UpperArm_R",
+      "vertices": 98,
+      "triangles": 192,
+      "collection": "GEO_BODY",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "WaistArmor_Belt",
+      "vertices": 98,
+      "triangles": 192,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "WaistArmor_L",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "WaistArmor_R",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "WaistCloth",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    },
+    {
+      "name": "WaistCloth_Rear",
+      "vertices": 96,
+      "triangles": 188,
+      "collection": "GEO_ARMOR",
+      "parent": "Armature",
+      "parent_type": "OBJECT",
+      "parent_bone": ""
+    }
+  ],
+  "deferred": [
+    "Final UV",
+    "Final Texture",
+    "Final Team Color Mask",
+    "Final Skinning",
+    "Animation Polish",
+    "Final LOD chain",
+    "Shader rewrite",
+    "Runtime Prefab replacement"
+  ]
+}

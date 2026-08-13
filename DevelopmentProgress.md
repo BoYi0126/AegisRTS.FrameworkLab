@@ -4,12 +4,322 @@
 
 ## Current Status
 
-- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；玩家守城、隨機武將模式與正式美術仍未完成。
+- Current Phase：PlayablePrototype_01 的 `fortified-city` 玩家攻城垂直切片與步兵／弓兵 Prototype L3 已可玩；Infantry initial v003的Phase 02結果為`CHANGE REQUESTED`，已建立不覆寫initial的`CHR_Infantry_A_v003_P02R1`與Revision 01 review package，狀態為`READY FOR PHASE02 REVISION REVIEW`；尚未通過人工審核、未進Phase 03且不是Production Ready。
 - Active Branch：`main`
-- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。
+- Last Trusted Runtime Validation：FrameworkLab EditMode 180/180、PlayMode 40/40；攻擊取消 domain targeted 2/2、軍團移動取消 1/1、弓兵 Attack-Move presentation 1/1、步兵實際移動直立檢查 1/1；Infantry／Archer Unity Builder PASS；步兵來源 manifest 26/26；Windows Development Build PASS（BuildReport 187,670,429 bytes），`.exe` 啟動 10 秒 process responding、Player log error scan 0 hits；solution build 0 warnings／0 errors。2026-08-13 P02R1只執行Blender source revision／read-only reopen、evidence rendering與package validation；未修改Runtime Prefab、未重跑Unity tests或build，故沒有把歷史runtime結果改記為本次通過。
 - Unity Project Version：`6000.5.7f1`
-- Highest Priority：由專案擁有者在最新 Windows Player 實際操作弓兵 Attack-Move，確認 0.38 秒出手承諾與移動切換手感；再依主觀結果微調集中式 cadence 表，之後建議依 Batch A 製作指揮官或城門並回到玩家守城／AI 正式攻城／維修成本。
-- Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam，不是產品功能缺口。
+- Highest Priority：Art／Design／Technical Art審核 `docs/ArtProduction/ReviewPackages/Infantry_Phase02_PrimaryForms_Revision01_Review/04_Review_Checklist.md`，對P02R1作`APPROVE`／`CONDITIONAL APPROVE`／`CHANGE REQUESTED`；審核前不得進Phase 03或替換Runtime Prefab。來源權利、source Actions、team-color shader、final skin／animation、完整LOD與Unity captures仍是後續production blockers。
+- Specification Difference：Unity 產品場景已改用 runtime-baked NavMesh 並讓 Gate 真實阻擋內院；純 C# tests 仍使用 deterministic `INavigationAdapter`，這是刻意的測試 seam。新 production 規格的 20k–35k LOD0、LOD3／Impostor、packed team mask 與多 influence deformation 是 `PROPOSED` 量產 gate，不是目前低模 Prototype 已實作的 runtime baseline。
+
+## 2026-08-13 — Infantry Phase 02 Revision 01 Primary Forms Gate Fix
+
+- Status：`READY FOR PHASE02 REVISION REVIEW`（Revision source、DCC evidence、required comparisons、review documents、manifests、資料夾、ZIP與逐檔驗證均完成；不自行宣告Revision PASS或進Phase 03）
+- Goal：完整執行 `mission/Infantry_Remaster_Phase02_Revision01_Task.md` 的`CHANGE REQUESTED`；保留v002與v003 initial，以局部Primary Forms reshape／rebuild修正toy-like head／helmet／plume／arms／chest／waist／legs／wraps／boots及shield boss比例，建立`CHR_Infantry_A_v003_P02R1.blend`與`Infantry_Phase02_PrimaryForms_Revision01_Review.zip`。
+- Baseline：
+  - Branch／HEAD：`main`／`ec0560192863a763d6beb3be6b9c0c642b1d4137`；開始時`git status --short --untracked-files=all`為266 entries，包含前述Production Spec、review packages、mission move與v003初版，全部保留，未reset／cleanup。
+  - Revision task：967 lines／13,508 bytes；SHA-256 `2D93F02F688CE6D158DB707CA42756A6780D7ADB8C927A17130D0F435A976B25`；review decision明確為`CHANGE REQUESTED`。
+  - Protected v002：blend SHA-256 `5D9D93F9559D2A1608FB4B57A7BC0AC284C4F3ED99BA826F0A5E98E1D5F51632`；master FBX `16B698ACC8797C80E0153D51916A9825D26453CCFF6A7289C46F5EF99F846468`。
+  - Protected v003 initial：`CHR_Infantry_A_v003.blend` SHA-256 `5F7C799C3B57A64B6E289A38FF2AA6E5509247C547FD4B2DE0EC47FF63AA4DBE`；1.830 m／28,138 tris／72 meshes。
+  - L1 reference：`Unit_03_Infantry_L1_Concept_Final.png` SHA-256 `C6BD352DE06854F8CD59AC92C891E43A0D40070D8F1AB72613358845847F461F`。
+- Scope In：
+  - 完整讀取Revision 01、Phase 01 target、Phase 02 initial task／reports、AGENTS要求的00／03／04／09／27／DevelopmentProgress／current Phase，以及Production Spec character／silhouette／Golden Sample／audit／naming／Unity acceptance／master checklist／open issues。
+  - 以Blender 5.2.0 LTS從exact-hash v003 initial建立versioned P02R1；保留armature、socket／anchor、materials、shield／sword主要尺寸與三層shoulder概念。
+  - 移除六個貼附式face pieces，把brow／nose／cheek／jaw大面整合進單一Head mesh；縮窄helmet crown、提高rim face clearance並重建向後／側向curved plume。
+  - UpperArm radial volume減13%；shoulder outer drop增加且採hard planar read；胸甲row加高重疊、降低gap、加入plate segmentation節奏並縮小center strap。
+  - Front／rear waist cloth改成有厚度的tapered shaped hem；左右各以main＋overlap兩塊side plate取代單一box；thigh／calf增加plane方向，八個donut wrap改成每腿兩條broader tilted wrap；boots縮窄toe／ankle並加入內外側差異。
+  - Shield boss直徑減12.5%，board/rim加入0.014 m內的subtle convex bow；sword主尺寸與readability保留，只收斂pommel球形。
+  - 產生5 Clay、4 silhouette、3 wireframe、128／64／32 px、2 initial comparison、2 L1 comparison；建立reports、checklist、Open Issues、manifests、review folder與ZIP。
+- Scope Out／Deferred：
+  - 未做Phase 03 Secondary Forms／ornament、Final UV、Final Texture、Final Team Color Mask、Final Skinning、Animation Polish、正式LOD／impostor、FBX export、Unity import/capture/test/build、Runtime Prefab replacement、shader、gameplay/API或Content change。
+  - 未覆寫、刪除或修改v001／v002／v003 initial及任何既有Blender／FBX／Texture／Material／Prefab／Animation／Shader／Scene／C#／`.meta` Production Asset；未commit、未push。
+- Major Files／Assets：
+  - `ArtSource/Units/Infantry/CHR_Infantry_A/v003/Source/CHR_Infantry_A_v003_P02R1.blend`：339,535 bytes；SHA-256 `6569A14825B53393B72306F79BF8B29F9DEA5C0FFAB8E30686E901D61964220F`。
+  - 新增`revise_infantry_v003_p02r1.py`、`render_infantry_v003_p02r1_review.py`、`compose_p02r1_comparisons.ps1`、`finalize_p02r1_review_package.ps1`；更新v003 README並新增`Documentation/P02R1_BUILD_RESULT.json`。
+  - 新增`docs/ArtProduction/ReviewPackages/Infantry_Phase02_PrimaryForms_Revision01_Review/`：44 files／13,694,385 bytes；含7 Markdown、19 PNG、revision blend/scripts、L1 reference、three task snapshots與7 manifest/checksum files。
+  - 新增`Infantry_Phase02_PrimaryForms_Revision01_Review.zip`：13,558,770 bytes；SHA-256 `11A4B858BD7D035138F63B1D49AB03BB142DF1293C5C4C459518CF58F381191D`。
+  - 同步Production Spec 08／09／16／17／99至P02R1 pending review；重建`RTS_Asset_Production_Spec_v1.zip`為62,269 bytes／SHA-256 `8EE7B95BCA702FD91632C692EDD0A09F895D5183C350F630B9089F131FC50195`。
+- Behavior Before／After：
+  - Before：v003 initial雖已脫離方塊Prototype，但Clay仍有球形helmet/head、貼附式face pieces、inflated upper arms、floating chest bars、box waist、四圈donut wraps、bell-like boots及偏大shield boss；人工決定為`CHANGE REQUESTED`。
+  - After：P02R1保留成功的盾劍、三層肩甲與heavy-infantry mass，在25,106 tris內把face整合成單一連續Head、以helmet/rim/plume形成更接近L1的頭部輪廓、收斂arm／boot roundness、把chest轉為nested segmented lamellar mass、把waist與wraps改為overlap language並調整shield curvature/boss。
+  - Visual QA共三輪：first build 25,394 tris；首次render發現face被scarf/helmet遮擋、wrap半埋、chest segmentation弱；第二輪修正clearance與row/wrap後仍認為三條wrap偏stacked；final改為每腿兩條broader tilted wraps，25,106 tris。
+- Architecture／API／Data：
+  - Architecture：Definition／Runtime／View、Player／AI Command與gameplay authority完全不變；P02R1仍是ArtSource DCC review candidate，不參與runtime。
+  - API：N/A；C# public API、Command／Event／Query、Animator parameter、`AttackImpact`、Asset／Prefab ID、socket／anchor name均無變更。
+  - Data：scene `SourceVersion=CHR_Infantry_A_v003_P02R1`、`ProductionStatus=WIP_MODEL`、`ReviewStatus=READY FOR PHASE02 REVISION REVIEW`；保留6 review-only materials、1 armature／23 bones、10 empties、0 Actions。沒有save schema、Content Pack、Prefab YAML或Unity importer變更。
+- Tests／Validation：
+  - Deterministic revision build：input hash gate通過；final 1.824011 m、64 meshes、12,671 vertices、25,106 triangles、6 materials、1 armature／23 bones、10 empties／0 Actions。
+  - Geometry audit：non-manifold 0、boundary 0、loose 0、zero-area faces 0；required collections只有`CHR_Infantry_A_v003`／`GEO_BODY`／`GEO_ARMOR`／`GEO_WEAPON`／`RIG`／`REVIEW`。
+  - Visual evidence：19 PNG＝Clay 5、Silhouette 4、Wireframe 3、ScreenSize 3、Comparison 4；final front／left／back／3Q、64／32 px、initial comparison與L1 comparison已人工檢視。
+  - Review ZIP：folder 44 files＝ZIP 44 entries；top-level只含`Infantry_Phase02_PrimaryForms_Revision01_Review/`；missing 0、extra 0、hash mismatch 0。
+  - Production Spec ZIP：folder 21 files＝ZIP 21 entries；missing 0、extra 0、hash mismatch 0。
+  - Unity Editor／EditMode／PlayMode／Builder／Windows Build／Profiler：`NOT RUN`，因Revision禁止修改正式Runtime Prefab；歷史runtime結果未冒充本次通過。
+- Acceptance：
+  - Version safety／v002＋v003 initial unchanged：`PASS` — exact hashes與protected-path Git scan提供證據。
+  - Required new P02R1 source／24K–30K／1.80–1.85 m／evidence／package／ZIP：`PASS` — machine-readable metrics與ZIP verification完成。
+  - 16-item visual Revision gate：`PARTIAL / REVIEW PENDING` — agent已完成對應geometry與evidence，但只由human reviewer決定是否通過。
+  - Phase 03 authorization／Production Ready：`NOT RUN / NOT AUTHORIZED`。
+- Completed：required reading、baseline hash lock、P02R1 deterministic source、三輪visual QA、required captures/comparisons、five required reports＋checklist/index、manifests、folder、ZIP、Production Spec同步與hash verification。
+- Not Completed／Deferred：人工Revision decision；Phase 03；final topology／UV／texture／team-color shader；skin／deformation／equipment binding；animation／durable Actions；formal LOD；Unity integration/captures/tests/build/profile；provenance／license；Golden Sample lock與Production Ready。
+- Known Issues／Risks：
+  - P02R1仍是static object-parent A-pose；shoulder/scarf/waist/shield deformation clearance尚未驗證。
+  - Chest plate segmentation與兩條calf wraps仍是Primary Forms簡化，不應被解讀為final lamellar／cloth topology。
+  - Face只做大型連續planes，沒有eyes／lips／facial rig；此gate只審proportion與continuity。
+  - No final UV／texture／team mask／shader／Actions／LOD／Unity capture；DCC evidence不能取代runtime acceptance。
+  - Upstream provenance／commercial distribution rights仍未完整，會阻擋Production Ready。
+- Git：Branch `main`／HEAD `ec0560192863a763d6beb3be6b9c0c642b1d4137`；未commit、未push。開始前 `git status --porcelain=v1 --untracked-files=all` 為266 entries，結案為317 entries（collapsed status 6）；v001／v002、Unity Infantry與`Library/`／`Temp/`／`obj/` protected paths本任務新增status entries為0。既有dirty worktree變更均保留。
+- Next（排序）：
+  1. Art／Design／Technical Art檢視四張Comparison、五張Clay、silhouette與64 px，填寫`04_Review_Checklist.md`。
+  2. 若`APPROVE`／`CONDITIONAL APPROVE`且明確授權，才另開Phase 03 Secondary Forms；若`CHANGE REQUESTED`，只建立focused P02R2，不覆寫initial或P02R1。
+  3. 後續依獨立gate處理topology／UV／texture／skin／animation／LOD／Unity integration與provenance，不把它們混入本Revision。
+
+## 2026-08-13 — Infantry Phase 02 Primary Forms v003 與 Review Package
+
+- Status：`READY FOR REVIEW`（建模、DCC evidence、review documents、manifests、原始資料夾、ZIP與逐檔驗證已完成；依任務要求未自行宣告Phase 02 PASS）
+- Goal：完整執行 `mission/Infantry_Remaster_Phase02_PrimaryForms_Task.md`；保留`CHR_Infantry_A_v002`，建立新的`CHR_Infantry_A_v003`，只處理Primary Forms／Silhouette／Major Geometry，產生`Infantry_Phase02_PrimaryForms_Review_v001/`與同名ZIP，不修改正式Runtime Prefab、不commit、不push。
+- Baseline：
+  - Branch／HEAD：`main`／`ec0560192863a763d6beb3be6b9c0c642b1d4137`；開始時worktree已有前述docs packages、ZIP、mission move與progress等216 entries，全部保留，未reset／cleanup。
+  - Phase 02 task SHA-256：`3229829154D75BA2ACA6C7BF18C7DA9C7EB88EE0911A3DFEA5E10B0ED8609B02`。
+  - Protected v002 source：`CHR_Infantry_A_v002.blend` SHA-256 `5D9D93F9559D2A1608FB4B57A7BC0AC284C4F3ED99BA826F0A5E98E1D5F51632`；master FBX SHA-256 `16B698ACC8797C80E0153D51916A9825D26453CCFF6A7289C46F5EF99F846468`。
+  - Stable contracts：`unit.infantry`、`PF_Unit_Infantry`、1.83 m target、Humanoid／23 bones、Root Motion Off、sockets／anchors、Animator parameters與`AttackImpact`；本階段不改runtime binding。
+- Scope In：
+  - 完整讀取Phase 02 task、Phase 01 target、AGENTS要求的00／03／04／09／27／DevelopmentProgress／current Phase／affected API docs，以及RTS production spec的Primary Forms、geometry、rig、naming、Unity acceptance、Golden Sample、audit、checklist、backlog與Open Issues。
+  - 以Blender 5.2.0 LTS從唯讀v002 contract baseline建立全新的versioned v003 source；重建body/head、helmet、三層shoulders、chest／lamellar bands、waist、legs、rounded boots、shield與tapered sword。
+  - 保留armature與empty/socket/anchor contract；採static A-pose／object-parent review binding，並把equipment planned attachment記為metadata，不冒充final skinning。
+  - 產生六向Clay、四向black silhouette、三向wireframe、128／64／32 px silhouette與兩張v002 comparison；輸出object／bone／geometry／screenshot／file manifests及SHA256SUMS。
+  - 將使用者直接要求執行Phase 02視為Phase 01 target批准，更新15-item approval record、entry gate及受影響的production-spec索引；Phase 02 reviewer decision仍維持pending。
+- Scope Out／Deferred：
+  - 未做Final UV、Final Texture、Final Team Color Mask、production shader、Final Skinning、Animation Polish、正式LOD／impostor、FBX export、Unity import/capture/test/build、Runtime Prefab replacement或gameplay/API change。
+  - 未修改／刪除／移動v001／v002、任何現有FBX／Texture／Material／Prefab／Animation／Shader／Scene／C#／`.meta` Production Asset；未commit、未push。
+  - 未進Phase 03，未鎖Golden Sample，未宣告Production Ready或Phase 02 PASS。
+- Major Files／Assets：
+  - 新增`ArtSource/Units/Infantry/CHR_Infantry_A/v003/`：`CHR_Infantry_A_v003.blend`、README、build／render／comparison／finalize scripts與`BUILD_RESULT.json`；source SHA-256 `5F7C799C3B57A64B6E289A38FF2AA6E5509247C547FD4B2DE0EC47FF63AA4DBE`。
+  - 新增`docs/ArtProduction/ReviewPackages/Infantry_Phase02_PrimaryForms_Review_v001/`：41 files／9,990,770 bytes；7 top-level Markdown reports、18 PNG、Blender source copy與scripts、2 task snapshots、comparison provenance note及7 manifest/checksum files。
+  - 新增`Infantry_Phase02_PrimaryForms_Review_v001.zip`：9,871,667 bytes；SHA-256 `F55BB2CDA64EBDDA4CF47D6B706BE7083AECD1DF71089AC7ECD144B47E6546CA`。
+  - 更新Phase 01 README／Approval Checklist／Entry Gate及Production Spec 08／09／16／17／99；重建`RTS_Asset_Production_Spec_v1.zip`為61,993 bytes／SHA-256 `3AF26269992C2981EBD0365E906B38FFAC4CA06827DE84F97E71A04ED4510FE9`。
+- Behavior Before／After：
+  - Before：v002是1.83 m、4,376-triangle playable prototype；Phase 01 target已完成但待使用者批准，沒有v003 actual geometry或Phase 02 exact-geometry review evidence。
+  - After：Phase 01 target獲授權；v003以新的curved／custom geometry取代方塊形體，具可辨識頭臉、曲面helmet、wide layered shoulders、shaped chest、tapered waist、leg rhythm、rounded boots、constructed shield與tapered sword；v002仍是immutable baseline。
+  - Initial bone-parent attempt因bone-space transform造成2.179808 m outlier而在save前停止；改為static review parenting後先得30,946 tris，再降低shoulder／wrap密度。視覺QA拒絕方塊boot與錯誤comparison framing；完成rounded boot rebuild及immutable-capture comparison後，final為28,138 tris／1.830 m。
+- Architecture／API／Data：
+  - Architecture：Definition／Runtime／View與Player／AI Command邊界完全未動；v003是DCC review candidate，不參與runtime authority。
+  - API：C# public API、Command／Event／Query、Animator parameters、`AttackImpact`、socket／anchor name、Asset／Prefab ID均無變更。
+  - Data：新blend含scene properties `AssetId=unit.infantry`、`SourceVersion=CHR_Infantry_A_v003`、`ProductionStatus=WIP_MODEL`；72 meshes分入`GEO_BODY`／`GEO_ARMOR`／`GEO_WEAPON`，並保留`RIG`／`REVIEW` collections。六個材質僅為review ID colors，不含final texture／UV contract。
+- Tests／Validation：
+  - Deterministic Blender build：final save成功；1.830000 m、72 meshes、14,211 vertices、28,138 triangles、6 materials、1 armature／23 bones／0 Actions。
+  - Blender read-only reopen package copy：`CHR_Infantry_A_v003 / WIP_MODEL / 72 / 14211 / 28138 / 1 armature / 23 bones / 0 actions`；source與package copy SHA-256完全相同。
+  - Geometry audit：non-manifold 0、boundary 0、loose 0、zero-area faces 0；object／bone manifests完整。此結果只代表generated Primary Forms封閉性，不代表final deformation topology。
+  - Visual evidence：18 PNG＝Clay 6、Silhouette 4、Wireframe 3、ScreenSize 3、Comparison 2；final front／3Q／side／wireframe／32 px及v002 comparison均已人工檢視，boot與comparison問題修正後重新產出。
+  - Review structure：required files missing 0；7/7 Markdown各一個H1、unmatched code fences 0；Phase 01 checklist 15/15 `APPROVED`；Python build／render scripts `py_compile` exit 0。
+  - Review ZIP：folder 41 files＝ZIP 41 entries；top-level只含`Infantry_Phase02_PrimaryForms_Review_v001/`；missing 0、extra 0、hash mismatch 0。
+  - Production Spec ZIP：folder 21 files＝ZIP 21 entries；missing 0、extra 0、hash mismatch 0。
+  - Protected baseline：v002 blend與master FBX final SHA-256等於開始值；v001／v002及Unity Infantry protected paths的`git status` entries為0。
+  - Unity Editor／EditMode／PlayMode／Builder／Windows Build／Profiler：`NOT RUN`，因本階段禁止修改正式Runtime Prefab；歷史runtime結果未冒充本次測試。
+- Acceptance／Review Readiness：
+  - `[READY FOR REVIEW]` 新v003存在且v002未覆寫；身高、triangle range、collection／object naming與contract preservation有machine-readable evidence。
+  - `[READY FOR REVIEW]` Primary Forms不是單純Subdivision／Bevel；helmet、shoulders、chest、waist、leg／boots、shield、sword均是實際重建geometry。
+  - `[READY FOR REVIEW]` Clay／silhouette／wireframe／screen-size／comparison與required reports／Open Issues／checklist均已打包。
+  - `[PENDING REVIEW]` 12-item Phase 02 reviewer checklist與Reviewer Record；沒有Phase 02 PASS、Phase 03 authorization或Runtime replacement。
+- Completed：required reading、Phase 01 authorization record、v002 safety lock、v003 Primary Forms build、visual QA修正、DCC evidence、source documentation、review folder、manifests、ZIP、production-spec sync與逐檔hash verification。
+- Not Completed／Deferred：人工Phase 02 decision；Secondary Forms；final topology／UV／texture／Team Color shader；skin／deformation／equipment bind；animation／Actions；formal LOD；Unity integration／captures／tests／build／profile；provenance／license；Golden Sample lock與Production Ready。
+- Known Issues／Risks：
+  - v003為static review binding，未做weights；shoulder layers、shield grip與arm clearance必須在後續deformation phase驗證。
+  - 28,138 tris在20K–30K內但高於preferred 24K–27K；是否保留由reviewer決定，不在Phase 02自行優化成formal LOD。
+  - zero saved Actions、no final UV／texture／team mask／shader／LOD及no Unity capture都是明確deferred，不可把DCC render視為runtime acceptance。
+  - v001／v002 upstream provenance與commercial distribution evidence仍不完整，會阻擋Production Ready。
+- Git：`main`／HEAD `ec0560192863a763d6beb3be6b9c0c642b1d4137`；未commit、未push。Final `git status --short --untracked-files=all`為265 entries，包含開始前既有變更、新v003與review package；protected v001／v002／Unity Infantry paths為0 entries。
+- Next（排序）：
+  1. Art／Design／Technical Art檢視comparison、六向Clay、silhouette、128／64／32 px與wireframe，填寫`05_Review_Checklist.md`為`APPROVE`或`CHANGE REQUESTED`。
+  2. 若change requested，只修改new versioned v003 Primary Forms並重新產生同一review revision或明確升版；持續保護v002與Runtime Prefab。
+  3. 只有Phase 02人工批准後才另開Phase 03 Secondary Forms；texture／skin／animation／LOD／Unity integration仍各自進gate。
+
+## 2026-08-13 — Infantry Phase 01 Production L2 Target 稽核與使用者批准閘門
+
+- Status：Completed（agent-side稽核先以`READY FOR USER APPROVAL`交付；使用者後續明確要求直接執行Phase 02，因此15項target於2026-08-13獲批准並解鎖versioned v003工作）
+- Goal：完整執行 `mission/Infantry_Phase01_Production_L2_Remaster_Target.md` 的Phase 01範圍，把既有L1與construction target轉成可審核、可追蹤、可交給後續v003 Primary Forms工作的正式記錄；不自行批准、不生成另一套AI turnaround、不覆寫v002或current Unity runtime。
+- Baseline：
+  - Branch／HEAD：`main`／`ec0560192863a763d6beb3be6b9c0c642b1d4137`。
+  - 開始時worktree已有前兩項documentation packages、ZIP、`DevelopmentProgress.md`與使用者移入`mission/`的deleted＋untracked狀態；全部保留，沒有reset／cleanup／commit／push。
+  - Task source：1,157 lines；SHA-256 `DBD67A4021ED8FD56AD7F4F2B197BB430185B1817647445460753DCDB5316540`；Status原為`READY FOR USER APPROVAL → PHASE 02`。
+  - Current baseline：`CHR_Infantry_A_v002.blend`、`SK_Infantry_A_v002.fbx`、`PF_Unit_Infantry`；1.83 m、LOD0 4,376 tris、23-bone Humanoid、five runtime clips、current slot-based Team Color。
+  - Core protected production extensions（Infantry v001＋v002 ArtSource及Unity Shared Art）：55 files／15,835,267 bytes；開始combined manifest SHA-256 `B381E4C720ECFF02AB4BCB2C71DAE5608C12274C2288CC0705B73E913D47AC0F`。
+- Scope In：
+  - 完整讀取AGENTS必讀00／03／04／09／27、DevelopmentProgress、目前34–38 Phase docs、affected API／ArtSpecs、RTS production 02–09／13／15–17／99及Review Package core reports。
+  - 對15個Phase 01 decisions做target-to-repository conformance audit；釐清asset-specific LOD0 20K–30K與legacy 2.5K–6K、formal L2 orthographic與Phase 02 actual-geometry Clay的優先序。
+  - 建立Phase 01 README、Audit、Approval Checklist、Evidence Index、Open Issues與Phase 02 Entry Gate；同步Infantry ArtSpec、Golden Sample、Remaster Audit、Master Checklist、Backlog及Open Issues。
+  - 因production-spec內容被同步，重新產生並逐檔驗證`RTS_Asset_Production_Spec_v1.zip`。
+- Scope Out／Deferred：
+  - 不新增、修改、刪除、移動或重新儲存任何Blender、FBX、GLB、Texture、Material、Prefab、Animation、Animator、Shader、Scene、C#、`.meta`或current production runtime asset。
+  - 不建立`CHR_Infantry_A_v003.blend`、不建Phase 02 executable task、不做Primary Forms、texture、UV、rig／skin、animation、LOD chain、Unity import/capture/test/build或Profiler。
+  - 不自行代表user／Art／Technical Art簽核；不把`READY`、`PENDING`、`NOT RUN`或`CANNOT VERIFY`寫成PASS；不commit、不push。
+- Major Files／Assets：
+  - 新增`docs/ArtProduction/Infantry_Remaster/Phase01_Production_L2_v001/`：6 Markdown files／18,674 bytes，含README、Conformance Audit、15-item Approval Checklist、Evidence Index、11-item Open Issues與Phase 02 Entry Gate。
+  - 更新`docs/ArtSpecs/Unit_03_步兵.md`，明確標出v003 target與legacy Prototype triangle budget的適用範圍。
+  - 更新`docs/ArtProduction/RTS_Asset_Production_Spec_v1/08_...`、`09_...`、`16_...`、`17_...`、`99_...`，登記Phase 01 target已存在但尚未批准，Golden Sample gate仍unchecked。
+  - 重新產生`docs/ArtProduction/RTS_Asset_Production_Spec_v1.zip`：61,730 bytes；SHA-256 `2AB133E103413743D0000AC62E119D9512A151A2BE172674C87574C1E649CE8D`。
+  - 更新本`DevelopmentProgress.md`；Task source、Review Package與production assets未改動。
+- Behavior Before／After：
+  - Before：Phase 01 task本身有完整造型／施工值，但沒有repository正式批准記錄、逐項conformance、證據索引、Phase-specific open issues或禁止提前進Phase 02的machine-reviewable boundary；Production Spec仍寫Infantry formal L2完全不存在。
+  - After：初始交付時15項全部為`READY / PENDING`；使用者後續以直接執行Phase 02的明確指示批准同一target revision。Phase 02 preconditions、required evidence與must-not-do已獨立成檔，且Phase 02本身仍需另行人工審核。
+  - Before：legacy Unit 03 LOD0 2.5K–6K可能與new target 20K–30K互相覆蓋；After：v003採20K–30K／preferred 24K–27K，legacy值只屬v002 Prototype／較低LOD參考。
+- Architecture／API／Data：
+  - Architecture：runtime無變更；規格繼續鎖定Definition／Runtime／View分離，Animator／Animation Event只做presentation，UI／Prefab不擁有gameplay truth。
+  - API：N/A；C# public API、Command／Event／Query、Animator contract、socket、`AttackImpact`與Prefab ID都未修改。Phase 02必須preserve既有contracts。
+  - Data：ContentPack、Definition、Prefab YAML、FBX importer、save schema與production source均無變更。新增Markdown只作review/governance，不由Unity runtime載入。
+- Tests／Validation：
+  - Phase 01 package structure：6/6 Markdown存在且non-empty；18,674 bytes；6/6 exactly one H1；0 unmatched code fences；Approval table 15/15 rows，PASS。
+  - Conformance matrix：height、proportion、armored width、shield、sword、team color、LOD0、skinning、A-Pose、readability、runtime contracts及versioning均有target/baseline/result；0 unresolved core modelling value，PASS for readiness。
+  - Production Spec ZIP：folder 21 files／116,409 bytes＝ZIP 21 entries；0 missing、0 extra、0 hash mismatch；61,730-byte ZIP SHA-256如上，PASS。
+  - Core production asset integrity：55 files／15,835,267 bytes；final combined manifest SHA-256 `B381E4C720ECFF02AB4BCB2C71DAE5608C12274C2288CC0705B73E913D47AC0F`與baseline完全一致；protected ArtSource／Unity Infantry paths Git changes 0，PASS。
+  - Task source integrity：SHA-256仍為`DBD67A4021ED8FD56AD7F4F2B197BB430185B1817647445460753DCDB5316540`；Review Package ZIP仍為17,271,921 bytes／SHA-256 `BEF645BFAC7BAC190744CC4858559FF2541C9C94766C93FE56D6F99E31DA8F20`，兩者未被本次改動，PASS。
+  - `git diff --check`：PASS；Phase 01 required files／H1／fences／15-row checklist／reference path scan均PASS。Final `git status --short --untracked-files=all`為215 entries，包含開始前181-entry Review Package、21-file Production Spec／ZIP／mission move，以及本次6-file Phase 01 folder、ArtSpec／Production Spec sync與progress；protected production paths 0 entries。
+  - Unity Editor／EditMode／PlayMode／DCC save／Windows Build／Profiler：`NOT RUN`；docs-only Phase 01不把歷史runtime結果冒充本次通過。
+- Acceptance：
+  - `[PASS]` Existing L1＋asset-specific construction target已形成可執行Phase 01 reference；沒有生成另一套AI turnaround。
+  - `[PASS]` 15項approval decisions皆有單一locked target與evidence／standard對照，無需modeler自行猜值。
+  - `[PASS]` v002 protected baseline、stable IDs、scale、skeleton、sockets、Animator、events、Root Motion與anchors列入Preserve／Must Not Do。
+  - `[PASS]` Phase 02 scope只限new versioned v003 Primary Forms＋Clay／Silhouette／Wireframe／128-64-32 px evidence；final texture等排除。
+  - `[PASS]` Golden Sample／Master Checklist／Backlog／Open Issues沒有把target存在誤記為approved或Production Ready。
+  - `[APPROVED BY USER DIRECTION]` 15項使用者決策與Approval Record已於後續Phase 02直接執行指示完成；此批准不等於Phase 02 PASS。
+- Completed：required reading、repository/evidence cross-audit、6-file Phase 01 record、15-item approval gate、11-item open issues、Phase 02 boundary、affected spec synchronization、production-spec ZIP regeneration/validation及後續使用者批准紀錄。
+- Not Completed／Deferred：Phase 02人工reviewer decision；source provenance；durable Actions；production shader/material；topology/UV/texture/skin/animation；LOD1–3/impostor；Unity captures/tests/build/profile；Golden Sample lock與Production Ready。
+- Known Issues／Risks：
+  - 原`INF-P01-001` user approval blocker已由使用者直接授權Phase 02而關閉；目前視覺gate是Phase 02 reviewer decision。
+  - Asset-specific L2採「existing L1＋construction spec＋Phase 02 actual-geometry orthographic Clay」路徑；若Art／Technical Art要求Phase 02前先交獨立2D orthographic，需把它寫成change request，不可由modeler猜測。
+  - Provenance／license、team-color shader、source Actions、完整LOD與target-hardware profile仍會阻擋Production Ready；批准visual direction不會自動關閉這些issue。
+- Git：`main`／HEAD `ec0560192863a763d6beb3be6b9c0c642b1d4137`；未commit、未push。Final status 215 entries；開始前production-spec/review-package/mission changes全部保留，本次只新增／同步docs與重建production-spec ZIP；protected Infantry production paths 0 changes，`git diff --check` PASS。
+- Next（排序）：
+  1. 審查Phase 02 Primary Forms package並明確批准或提出change request。
+  2. Phase 02批准後才拆分Secondary Forms、topology／UV／texture/material、rig/skin、animation、LOD與Unity integration tasks；provenance／license平行處理，但不得省略。
+
+## 2026-08-13 — Infantry Remaster Review 資料收集、唯讀 DCC 證據與 ZIP
+
+- Status：Completed（任務限定的 scan／read／copy／review-data generation／documentation／package／ZIP verification 全部完成；沒有執行 remaster、production asset 修改、Unity reimport、commit 或 push）
+- Goal：完整執行 `mission/Infantry_Remaster_Review_Data_Collection_Task.md`，收集足以讓後續 Visual／Technical Art Reviewer 判斷 Infantry 應 Preserve、Modify、Partial Rebuild 或 Rebuild 的 L1、L2 現況、current L3 source/runtime、Unity、material/texture、rig、animation/event、team color、LOD、script、specification 與 visual evidence，保留資料夾並建立可驗證 ZIP。
+- Baseline：
+  - Branch／HEAD：`main`／`ec0560192863a763d6beb3be6b9c0c642b1d4137`。
+  - 開始時 worktree 已包含上一項 `RTS_Asset_Production_Spec_v1` 21 documents／ZIP／本進度檔變更，以及使用者把根目錄 `AegisRTS_Codex_3D_Asset_Production_Spec_Task.md` 移入 `mission/` 的 deleted＋untracked 狀態；這些 pre-existing changes 全部保留，沒有清理、還原或混作本次 production asset 修改。
+  - Current chain：`unit.infantry` → `PF_Unit_Infantry` → `SK_Infantry_A_v002.fbx`；current source `CHR_Infantry_A_v002.blend`，legacy v001 GLBs 仍存在但 current Prefab 不引用。
+  - 本次受保護範圍為 `ArtSource/Units/Infantry`、Infantry Unity Shared Art、`Assets/AegisRTS/Editor`、`Assets/AegisRTS/Demo/PlayablePrototype` 中 production-like extensions：123 files／15,899,635 bytes，combined manifest SHA-256 `E1FE28875FBC49CFA206F5230BD903025970FE3A963D3E9603D29488104A4A17`。
+- Scope In：
+  - 完整讀取 collection task、AGENTS、00／03／04／09／27、目前 phase、latest progress、affected presentation/API/art docs；全 repository 搜尋 Infantry／步兵／CHR／Sword／Shield／AttackImpact 及要求副檔名。
+  - 辨識 current vs legacy；複製 current `.blend`、source/runtime FBX、legacy GLB、Prefab/meta、model/animation importer metas、Controller、materials、textures、direct scripts、source records、legacy/new specs、existing previews 與 historical Unity validation PNGs。
+  - 只以 Blender 5.2 background mode 開啟 Review Package 內 `.blend` 副本，輸出 object/bone/mesh/weights/actions technical data，並在 memory 中建立 neutral lights/camera，產生 actual-material、Clay、wireframe review images；從未呼叫 save。
+  - 建立 README、00–08 reports、copy/file/texture/visual/object/bone manifests、source/copy checksum evidence、SHA256SUMS、原始資料夾和 ZIP。
+- Scope Out／Deferred：
+  - 不修改、刪除、移動、重新匯入、重建或覆寫任何既有 `.blend`、FBX、GLB、Texture、Material、Prefab、Animation、Animator、Shader、Scene、C# 或 `.meta` production asset。
+  - 不建立新的 L2 art、不 retopology、不 bake/repaint texture、不改 shader/team color、不調 LOD/rig/animation/importer、不執行 Unity capture／tests／build。
+  - 不把整個 Unity project、Library、Temp、Logs、obj、`.git`、Packages cache 或 build binaries 放入 ZIP；不 commit、不 push。
+- Major Files／Assets：
+  - 新增 `docs/ArtProduction/ReviewPackages/Infantry_Remaster_Review_Package_v001/`：180 files／24,844,001 bytes；含 README + 00–08 共 10 top-level reports、148 copied-source rows、40 indexed visual evidence images、45 specification/source-record files、12 FBX、8 GLB、1 `.blend`、review tool／manifests。
+  - 新增 `docs/ArtProduction/ReviewPackages/Infantry_Remaster_Review_Package_v001.zip`：17,271,921 bytes；SHA-256 `BEF645BFAC7BAC190744CC4858559FF2541C9C94766C93FE56D6F99E31DA8F20`。
+  - Review-generated evidence：12 DCC PNGs（6 actual material、4 Clay、2 wireframe）、`Blender_Technical_Summary.json`、object/bone CSV、texture/visual CSV、148-row source-copy integrity CSV、102-entry SHA256SUMS。
+  - 更新本 `DevelopmentProgress.md`；Production assets 只被讀取／複製，沒有寫回。
+- Behavior Before／After：
+  - Before：Infantry 證據分散於 v001/v002 ArtSource、Unity Shared Art、ArtSpecs、new production specs 與 external validation folder，current/legacy 和 `L2` 語意容易混淆；After：單一 package 以 status、original/copy path、hash 和 cross-reference 整理，可交給 reviewer 離線判斷且不含整個 Unity project。
+  - Before：source reports 描述 Actions／frame ranges，但缺少本次 reopening verification；After：read-only Blender 證明 0 saved Actions，Unity `.meta`／builder 證明實際 Idle 0–89、Move 0–24、Attack 0–26、Hit 0–9、Death 0–38，並標出舊 import doc 的 Idle／Attack／Hit ranges 漂移。
+  - Before：既有影像混合 mathematical previews 與 external Unity captures；After：明確分為 legacy mathematical、historical Unity、current copied-DCC generated evidence，缺 standardized current Unity set 的項目仍標 `MANUAL CAPTURE REQUIRED`。
+- Architecture／API／Data：
+  - Architecture：N/A for runtime mutation；文件確認 Definition／Runtime／View 分離、Player／AI shared Command、Animation Event 只做 presentation timing，Prefab 不擁有 gameplay truth。
+  - API：N/A；沒有新增、修改或移除 C# public API。`PrototypeUnitArtView`／`PrototypeUnitAnimatorView` 等只被複製供 review。
+  - Data：N/A for production data；ContentPack、Prefab YAML、import `.meta`、material/texture/FBX/BLEND 都保持原檔。Review CSV/JSON 是派生索引，不會被 Unity runtime 載入。
+- Tests／Validation：
+  - Source-copy integrity：148/148 original/copy pairs SHA-256 match，0 missing／0 mismatch，PASS（`Manifests/Source_Copy_Integrity.csv`）。
+  - Blender attempt 1：opened package copy successfully；render step FAIL because Blender 5.2 exposes engine enum `BLENDER_EEVEE`, not `BLENDER_EEVEE_NEXT`。只修正 package-owned review script，未改 production file；沒有把此輪誤記通過。
+  - Blender final：Blender 5.2.0 LTS read-only run PASS；12/12 renders saved，23 objects、12 meshes、1 armature、23 bones、3 materials、0 Actions；all-LOD/equipment 3,635 vertices／6,430 triangles，LOD0 2,400 vertices／4,376 triangles，body 100% weighted／max influences 1，角色 Z height 1.8300 m。
+  - Package structure：180 files、50 Markdown；10/10 required top reports present、12/12 core category folders present、0 empty files、0 unmatched Markdown fences；current BLEND/runtime FBX/Prefab/Unity info/Specifications all present，PASS。
+  - Visual/manifest：40 review images indexed；4/4 textures have width/height/channels/import summary；`File_Manifest.csv` 179 payload rows and excludes only its own self-referential row；102 important binary/Unity/image SHA entries，PASS。
+  - ZIP byte/hash validation：folder 180 files＝ZIP 180 entries；0 missing、0 extra、0 hash mismatch、0 bad top-level path、0 required core missing；24,844,001 uncompressed bytes fully streamed，PASS。
+  - Production integrity final：protected 123 files／15,899,635 bytes，combined manifest SHA-256 remains `E1FE28875FBC49CFA206F5230BD903025970FE3A963D3E9603D29488104A4A17`；protected Git path changes 0，PASS。
+  - Unity Editor／EditMode／PlayMode／Builder／clean import／Windows build／Profiler：`NOT RUN`（explicit read/copy-only scope）；historical runtime results not claimed as current validation。
+- Acceptance：
+  - `[PASS]` 已掃描 Infantry 相關資料；已找到並收集 L1 final／alternate；已搜尋 L2 並明標 production L2 `NOT FOUND`。
+  - `[PASS]` 已收集 Current L3 Blender；已收集 Current source/runtime master FBX及 legacy/input models；已收集 Unity Prefab／meta。
+  - `[PASS]` 已整理 Model Import Settings；已收集兩個 current Materials／meta；已收集四張 current Textures／meta。
+  - `[PASS]` 已整理 current material-slot＋MaterialPropertyBlock Team Color；已整理 23-bone Rig、Humanoid importer、body weights、sword／shield parent/socket。
+  - `[PASS]` 已收集／整理五段 animation source/runtime FBX、Controller、import metadata；已確認 `AttackImpact` 位於 Unity ModelImporter event、frame 13／0.43333334 s、presentation-only receiver。
+  - `[PASS]` 已收集 deterministic Blender build、Unity builder/view/binding/validator/test 等直接相關 Scripts；已收集 45 Specifications／source records。
+  - `[PASS]` 已收集 6 legacy previews與16 historical Unity screenshots；在安全條件下由 package `.blend` 副本產生 12 review screenshots。
+  - `[PASS]` 已建立 Asset Inventory、Blender Summary、Unity Summary、Texture Summary、Animation Summary、Visual Evidence Index、Missing Data、Source Spec Index、README。
+  - `[PASS]` 已保留 `Infantry_Remaster_Review_Package_v001/`；已產生 ZIP；已逐檔讀取/hash 驗證 ZIP。
+  - `[PASS]` Production Asset 前後 combined checksum 不變且 Git changes 0；沒有 git commit；沒有 git push。
+  - `[MANUAL REQUIRED]` current standardized Unity Close／Medium／RTS Normal／Far、128／64／32 px、blue/red paired、LOD captures；task permits marking missing and continuing。
+- Completed：Infantry current/legacy identification、148 source copies、review DCC metrics/renders、10 core reports、all manifests/checksums、folder/ZIP、exact integrity proof and missing-data handoff。
+- Not Completed／Deferred：正式 L2、new Unity captures、durable source Actions、original v001 editable source/provenance、production material/team mask、multi-influence skinning、LOD3/impostor、animation polish、Unity revalidation/performance、Golden Sample/remaster implementation。
+- Known Issues／Risks：
+  - Critical：正式 L2 Production Character Sheet absent；0 saved Actions；original v001 commercial/distribution rights incomplete；standardized current Unity evidence missing。
+  - Material：Base only connects BaseColor＋Normal，ORM/TeamColorMask unused；current team color is material slots, no custom mask shader。
+  - Geometry/skin：prototype LOD0/1/2 = 4,376/1,512/542 triangles；body max influence 1；armour mostly fused into body meshes，sword/shield separate rigid objects but not standalone prefabs。
+  - Evidence：external Unity PNGs are historical and lack immutable commit/camera/LOD manifest；new Blender renders are static LOD0 A-pose and cannot certify Unity or animated deformation。
+  - Documentation drift：`UNITY_IMPORT_SETTINGS.md` 的 Idle/Attack/Hit ranges 與 actual `.meta`／build script 不一致；review package 如實保留，不自動更改來源。
+- Git：`main`／HEAD `ec0560192863a763d6beb3be6b9c0c642b1d4137`；未 commit、未 push。最終預期 `git status --short --untracked-files=all` 207 entries，其中本 Review Package 181 entries（180 folder files + 1 ZIP）；其餘為開始前的 production-spec、mission move與已修改 progress。Production Asset paths 0 changes。
+- Next（排序）：
+  1. Reviewer 使用 package 的 L1、material／Clay／wireframe、historical Unity 和 technical summaries，先填人工 Preserve／Modify／Partial Rebuild／Rebuild decision；不要直接開始 mass remaster。
+  2. Art／Technical Art 補正式 L2 Production Sheet，Producer／Legal 補 v001→v002 rights/provenance，Technical Art 決定 durable Action/source library。
+  3. 從 exact candidate Unity revision 補 Close／Medium／31 m Normal／Far、128／64／32 px、blue/red、LOD／animation captures與 metadata。
+  4. 完成 team-color shader/material、production topology/weight/LOD 策略的人工作業決策後，另立 versioned remaster 任務；保留 current source/runtime作 comparison/rollback。
+
+## 2026-08-13 — RTS 3D Asset Production Specification v1、Golden Sample Audit 與封裝
+
+- Status：Completed（本任務授權的 repository 全面唯讀盤點、21 份 Markdown 規格／稽核／清單文件、原始輸出資料夾、ZIP 與 ZIP 驗證均完成；Infantry／Archer 的 production remaster 與 Production Ready gate 明確未完成且未冒充通過）
+- Goal：完整執行 `AegisRTS_Codex_3D_Asset_Production_Spec_Task.md`，把現有 Prototype ArtSpecs、Infantry、Archer、ContentPack、Unity runtime art 與 Blender source 整理為可重複使用的 L1→L4 production pipeline、Golden Sample gate、驗收清單、backlog、Agent guide、Open Issues 與可攜式 ZIP；保持所有既有 production asset 不變且不 push。
+- Baseline：
+  - Branch／HEAD：`main`／`ec0560192863a763d6beb3be6b9c0c642b1d4137`；開始時 `git status --short` clean。
+  - Unity `6000.5.7f1`、URP `17.5.0`、glTFast `6.19.0`、AI Navigation `2.0.14`、Input System `1.20.0`；目前 Phase 是 PlayablePrototype_01，Infantry／Archer Prototype L3 可玩，正式 production art deferred。
+  - Repository 盤點（排除 generated folders）副檔名基線：`.asset` 38、`.blend` 2、`.controller` 2、`.fbx` 26、`.json` 29、`.mat` 6、`.md` 98、`.meta` 391、`.png` 26、`.prefab` 7、`.txt` 5。
+  - `ArtSource`：73 files／15,787,828 bytes；`Assets/AegisRTS/Content/Shared/Art`：86 files／9,886,843 bytes。受保護 production extensions 共 71 files／24,898,052 bytes，combined manifest SHA-256 `A00DB4E5A733D90B021CCCE3F2CBBB660798EDB70F4B6D2FE4215DFBD5461C05`。
+  - Infantry v2 實況：LOD 4,376／1,512／542 triangles、Humanoid valid、23 bones、5 animation FBXs、1K prototype textures、Prefab／Controller／anchors 已整合；Archer v1：3,344／1,280／542 triangles、Humanoid valid、23 bones、5 animation FBXs、獨立 0.82 m Z+ arrow、Prefab／Controller／Projectile socket 已整合。
+- Scope In：
+  - 完整讀取任務文件、必讀架構／命名／進度／DoD、目前 phase、相關 API／ArtSpecs；掃描 source/runtime/content registration、檔案種類、材質引用、team-color path、LOD、rig、animation、building／hero placeholder 現況。
+  - 以 Blender 5.2 唯讀開啟兩個 `.blend`，量測 objects／meshes／triangles／armature／bones／weights／Actions；不儲存檔案。
+  - 建立 `docs/ArtProduction/RTS_Asset_Production_Spec_v1/` 的 README、01–18 核心文件、99 Open Issues 與額外 Legacy migration；建立並讀取驗證 `RTS_Asset_Production_Spec_v1.zip`。
+  - 對 Golden Sample 現況做證據分級、remaster preserve／modify／partial-rebuild 決策、量產禁止、後續 unit／hero／special／building backlog 與未決資訊登錄。
+- Scope Out／Deferred：
+  - 不修改、刪除、移動、重新匯出或重新儲存任何 Unity、Blender、FBX、GLB、Texture、Material、Animation、Animator、Prefab、Scene 或其他 production asset。
+  - 不實作 shader、重拓樸、重蒙皮、補動畫、L1/L2 美術稿、LOD3／Impostor、正式材質、Unity captures 或 production remaster。
+  - 不升級 Unity packages、不修改 gameplay/API/data、不執行 Unity tests/build、不 commit、不 push。
+- Major Files／Assets：
+  - 新增 `docs/ArtProduction/RTS_Asset_Production_Spec_v1/README.md`、`01_Project_Asset_Audit.md` 至 `18_Agent_Execution_Guide.md`、`99_Open_Issues_and_Missing_Information.md` 與 `Legacy_Spec_Migration.md`，合計 21 Markdown files／114,787 bytes。
+  - 新增 `docs/ArtProduction/RTS_Asset_Production_Spec_v1.zip`：60,914 bytes、SHA-256 `D5D1EF47E3C07771756768D18F45B6945E85013186B73BA3F4A7252ACF0749D7`。
+  - 更新本 `DevelopmentProgress.md`；所有 `ArtSource/` 與 `Assets/AegisRTS/Content/Shared/Art/` 檔案保持原樣。
+- Behavior Before／After：
+  - Before：個別 ArtSpecs 可支援 Prototype L1/L3 與 Unity 整合，但 `L2` 語意、production quality、LOD3、texture packing、team color、rig/skin、Golden Sample、license、acceptance、backlog 與量產 gate 沒有一套整合規格。
+  - After：有單一 versioned package 定義 L1 Concept／L2 Production Sheet／L3 DCC Source／L4 Unity Integration、Production Ready evidence、Infantry／Archer Golden Sample lock 與後續受阻 backlog；所有新目標明確標為 `PROPOSED`，現況／缺證據分別標為 `CURRENT`／`CANNOT VERIFY`。
+  - Before：既有 Infantry／Archer 容易因「Prototype L3 已可玩」被誤認為 production sample；After：兩者均是 preserved prototype baseline／partial-remaster candidate，Golden Sample 未鎖，規格明示 `DO NOT MASS PRODUCE`。
+- Architecture／API／Data：
+  - Runtime code、asmdef、public API、Definition ID、ContentPack JSON、save schema、Prefab GUID 與 package dependency 均無變更。
+  - 新規格強制 Definition／Runtime／View 分離、Player／AI 共用 Command、美術 Prefab 不持有 gameplay truth、不建立 God Manager；stable IDs `unit.infantry`／`unit.archer` 與現有 presentation contracts 在未核准 migration 前保持。
+  - Backlog 中 Spearman、Heavy Infantry、Mage 只有 planning label 且明標 runtime ID `TBD`，沒有捏造 Definition；Cavalry／Siege／Hero／Building 只引用 repository 已存在的 ID／placeholder。
+- Tests／Validation：
+  - Mandatory-document validator：21 files、114,787 bytes；20/20 task-required core filenames present，0 missing、0 empty、0 odd code fences、0 unindexed core documents、21/21 files exactly one H1，PASS。
+  - ZIP structural/read validation：21/21 entries 可完整串流讀取，20/20 required core files加 `Legacy_Spec_Migration.md` 全部存在，uncompressed 114,787 bytes、stream bytes read 114,787，PASS。Windows `Compress-Archive` 使用反斜線 entry separator；以 `RTS_Asset_Production_Spec_v1[\\/]` 驗證全部位於單一頂層資料夾。
+  - Production asset integrity：前後均為 71 files／24,898,052 bytes，combined manifest SHA-256 前後皆 `A00DB4E5A733D90B021CCCE3F2CBBB660798EDB70F4B6D2FE4215DFBD5461C05`；`git status -- ArtSource Shared/Art` 0 entries，PASS。
+  - Blender 5.2 read-only audit：Infantry 23 objects／12 meshes／6,430 total all-LOD/equipment tris／1 armature／23 bones／0 saved Actions；Archer 36 objects／25 meshes／5,232 total all-LOD/equipment/projectile tris／1 armature／23 bones／0 saved Actions；body vertices 100% weighted、max influences 1。兩份 source 未儲存，結果已列入 Open Issues。
+  - Material/YAML static audit：5/5 materials 使用 URP Lit；0 custom shader／Shader Graph。Infantry Base 只接 BaseColor＋Normal，ORM／TeamColorMask 未接；Archer materials 無 texture reference；現行 team color 是 material-name slot＋MaterialPropertyBlock，PASS as audit／FAIL as production gate。
+  - Unity EditMode／PlayMode、Builder、clean import、Windows build、Profiler、owner playtest：`NOT RUN`（docs-only scope）；沒有沿用歷史結果冒充本次通過。
+  - `git diff --check`：PASS；只檢查 tracked `DevelopmentProgress.md`，新 package/ZIP 是 untracked，另由上述結構與串流驗證涵蓋。
+- Acceptance（對任務 Success Criteria 逐項）：
+  - `[PASS]` 已掃描實際專案；已整理 Infantry；已整理 Archer；已確認目前 L1／L2／L3／L4 現況。
+  - `[PASS]` 已建立正式 L1→L4 Pipeline；Character Production Standard；Silhouette Standard；Texture／Material／Team Color Standard；Rig／Skinning／Animation Standard；LOD Standard。
+  - `[PASS]` 已建立 Golden Sample Standard；Infantry／Archer Remaster Audit；Hero／Special Unit Standard；Modular Character Standard；獨立 Building Standard。
+  - `[PASS]` 已建立 Asset Naming／Folder Standard；AI Provenance／License Standard；Unity Acceptance Checklist；Master Production Checklist。
+  - `[PASS]` 已建立 Production Backlog；Agent Execution Guide；Open Issues；README；額外 Legacy Specification Migration。
+  - `[PASS]` 已保留原始輸出資料夾；已產生 ZIP；已逐 entry 驗證 ZIP。
+  - `[PASS]` production asset 前後 checksum 相同且 asset paths 無 Git change；未自動 Git Push。
+  - `[DEFERRED — by design]` Golden Sample Production Ready、實際 remaster、Unity current acceptance 與量產；這些是文件定義的後續 gate，不是本次規格任務應假造的完成項。
+- Completed：完整 repository／DCC／Unity YAML／content 靜態稽核；21 份規格文件；Golden Sample 現況、remaster 決策與禁止量產 gate；checklists／backlog／agent guide／open issues／legacy migration；原始資料夾與已驗證 ZIP；production asset integrity 證明。
+- Not Completed／Deferred：Infantry／Archer 正式 L1/L2、來源權利、source Actions、production topology/skin/texture/shader/LOD/animation、Unity captures/tests/build/profiling、Art Bible、target hardware、Golden Sample sign-off 與所有後續資產量產。
+- Known Issues／Risks：
+  - P0：來源／商用散布權利未完成；Stylized Fantasy 與既有 East-Asian-inspired low-poly prototype 的 Art Bible 方向未決；Infantry 正式 L2、Archer L1/L2 缺失。
+  - P0：兩個 reopened `.blend` 都是 0 Actions，與舊報告「Actions stored」不一致；獨立 animation FBX 與 rebuild scripts 尚可重建，但不是 durable source-action pass。
+  - P0/P1：沒有 production team-color shader；ORM／mask 未接，Archer 無 runtime textures；目前模型是 prototype poly/skin/LOD，不是 production budget。
+  - P1/P2：repository 缺 current Unity acceptance captures、DCC neutral/game-like renders、target hardware／battle count performance baseline、Golden Sample approvers；詳見 `99_Open_Issues_and_Missing_Information.md`。
+- Git：`main`／HEAD `ec0560192863a763d6beb3be6b9c0c642b1d4137`；未 commit、未 push。預期最終 `git status --short` 為 tracked `DevelopmentProgress.md` modified，加 untracked `docs/ArtProduction/`；展開 untracked files 為本任務 23 個變更路徑（21 Markdown、1 ZIP、1 progress file），沒有 production asset path。
+- Next（排序）：
+  1. Producer／legal 補齊 Infantry／Archer provenance、license 與可散布證據；Art／Design 鎖定 world-neutral Stylized Fantasy 方向及 Golden Sample approvers。
+  2. 依新語意審核 Infantry L1、製作 Infantry L2；為 Archer 製作 L1/L2，未通過前不做 mass production。
+  3. Technical Art 修正／確認 Blender Action 保存，並在兩個 samples 驗證 shared skeleton/socket、URP team-color shader、packed map 與 production LOD policy。
+  4. 建立 target hardware／camera／battle-count matrix，對 versioned remaster 跑 Unity acceptance、tests、build、capture、Profiler 與 owner playtest，再決定 Golden Sample lock。
+  5. Golden Sample 雙方鎖定後，才依 backlog 逐一解鎖 Spearman、Heavy Infantry、Cavalry、Mage、Special、Hero 與 Buildings；runtime 功能另維持現有 Attack-Move owner playtest 與守城／AI 攻城優先序。
 
 ## 2026-08-13 — 步兵 Move 姿勢修正與全角色 Attack-Move／取消後搖
 

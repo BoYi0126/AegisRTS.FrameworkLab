@@ -1,0 +1,243 @@
+{
+  "blender_version": "5.2.0 LTS",
+  "opened_file": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\docs\\ArtProduction\\ReviewPackages\\Infantry_Remaster_Review_Package_v001\\L3_Source\\CHR_Infantry_A_v002.blend",
+  "saved_by_script": false,
+  "objects": 23,
+  "meshes": 12,
+  "armatures": 1,
+  "materials": 3,
+  "actions": 0,
+  "bones": 23,
+  "all_mesh_totals": {
+    "vertices": 3635,
+    "triangles": 6430,
+    "unweighted_vertices": 285,
+    "max_influences": 1
+  },
+  "lod0_review_totals": {
+    "vertices": 2400,
+    "triangles": 4376,
+    "mesh_count": 4
+  },
+  "lod0_review_objects": [
+    "SK_Infantry_A_LOD0_Team",
+    "SM_Infantry_Shield_LOD0",
+    "SM_Infantry_Sword_LOD0",
+    "SK_Infantry_A_LOD0_Base"
+  ],
+  "character_bounds_m": {
+    "min": [
+      -0.9898179769515991,
+      -0.29499998688697815,
+      0.0
+    ],
+    "max": [
+      1.4117889404296875,
+      0.20499999821186066,
+      1.8300145864486694
+    ],
+    "dimensions": [
+      2.401607036590576,
+      0.5,
+      1.8300145864486694
+    ],
+    "height_z": 1.8300145864486694
+  },
+  "armature_names": [
+    "Armature"
+  ],
+  "material_names": [
+    "MAT_Infantry_Base",
+    "MAT_Infantry_TeamColor",
+    "Material"
+  ],
+  "action_names": [],
+  "external_images": [
+    {
+      "name": "Image_0",
+      "filepath": "",
+      "packed": true
+    },
+    {
+      "name": "Image_0.001",
+      "filepath": "",
+      "packed": true
+    },
+    {
+      "name": "Image_0.002",
+      "filepath": "",
+      "packed": true
+    },
+    {
+      "name": "Image_1",
+      "filepath": "",
+      "packed": true
+    },
+    {
+      "name": "Image_1.001",
+      "filepath": "",
+      "packed": true
+    },
+    {
+      "name": "Image_1.002",
+      "filepath": "",
+      "packed": true
+    },
+    {
+      "name": "T_Infantry_A_BaseColor_1K.png",
+      "filepath": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\docs\\ArtProduction\\ReviewPackages\\Infantry_Remaster_Review_Package_v001\\L3_Source\\..\\Textures\\T_Infantry_A_BaseColor_1K.png",
+      "packed": false
+    },
+    {
+      "name": "T_Infantry_A_TeamColorMask_1K.png",
+      "filepath": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\docs\\ArtProduction\\ReviewPackages\\Infantry_Remaster_Review_Package_v001\\L3_Source\\..\\Textures\\T_Infantry_A_TeamColorMask_1K.png",
+      "packed": false
+    }
+  ],
+  "mesh_details": {
+    "SK_Infantry_A_LOD0_Team": {
+      "vertices": 66,
+      "edges": 168,
+      "polygons": 112,
+      "triangles": 112,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 66,
+      "unweighted_vertices": 0,
+      "max_influences": 1
+    },
+    "SM_Infantry_Shield_LOD0": {
+      "vertices": 58,
+      "edges": 156,
+      "polygons": 104,
+      "triangles": 104,
+      "material_slots": 2,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 0,
+      "unweighted_vertices": 58,
+      "max_influences": 0
+    },
+    "SM_Infantry_Sword_LOD0": {
+      "vertices": 66,
+      "edges": 174,
+      "polygons": 116,
+      "triangles": 116,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 0,
+      "unweighted_vertices": 66,
+      "max_influences": 0
+    },
+    "SK_Infantry_A_LOD0_Base": {
+      "vertices": 2210,
+      "edges": 6066,
+      "polygons": 4044,
+      "triangles": 4044,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 2210,
+      "unweighted_vertices": 0,
+      "max_influences": 1
+    },
+    "SK_Infantry_A_LOD1_Base": {
+      "vertices": 694,
+      "edges": 1842,
+      "polygons": 1228,
+      "triangles": 1228,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 694,
+      "unweighted_vertices": 0,
+      "max_influences": 1
+    },
+    "SK_Infantry_A_LOD1_Team": {
+      "vertices": 54,
+      "edges": 132,
+      "polygons": 88,
+      "triangles": 88,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 54,
+      "unweighted_vertices": 0,
+      "max_influences": 1
+    },
+    "SM_Infantry_Shield_LOD1": {
+      "vertices": 46,
+      "edges": 120,
+      "polygons": 80,
+      "triangles": 80,
+      "material_slots": 2,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 0,
+      "unweighted_vertices": 46,
+      "max_influences": 0
+    },
+    "SM_Infantry_Sword_LOD1": {
+      "vertices": 66,
+      "edges": 174,
+      "polygons": 116,
+      "triangles": 116,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 0,
+      "unweighted_vertices": 66,
+      "max_influences": 0
+    },
+    "SK_Infantry_A_LOD2_Base": {
+      "vertices": 301,
+      "edges": 663,
+      "polygons": 442,
+      "triangles": 442,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 301,
+      "unweighted_vertices": 0,
+      "max_influences": 1
+    },
+    "SK_Infantry_A_LOD2_Team": {
+      "vertices": 25,
+      "edges": 45,
+      "polygons": 30,
+      "triangles": 30,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 25,
+      "unweighted_vertices": 0,
+      "max_influences": 1
+    },
+    "SM_Infantry_Shield_LOD2": {
+      "vertices": 20,
+      "edges": 42,
+      "polygons": 28,
+      "triangles": 28,
+      "material_slots": 2,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 0,
+      "unweighted_vertices": 20,
+      "max_influences": 0
+    },
+    "SM_Infantry_Sword_LOD2": {
+      "vertices": 29,
+      "edges": 63,
+      "polygons": 42,
+      "triangles": 42,
+      "material_slots": 1,
+      "uv_sets": 1,
+      "shape_keys": 0,
+      "weighted_vertices": 0,
+      "unweighted_vertices": 29,
+      "max_influences": 0
+    }
+  }
+}

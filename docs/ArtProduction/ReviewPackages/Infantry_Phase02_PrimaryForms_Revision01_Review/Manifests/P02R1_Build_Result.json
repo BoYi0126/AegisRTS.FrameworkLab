@@ -1,0 +1,65 @@
+{
+  "status": "WIP_MODEL",
+  "review_status": "READY FOR PHASE02 REVISION REVIEW",
+  "asset_id": "unit.infantry",
+  "source_version": "CHR_Infantry_A_v003_P02R1",
+  "blender_version": "5.2.0 LTS",
+  "input_v003_initial": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v003\\Source\\CHR_Infantry_A_v003.blend",
+  "input_v003_initial_sha256": "5F7C799C3B57A64B6E289A38FF2AA6E5509247C547FD4B2DE0EC47FF63AA4DBE",
+  "output_blend": "C:\\projects\\Unity\\AegisRTS.FrameworkLab\\ArtSource\\Units\\Infantry\\CHR_Infantry_A\\v003\\Source\\CHR_Infantry_A_v003_P02R1.blend",
+  "output_blend_sha256": "6569A14825B53393B72306F79BF8B29F9DEA5C0FFAB8E30686E901D61964220F",
+  "bounds_m": {
+    "min": [
+      -0.8899999856948853,
+      -0.28071996569633484,
+      0.0
+    ],
+    "max": [
+      1.0283448696136475,
+      0.19922910630702972,
+      1.8240108489990234
+    ],
+    "height_z": 1.8240108489990234
+  },
+  "mesh_count": 64,
+  "vertices": 12671,
+  "triangles": 25106,
+  "material_count": 6,
+  "armature": "Armature",
+  "bone_count": 23,
+  "empty_socket_anchor_count": 10,
+  "collections": [
+    "CHR_Infantry_A_v003",
+    "GEO_ARMOR",
+    "GEO_BODY",
+    "GEO_WEAPON",
+    "REVIEW",
+    "RIG"
+  ],
+  "topology": {
+    "non_manifold_edges": 0,
+    "boundary_edges": 0,
+    "loose_edges": 0,
+    "zero_area_faces": 0
+  },
+  "primary_forms_changes": [
+    "Continuous stylized head with integrated face planes",
+    "Narrower lower-dome helmet and backward-curved plume",
+    "Upper-arm radial volume reduced 13 percent",
+    "Harder three-layer shoulder plates with stronger outer drop",
+    "Overlapping nested lamellar chest rows and reduced center strap",
+    "Tapered front/rear cloth and overlapping side waist plates",
+    "Planed leg rhythm, two broad spiral wraps, narrower asymmetric boots",
+    "Smaller shield boss, subtle shield bow, less spherical sword pommel"
+  ],
+  "deferred": [
+    "Secondary Forms",
+    "Final UV",
+    "Final Texture",
+    "Final Team Color Mask",
+    "Final Skinning",
+    "Animation Polish",
+    "Final LOD chain",
+    "Unity runtime integration"
+  ]
+}
